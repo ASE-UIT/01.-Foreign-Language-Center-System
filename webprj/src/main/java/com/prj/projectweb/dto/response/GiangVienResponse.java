@@ -14,4 +14,6 @@ public class GiangVienResponse {
     Long id;
     String name;
     LocalDate dob;
+    Integer likes;
+    Integer dislikes;
 }

@@ -13,4 +13,6 @@ import java.time.LocalDate;
 public class GiangVienDTO {
     String name;
     LocalDate dob;
+    Integer likes;
+    Integer dislikes;
 }

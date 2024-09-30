@@ -24,6 +24,8 @@ public class GiangVien {
 
     String name;
     LocalDate dob;
+    Integer likes;
+    Integer dislikes;
 
     // Mối quan hệ OneToMany với Course
     @OneToMany(mappedBy = "giangVien", cascade = CascadeType.ALL, orphanRemoval = true)
