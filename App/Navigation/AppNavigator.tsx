@@ -5,11 +5,13 @@ import WelcomeScreen from '../Screens/WelcomeScreen';
 import LoginScreen from '../Screens/LoginScreen';
 import RegisterScreen from '../Screens/RegisterScreen';
 import RoleScreen from '../Screens/RoleScreen';
+import ScheduleScreen from '../Screens/ScheduleScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
   Login: undefined | userInfo; // set for passing param
   Register: undefined; // add RegisterScreen
+  Schedule: undefined;
   Role: undefined | userInfo; // add RoleScreen
 };
 
@@ -26,6 +28,8 @@ const AppNavigator: React.FC = () => (
 
       {/* add Role Screen*/}
       <Stack.Screen name="Role" component={RoleScreen} />
+      {/* add Schedule Screen*/}
+      <Stack.Screen name="Schedule" component={ScheduleScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

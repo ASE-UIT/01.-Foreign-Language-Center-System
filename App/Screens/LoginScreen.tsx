@@ -17,6 +17,8 @@ const LoginScreen: React.FC = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
+    let indexUser = -1
+
     const route = useRoute<RouteProp<RootStackParamList>>(); // Passing parameters to routes
 
     const keyInfo = route.params?.keyInfo
@@ -46,32 +48,64 @@ const LoginScreen: React.FC = () => {
     }, [route.params?.keyInfo]); // value from component used inside of the function.
 
     const handleLogin = () => {
-        for (let i = 0; i < users.length; i++) {
-            if (email == users[i].keyInfo && password == users[i].password
-                && email.startsWith('ph')) {
-                navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
+       for (let i = 0; i < users.length; i++) {
+            if (email == users[i].keyInfo) {
+                indexUser = i;
             }
-        } // check Parent Role
+        } // find index of account
 
 
-        const validEmail = "abc@gmail.com";
-        const validPassword = "12345678";
-        if (email !== validEmail) {
-            return {
+         //handle Login
+         if (email == '' || pwd == '') {
+            Alert.alert('Bạn cần nhập tài khoản và mật khẩu')
+        }
+        else if (-1 == indexUser) {
+            console.log({
                 code: 1001,
                 message: "email wrong"
-            };
+            })
+            Alert.alert('Tài khoản không tồn tại')
         }
-        if (password !== validPassword) {
-            return {
+        else if (pwd !== users[indexUser].password) {
+            console.log({
                 code: 1001,
                 message: "password wrong"
-            };
+            })
+            Alert.alert('Bạn đã nhập sai mật khẩu')
         }
-        return {
-            code: 1000,
-            message: "login successful"
-        };
+        else {
+            console.log({
+                code: 1000,
+                message: "login successful"
+            })
+            if (email.startsWith('ph', 0)) {
+                navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
+            }
+            else {
+                navigation.navigate('Schedule')
+            }
+
+            setEmail('')
+            setPassword('')
+        }
+        // const validEmail = "abc@gmail.com";
+        // const validPassword = "12345678";
+        // if (email !== validEmail) {
+        //     return {
+        //         code: 1001,
+        //         message: "email wrong"
+        //     };
+        // }
+        // if (password !== validPassword) {
+        //     return {
+        //         code: 1001,
+        //         message: "password wrong"
+        //     };
+        // }
+        // return {
+        //     code: 1000,
+        //     message: "login successful"
+        // };
 
     };
 

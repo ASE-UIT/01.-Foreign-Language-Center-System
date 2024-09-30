@@ -3,8 +3,9 @@ import { Text, View } from "react-native"
 import { Dropdown } from 'react-native-element-dropdown';
 import { styles } from "../Styles/globaStyles";
 import CustomButton from "../Components/CustomButton";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { RootStackParamList } from "../Navigation/AppNavigator";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 
 const data = [
@@ -21,7 +22,7 @@ const data = [
 const RoleScreen: React.FC = () => {
     const [value, setValue] = useState<string>();
     const route = useRoute<RouteProp<RootStackParamList>>(); // Passing parameters to routes
-
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>(); // add navigation
 
     const fullName = route.params?.fullName
 
@@ -60,6 +61,7 @@ const RoleScreen: React.FC = () => {
                 placeholder="Chọn học viên"
                 containerStyle={{ borderRadius: 10 }}
                 itemContainerStyle={{ borderRadius: 10 }}
+                value={value}
                 onChange={item => {
                     setValue(item.keyParent);
                 }}
@@ -70,7 +72,7 @@ const RoleScreen: React.FC = () => {
             <View style={styles.loginButton}>
                 <CustomButton
                     title="Tiếp tục"
-                    onPress={() => alert('chon hoc vien thanh cong')}
+                    onPress={() => navigation.navigate('Schedule')}
                     primary
                 />
             </View>
