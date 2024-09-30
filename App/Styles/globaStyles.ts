@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
 
 export const styles = StyleSheet.create({
   container: {
@@ -135,3 +136,142 @@ export const welcomeStyles = StyleSheet.create({
 
   
 })
+
+export const studenthomeStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '##fcfbfe',
+  },
+  header: {   
+    backgroundColor: '#0000FF',
+    padding: 20,
+    paddingTop: 30,
+    width: '100%',
+    borderRadius: 11,
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  subText: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    marginBottom: 10,
+  },
+  searchInput: {
+    backgroundColor: '#5874e4',
+    borderRadius: 10,
+    padding: 10,
+    color: "#FFFFFF",
+    fontSize: 16,
+    paddingLeft: 40,
+  },
+  filter: {
+    backgroundColor: '#5874e4', 
+    padding: 10, 
+    marginLeft: 10, 
+    borderRadius: 10, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    width: 49,
+    height: 49,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginVertical: 16,
+    paddingLeft: 20,
+  },
+  horizontalItem: {
+    marginRight: 5,
+    width: 230,
+    marginLeft:20,
+    paddingLeft: 20,
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
+  },
+  languageImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 10,
+  },
+  languageText: {
+    fontSize: 16,
+    marginVertical: 8,
+    marginLeft: -10,
+    marginBottom: 60,
+  },
+  bottomInfo: {
+    position: 'absolute',
+    bottom: 2,       
+    left: 10,
+    right: 10,
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+  },
+  instructorText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  priceText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    
+  },
+  oldPriceText: {
+    textDecorationLine: 'line-through',
+    color: '#999',
+    fontSize: 14,
+  },
+  verticalItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 8,
+    paddingLeft: 20,
+  },
+  flagText: {
+    fontSize: 24,
+    marginRight: 16,
+  },
+  courseName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  startDate: {
+    fontSize: 14,
+    color: '#666',
+  },
+  seeAllButton: {
+    backgroundColor: '#d4dae3',
+    padding: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 16,
+    height: 33,
+  },
+  seeAllText: {
+    color: '#0000FF',
+    fontSize: 13,
+  },
+  menu: {
+    position: 'absolute',
+    top: 90, // Điều chỉnh để đặt menu dưới header
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+    padding: 10,
+  },
+  menuItem: {
+    fontSize: 16,
+    color: '#333',
+    marginVertical: 5,
+  },
+});

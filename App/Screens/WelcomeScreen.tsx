@@ -36,7 +36,7 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
             <View style={welcomeStyles.registerButton}>
                 <CustomButton
                     title="Đăng ký"
-                    onPress={() => navigation.navigate('Register')}
+                    onPress={() => navigation.navigate('StudentHome')}
                     secondary
                 />
             </View>
