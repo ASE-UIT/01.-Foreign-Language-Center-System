@@ -48,46 +48,52 @@ const LoginScreen: React.FC = () => {
     }, [route.params?.keyInfo]); // value from component used inside of the function.
 
     const handleLogin = () => {
-       for (let i = 0; i < users.length; i++) {
-            if (email == users[i].keyInfo) {
-                indexUser = i;
-            }
-        } // find index of account
+        //    for (let i = 0; i < users.length; i++) {
+        //         if (email == users[i].keyInfo) {
+        //             indexUser = i;
+        //         }
+        //     } // find index of account
 
 
-         //handle Login
-         if (email == '' || pwd == '') {
-            Alert.alert('Bạn cần nhập tài khoản và mật khẩu')
-        }
-        else if (-1 == indexUser) {
-            console.log({
-                code: 1001,
-                message: "email wrong"
-            })
-            Alert.alert('Tài khoản không tồn tại')
-        }
-        else if (pwd !== users[indexUser].password) {
-            console.log({
-                code: 1001,
-                message: "password wrong"
-            })
-            Alert.alert('Bạn đã nhập sai mật khẩu')
-        }
-        else {
-            console.log({
-                code: 1000,
-                message: "login successful"
-            })
-            if (email.startsWith('ph', 0)) {
-                navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
-            }
-            else {
-                navigation.navigate('Schedule')
-            }
+        //      //handle Login
+        //      if (email == '' || pwd == '') {
+        //         Alert.alert('Bạn cần nhập tài khoản và mật khẩu')
+        //     }
+        //     else if (-1 == indexUser) {
+        //         console.log({
+        //             code: 1001,
+        //             message: "email wrong"
+        //         })
+        //         Alert.alert('Tài khoản không tồn tại')
+        //     }
+        //     else if (pwd !== users[indexUser].password) {
+        //         console.log({
+        //             code: 1001,
+        //             message: "password wrong"
+        //         })
+        //         Alert.alert('Bạn đã nhập sai mật khẩu')
+        //     }
+        //     else {
+        //         console.log({
+        //             code: 1000,
+        //             message: "login successful"
+        //         })
+        //         if (email.startsWith('ph', 0)) {
+        //             navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
+        //         }
+        //         else {
+        //             navigation.navigate('Schedule')
+        //         }
 
-            setEmail('')
-            setPassword('')
-        }
+        //         setEmail('')
+        //         setPassword('')
+        //     }
+
+        navigation.navigate('Schedule')
+
+
+
+
         // const validEmail = "abc@gmail.com";
         // const validPassword = "12345678";
         // if (email !== validEmail) {

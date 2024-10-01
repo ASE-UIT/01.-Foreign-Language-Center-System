@@ -5,6 +5,7 @@ import { RootStackParamList } from '../Navigation/AppNavigator';
 import CustomButton from '../Components/CustomButton';
 import { styles, welcomeStyles } from '../Styles/globaStyles';
 
+
 type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
 
 type Props = {
@@ -14,7 +15,7 @@ type Props = {
 
 
 const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
-    
+
 
     return (
         <View style={styles.container}>
