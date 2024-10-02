@@ -55,4 +55,24 @@ public class CourseController {
                 .result(courseService.getCourseById(course_id))
                 .build();
     }
+        @PutMapping("/edit/{course_id}")
+    public ApiResponse<String> editCourse(@PathVariable("course_id") Long courseId, @RequestBody CourseRequest courseRequest) {
+        log.info("đang trong controller chỉnh sửa khóa học");
+        try {
+            courseService.editCourse(courseId, courseRequest);
+            return ApiResponse.<String>builder()
+                    .message("Chỉnh sửa khóa học thành công")
+                    .build();
+        }
+        catch (AppException e) {
+            return ApiResponse.<String>builder()
+                    .message("Chỉnh sửa khóa học thất bại: " + e.getMessage())
+                    .build();
+        }
+        catch (Exception e) {
+            return ApiResponse.<String>builder()
+                    .message("Có lỗi xảy ra: " + e.getMessage())
+                    .build();
+        }
+    }
 }
