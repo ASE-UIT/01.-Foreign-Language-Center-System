@@ -21,6 +21,7 @@ public enum ErrorCode {
     INVALID_REQUEST(1014, "Parent must have role PhuHuynh.", HttpStatus.BAD_REQUEST),
     TIMESLOT_NOTFOUND(1015, "Timeslot not found", HttpStatus.NOT_FOUND),
     TIMESLOT_EXISTED(1016, "Timeslot existed", HttpStatus.BAD_REQUEST),
+    TEACHER_NOTFOUND(1017, "Teacher not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

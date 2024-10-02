@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +40,7 @@ public class CourseService {
     GiangVienRepository giangVienRepository;
     CourseMapper courseMapper;
     TimeSlotRepository timeSlotRepository;
+    GiangVienService giangVienService;
 
 
     @Transactional
@@ -59,7 +61,7 @@ public class CourseService {
 
         if (courseRequest.getGiangVien() != null) {
             GiangVien giangVien = giangVienRepository.findById(courseRequest.getGiangVien().getId())
-                    .orElseThrow(() -> new Exception("GiangVien không tồn tại với id: " + courseRequest.getGiangVien().getId()));
+                    .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
 
             // Thiết lập mối quan hệ giữa Course và GiangVien
             course.setGiangVien(giangVien);
@@ -127,4 +129,56 @@ public class CourseService {
         return courseMapper.toCourseRequest(courseRepository.findById(course_id)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND)));
     }
+
+    @Transactional
+    public String addGiangVienToCourse(Long courseId, GiangVienRequest giangVienRequest) throws Exception {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
+
+        GiangVien giangVien = giangVienRepository.findById(giangVienRequest.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
+
+        // Lấy lịch của giảng viên và khóa học
+        Set<TimeSlot> giangVienSchedules = giangVienService.getSchedulesOfGiangVien(giangVien.getId());
+        Set<TimeSlot> courseSchedules = this.getSchedulesOfCourse(courseId);
+
+        // Kiểm tra xem lịch có trùng không
+        if (isScheduleConflict(giangVienSchedules, courseSchedules)) {
+            return "Giảng viên bị trùng lịch";
+        }
+
+        // Thêm giảng viên vào khóa học
+        course.setGiangVien(giangVien);
+        giangVien.addCourse(course); // Phương thức tiện ích đã có trong GiangVien
+
+        // Lưu khóa học với giảng viên mới
+        courseRepository.save(course);
+
+        return "Đã thêm thành công giảng viên " + giangVienRequest.getName() + " vào khóa hoc id = " + courseId;
+    }
+
+
+
+
+    // lay lich cua khoa hoc
+    public Set<TimeSlot> getSchedulesOfCourse(Long courseId) throws Exception {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
+
+        return course.getSchedule();
+    }
+
+    public boolean isScheduleConflict(Set<TimeSlot> giangVienSchedules, Set<TimeSlot> courseSchedules) {
+        for (TimeSlot gvSlot : giangVienSchedules) {
+            for (TimeSlot courseSlot : courseSchedules) {
+                if (gvSlot.getDay().equals(courseSlot.getDay()) &&
+                        gvSlot.getTimeRange().equals(courseSlot.getTimeRange())) {
+                    return true; // Trùng lịch
+                }
+            }
+        }
+        return false; // Không trùng lịch
+    }
+
+
 }
