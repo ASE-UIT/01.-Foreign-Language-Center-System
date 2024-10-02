@@ -2,12 +2,15 @@ package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
+import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.GiangVien;
+import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.CourseMapper;
+import com.prj.projectweb.mapper.TimeSlotMapper;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +36,7 @@ public class CourseService {
     CourseRepository courseRepository;
     GiangVienRepository giangVienRepository;
     CourseMapper courseMapper;
+    TimeSlotMapper timeSlotMapper;
 
 
     @Transactional
@@ -50,17 +54,27 @@ public class CourseService {
         course.setStartTime(LocalDate.parse(courseRequest.getStartTime()));
         course.setEndTime(LocalDate.parse(courseRequest.getEndTime()));
 
-        GiangVien giangVien = giangVienRepository.findById(courseRequest.getGiangVien().getId())
-                .orElseThrow(() -> new Exception("GiangVien không tồn tại với id: " + courseRequest.getGiangVien().getId()));
+        if (courseRequest.getGiangVien() != null) {
+            GiangVien giangVien = giangVienRepository.findById(courseRequest.getGiangVien().getId())
+                    .orElseThrow(() -> new Exception("GiangVien không tồn tại với id: " + courseRequest.getGiangVien().getId()));
 
-        // Thiết lập mối quan hệ giữa Course và GiangVien
-        course.setGiangVien(giangVien);
-        giangVien.addCourse(course); // Phương thức tiện ích trong GiangVien
+            // Thiết lập mối quan hệ giữa Course và GiangVien
+            course.setGiangVien(giangVien);
+            giangVien.addCourse(course); // Phương thức tiện ích trong GiangVien
+        }
 
 
         // Thiết lập mối quan hệ cho CourseContent
         if (course.getCourseContent() != null) {
             course.getCourseContent().forEach(content -> content.setCourse(course));
+        }
+
+        // Thiết lập mối quan hệ cho TimeSlot
+        if (courseRequest.getSchedules() != null) {
+            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedules()) {
+                TimeSlot timeSlot = timeSlotMapper.toTimeSlot(timeSlotRequest);
+                course.addTimeSlot(timeSlot);
+            }
         }
 
         // Thiết lập mối quan hệ cho Certificate

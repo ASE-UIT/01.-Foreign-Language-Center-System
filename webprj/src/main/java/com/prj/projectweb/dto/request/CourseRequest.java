@@ -20,7 +20,7 @@ public class CourseRequest {
     CertificateRequest certificate;
     String startTime;
     String endTime;
-    List<String> schedule;
+    List<TimeSlotRequest> schedules;
     Integer likes;
     String image;
     Integer numberOfStudents;

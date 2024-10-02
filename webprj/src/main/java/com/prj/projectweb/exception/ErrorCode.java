@@ -18,7 +18,8 @@ public enum ErrorCode {
     EMAIL_WRONG(1010, "Email wrong", HttpStatus.UNAUTHORIZED),
     EMAIL_EXISTED(1011, "Email existed", HttpStatus.BAD_REQUEST),
     PARENT_NOTFOUND(1012, "Parent not found", HttpStatus.NOT_FOUND),
-    INVALID_REQUEST(1012, "Parent must have role PhuHuynh.", HttpStatus.BAD_REQUEST),
+    INVALID_REQUEST(1014, "Parent must have role PhuHuynh.", HttpStatus.BAD_REQUEST),
+    TIMESLOT_EXISTED(1015, "Time slot existed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -42,8 +42,10 @@ public class Course {
     LocalDate startTime;
     LocalDate endTime;
 
-    @ElementCollection
-    List<String> schedule;
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
+    List<TimeSlot> schedules = new ArrayList<>();
 
     Integer likes;
 
@@ -56,7 +58,7 @@ public class Course {
     @JsonBackReference
     GiangVien giangVien;
 
-    // Phương thức tiện ích để quản lý mối quan hệ với CourseContent
+    // Phương thức tiện ích
     public void addCourseContent(CourseContent content) {
         courseContent.add(content);
         content.setCourse(this);
@@ -67,7 +69,16 @@ public class Course {
         content.setCourse(null);
     }
 
-    // Phương thức tiện ích để quản lý mối quan hệ với Certificate
+    public void addTimeSlot(TimeSlot timeSlot) {
+        schedules.add(timeSlot);
+        timeSlot.setCourse(this);
+    }
+
+    public void removeTimeSlot(TimeSlot timeSlot) {
+        schedules.remove(timeSlot);
+        timeSlot.setCourse(null);
+    }
+
     public void setCertificate(Certificate certificate) {
         this.certificate = certificate;
         if (certificate != null) {
