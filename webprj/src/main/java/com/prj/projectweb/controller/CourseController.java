@@ -1,6 +1,7 @@
 package com.prj.projectweb.controller;
 
 import com.prj.projectweb.dto.request.CourseRequest;
+import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.service.CourseService;
@@ -53,6 +54,13 @@ public class CourseController {
     ApiResponse<CourseRequest> getCourseById(@PathVariable("course_id") Long course_id) throws Exception {
         return ApiResponse.<CourseRequest>builder()
                 .result(courseService.getCourseById(course_id))
+                .build();
+    }
+
+    @PutMapping("/addGiangVien/{course_id}")
+    ApiResponse<String> addGiangVien(@PathVariable("course_id") Long course_id, @RequestBody GiangVienRequest giangVienRequest) throws Exception {
+        return ApiResponse.<String>builder()
+                .result(courseService.addGiangVienToCourse(course_id, giangVienRequest))
                 .build();
     }
 }

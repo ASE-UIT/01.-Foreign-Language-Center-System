@@ -4,21 +4,25 @@ import com.prj.projectweb.dto.request.CertificateRequest;
 import com.prj.projectweb.dto.request.CourseContentRequest;
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
+import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Certificate;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseContent;
 import com.prj.projectweb.entities.GiangVien;
+import com.prj.projectweb.entities.TimeSlot;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-09-30T10:11:30+0700",
+    date = "2024-10-02T13:32:13+0700",
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -45,10 +49,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( courseRequest.getEndTime() != null ) {
             course.endTime( LocalDate.parse( courseRequest.getEndTime() ) );
         }
-        List<String> list1 = courseRequest.getSchedule();
-        if ( list1 != null ) {
-            course.schedule( new ArrayList<String>( list1 ) );
-        }
+        course.schedule( timeSlotRequestListToTimeSlotSet( courseRequest.getSchedule() ) );
         course.likes( courseRequest.getLikes() );
         course.image( courseRequest.getImage() );
         course.numberOfStudents( courseRequest.getNumberOfStudents() );
@@ -78,10 +79,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( course.getEndTime() != null ) {
             courseRequest.endTime( DateTimeFormatter.ISO_LOCAL_DATE.format( course.getEndTime() ) );
         }
-        List<String> list1 = course.getSchedule();
-        if ( list1 != null ) {
-            courseRequest.schedule( new ArrayList<String>( list1 ) );
-        }
+        courseRequest.schedule( timeSlotSetToTimeSlotRequestList( course.getSchedule() ) );
         courseRequest.likes( course.getLikes() );
         courseRequest.image( course.getImage() );
         courseRequest.numberOfStudents( course.getNumberOfStudents() );
@@ -156,6 +154,32 @@ public class CourseMapperImpl implements CourseMapper {
         return certificate.build();
     }
 
+    protected TimeSlot timeSlotRequestToTimeSlot(TimeSlotRequest timeSlotRequest) {
+        if ( timeSlotRequest == null ) {
+            return null;
+        }
+
+        TimeSlot.TimeSlotBuilder timeSlot = TimeSlot.builder();
+
+        timeSlot.day( timeSlotRequest.getDay() );
+        timeSlot.timeRange( timeSlotRequest.getTimeRange() );
+
+        return timeSlot.build();
+    }
+
+    protected Set<TimeSlot> timeSlotRequestListToTimeSlotSet(List<TimeSlotRequest> list) {
+        if ( list == null ) {
+            return null;
+        }
+
+        Set<TimeSlot> set = LinkedHashSet.newLinkedHashSet( list.size() );
+        for ( TimeSlotRequest timeSlotRequest : list ) {
+            set.add( timeSlotRequestToTimeSlot( timeSlotRequest ) );
+        }
+
+        return set;
+    }
+
     protected CourseContentRequest courseContentToCourseContentRequest(CourseContent courseContent) {
         if ( courseContent == null ) {
             return null;
@@ -197,6 +221,32 @@ public class CourseMapperImpl implements CourseMapper {
         certificateRequest.details( certificate.getDetails() );
 
         return certificateRequest.build();
+    }
+
+    protected TimeSlotRequest timeSlotToTimeSlotRequest(TimeSlot timeSlot) {
+        if ( timeSlot == null ) {
+            return null;
+        }
+
+        TimeSlotRequest.TimeSlotRequestBuilder timeSlotRequest = TimeSlotRequest.builder();
+
+        timeSlotRequest.day( timeSlot.getDay() );
+        timeSlotRequest.timeRange( timeSlot.getTimeRange() );
+
+        return timeSlotRequest.build();
+    }
+
+    protected List<TimeSlotRequest> timeSlotSetToTimeSlotRequestList(Set<TimeSlot> set) {
+        if ( set == null ) {
+            return null;
+        }
+
+        List<TimeSlotRequest> list = new ArrayList<TimeSlotRequest>( set.size() );
+        for ( TimeSlot timeSlot : set ) {
+            list.add( timeSlotToTimeSlotRequest( timeSlot ) );
+        }
+
+        return list;
     }
 
     protected GiangVienRequest giangVienToGiangVienRequest(GiangVien giangVien) {
