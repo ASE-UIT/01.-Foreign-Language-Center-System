@@ -19,6 +19,7 @@ public enum ErrorCode {
     EMAIL_EXISTED(1011, "Email existed", HttpStatus.BAD_REQUEST),
     PARENT_NOTFOUND(1012, "Parent not found", HttpStatus.NOT_FOUND),
     INVALID_REQUEST(1012, "Parent must have role PhuHuynh.", HttpStatus.BAD_REQUEST),
+    COURSE_UPDATE_FAILED(1005, "Course update failed", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
