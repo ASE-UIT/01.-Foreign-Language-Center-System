@@ -14,13 +14,15 @@ import com.prj.projectweb.entities.TimeSlot;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-02T12:11:31+0700",
+    date = "2024-10-02T13:32:13+0700",
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -47,7 +49,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( courseRequest.getEndTime() != null ) {
             course.endTime( LocalDate.parse( courseRequest.getEndTime() ) );
         }
-        course.schedules( timeSlotRequestListToTimeSlotList( courseRequest.getSchedules() ) );
+        course.schedule( timeSlotRequestListToTimeSlotSet( courseRequest.getSchedule() ) );
         course.likes( courseRequest.getLikes() );
         course.image( courseRequest.getImage() );
         course.numberOfStudents( courseRequest.getNumberOfStudents() );
@@ -77,7 +79,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( course.getEndTime() != null ) {
             courseRequest.endTime( DateTimeFormatter.ISO_LOCAL_DATE.format( course.getEndTime() ) );
         }
-        courseRequest.schedules( timeSlotListToTimeSlotRequestList( course.getSchedules() ) );
+        courseRequest.schedule( timeSlotSetToTimeSlotRequestList( course.getSchedule() ) );
         courseRequest.likes( course.getLikes() );
         courseRequest.image( course.getImage() );
         courseRequest.numberOfStudents( course.getNumberOfStudents() );
@@ -165,17 +167,17 @@ public class CourseMapperImpl implements CourseMapper {
         return timeSlot.build();
     }
 
-    protected List<TimeSlot> timeSlotRequestListToTimeSlotList(List<TimeSlotRequest> list) {
+    protected Set<TimeSlot> timeSlotRequestListToTimeSlotSet(List<TimeSlotRequest> list) {
         if ( list == null ) {
             return null;
         }
 
-        List<TimeSlot> list1 = new ArrayList<TimeSlot>( list.size() );
+        Set<TimeSlot> set = LinkedHashSet.newLinkedHashSet( list.size() );
         for ( TimeSlotRequest timeSlotRequest : list ) {
-            list1.add( timeSlotRequestToTimeSlot( timeSlotRequest ) );
+            set.add( timeSlotRequestToTimeSlot( timeSlotRequest ) );
         }
 
-        return list1;
+        return set;
     }
 
     protected CourseContentRequest courseContentToCourseContentRequest(CourseContent courseContent) {
@@ -234,17 +236,17 @@ public class CourseMapperImpl implements CourseMapper {
         return timeSlotRequest.build();
     }
 
-    protected List<TimeSlotRequest> timeSlotListToTimeSlotRequestList(List<TimeSlot> list) {
-        if ( list == null ) {
+    protected List<TimeSlotRequest> timeSlotSetToTimeSlotRequestList(Set<TimeSlot> set) {
+        if ( set == null ) {
             return null;
         }
 
-        List<TimeSlotRequest> list1 = new ArrayList<TimeSlotRequest>( list.size() );
-        for ( TimeSlot timeSlot : list ) {
-            list1.add( timeSlotToTimeSlotRequest( timeSlot ) );
+        List<TimeSlotRequest> list = new ArrayList<TimeSlotRequest>( set.size() );
+        for ( TimeSlot timeSlot : set ) {
+            list.add( timeSlotToTimeSlotRequest( timeSlot ) );
         }
 
-        return list1;
+        return list;
     }
 
     protected GiangVienRequest giangVienToGiangVienRequest(GiangVien giangVien) {

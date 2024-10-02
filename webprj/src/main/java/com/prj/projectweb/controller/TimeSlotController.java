@@ -11,10 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,6 +35,19 @@ public class TimeSlotController {
         return ApiResponse.<List<TimeSlot>>builder()
                 .message("add list timeslot successfully")
                 .result(timeSlotService.addList(timeSlotRequest))
+                .build();
+    }
+
+    @GetMapping("/get/{id}")
+    public ApiResponse<TimeSlot> getById(@PathVariable("id") Long id) throws Exception {
+        return ApiResponse.<TimeSlot>builder()
+                .result(timeSlotService.getById(id))
+                .build();
+    }
+    @GetMapping("/getList")
+    public ApiResponse<List<TimeSlot>> getList() throws Exception {
+        return ApiResponse.<List<TimeSlot>>builder()
+                .result(timeSlotService.getList())
                 .build();
     }
 }

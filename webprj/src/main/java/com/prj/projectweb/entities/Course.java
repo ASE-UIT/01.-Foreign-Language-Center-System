@@ -8,7 +8,9 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -42,10 +44,16 @@ public class Course {
     LocalDate startTime;
     LocalDate endTime;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "course_time_slot",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "timeslot_id")
+    )
     @JsonManagedReference
     @Builder.Default
-    List<TimeSlot> schedules = new ArrayList<>();
+    Set<TimeSlot> schedule = new HashSet<>();
+
 
     Integer likes;
 
@@ -70,13 +78,13 @@ public class Course {
     }
 
     public void addTimeSlot(TimeSlot timeSlot) {
-        schedules.add(timeSlot);
-        timeSlot.setCourse(this);
+        schedule.add(timeSlot);
+        timeSlot.getCourses().add(this);
     }
 
     public void removeTimeSlot(TimeSlot timeSlot) {
-        schedules.remove(timeSlot);
-        timeSlot.setCourse(null);
+        schedule.remove(timeSlot);
+        timeSlot.getCourses().remove(this);
     }
 
     public void setCertificate(Certificate certificate) {

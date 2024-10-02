@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-09-30T10:08:05+0700",
+    date = "2024-10-02T13:25:10+0700",
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -43,6 +43,8 @@ public class GiangVienMapperImpl implements GiangVienMapper {
         }
         giangVienResponse.id( giangVien.getId() );
         giangVienResponse.name( giangVien.getName() );
+        giangVienResponse.likes( giangVien.getLikes() );
+        giangVienResponse.dislikes( giangVien.getDislikes() );
 
         return giangVienResponse.build();
     }
@@ -57,6 +59,8 @@ public class GiangVienMapperImpl implements GiangVienMapper {
 
         giangVien.name( giangVienDTO.getName() );
         giangVien.dob( giangVienDTO.getDob() );
+        giangVien.likes( giangVienDTO.getLikes() );
+        giangVien.dislikes( giangVienDTO.getDislikes() );
 
         return giangVien.build();
     }

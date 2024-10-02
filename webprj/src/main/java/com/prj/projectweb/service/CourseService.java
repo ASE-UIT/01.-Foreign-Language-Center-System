@@ -13,6 +13,8 @@ import com.prj.projectweb.mapper.CourseMapper;
 import com.prj.projectweb.mapper.TimeSlotMapper;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
+import com.prj.projectweb.repositories.TimeSlotRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
@@ -36,12 +38,13 @@ public class CourseService {
     CourseRepository courseRepository;
     GiangVienRepository giangVienRepository;
     CourseMapper courseMapper;
-    TimeSlotMapper timeSlotMapper;
+    TimeSlotRepository timeSlotRepository;
 
 
     @Transactional
     public String addCourse(CourseRequest courseRequest) throws Exception {
         log.info("in add course service");
+
 
         // Kiểm tra tên khóa học đã tồn tại chưa
         if (courseRepository.existsByCourseName(courseRequest.getCourseName())) {
@@ -70,9 +73,12 @@ public class CourseService {
         }
 
         // Thiết lập mối quan hệ cho TimeSlot
-        if (courseRequest.getSchedules() != null) {
-            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedules()) {
-                TimeSlot timeSlot = timeSlotMapper.toTimeSlot(timeSlotRequest);
+        if (courseRequest.getSchedule() != null) {
+            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
+                TimeSlot timeSlot = timeSlotRepository
+                        .findByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())
+                        .orElseThrow(() -> new AppException(ErrorCode.TIMESLOT_NOTFOUND));
+
                 course.addTimeSlot(timeSlot);
             }
         }

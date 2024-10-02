@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -20,8 +23,7 @@ public class TimeSlot {
     String day; // e.g., Mon, Fri, Sat
     String timeRange; // e.g., "7h - 9h"
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "course_id")
+    @ManyToMany(mappedBy = "schedule")
     @JsonBackReference
-    Course course;
+    List<Course> courses = new ArrayList<>();
 }

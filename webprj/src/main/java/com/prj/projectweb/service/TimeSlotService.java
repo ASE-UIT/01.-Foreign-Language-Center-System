@@ -2,6 +2,8 @@ package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
+import com.prj.projectweb.dto.response.CourseResponse;
+import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,5 +56,22 @@ public class TimeSlotService {
         }
 
         return lists;
+    }
+
+    @Transactional(readOnly = true)
+    public List<TimeSlot> getList() {
+        log.info("in get list timeslot service");
+
+        List<TimeSlot> responses = timeSlotRepository.findAll();
+
+        return responses;
+    }
+
+    @Transactional(readOnly = true)
+    public TimeSlot getById(Long id) throws Exception {
+        log.info("in get timeslot by id service");
+
+        return timeSlotRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TIMESLOT_NOTFOUND));
     }
 }
