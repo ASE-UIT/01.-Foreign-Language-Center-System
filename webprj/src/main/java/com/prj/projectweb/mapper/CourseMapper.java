@@ -1,13 +1,16 @@
 package com.prj.projectweb.mapper;
 
 import com.prj.projectweb.dto.request.CourseRequest;
+import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseContent;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import com.prj.projectweb.entities.TimeSlot;
+import org.mapstruct.*;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
@@ -20,4 +23,10 @@ public interface CourseMapper {
 
     @Mapping(source = "giangVien.name", target = "nameOfGiangVien")
     CourseResponse toCourseResponse(Course course);
+
+    Set<TimeSlotRequest> toTimeSlotRequestSet(Set<TimeSlot> timeSlots); // Đổi thành Set
+    Set<TimeSlot> toTimeSlotSet(Set<TimeSlotRequest> timeSlotRequests); // Đổi thành Set
 }
+
+
+

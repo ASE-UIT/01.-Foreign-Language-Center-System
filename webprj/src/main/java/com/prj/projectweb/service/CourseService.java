@@ -81,7 +81,9 @@ public class CourseService {
                         .findByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())
                         .orElseThrow(() -> new AppException(ErrorCode.TIMESLOT_NOTFOUND));
 
-                course.addTimeSlot(timeSlot);
+                if (!course.getSchedule().contains(timeSlot)) {
+                    course.addTimeSlot(timeSlot);
+                }
             }
         }
 
