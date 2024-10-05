@@ -195,6 +195,7 @@ public class CourseService {
         }
         return false; // Không trùng lịch
     }
+
     @Transactional
     public String editCourse(Long courseId, CourseRequest courseRequest) throws Exception {
         log.info("in edit course service");
@@ -203,15 +204,24 @@ public class CourseService {
         Course existingCourse = courseRepository.findById(courseId)
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
 
+
         try {
+            // Cập nhật các trường khác của Course từ CourseRequest
             courseMapper.updateCourse(existingCourse, courseRequest);
 
+            if (courseRequest.getGiangVien().getId() != null) {
+                addGiangVienToCourse(courseId, GiangVienRequest.builder()
+                        .id(courseRequest.getGiangVien().getId())
+                        .name(courseRequest.getGiangVien().getName())
+                        .build());
+            }
 
             // Lưu thay đổi vào database
             courseRepository.save(existingCourse);
 
             return "Cập nhật khóa học thành công";
         } catch (Exception e) {
+            log.error("Error updating course", e);
             // Nếu có lỗi xảy ra trong quá trình lưu trữ, ném một ngoại lệ
             throw new AppException(ErrorCode.COURSE_UPDATE_FAILED);
         }
