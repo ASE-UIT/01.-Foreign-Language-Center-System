@@ -4,13 +4,10 @@ import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
-import com.prj.projectweb.entities.CourseContent;
 import com.prj.projectweb.entities.TimeSlot;
 import org.mapstruct.*;
 
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
@@ -24,8 +21,13 @@ public interface CourseMapper {
     @Mapping(source = "giangVien.name", target = "nameOfGiangVien")
     CourseResponse toCourseResponse(Course course);
 
+
     Set<TimeSlotRequest> toTimeSlotRequestSet(Set<TimeSlot> timeSlots); // Đổi thành Set
     Set<TimeSlot> toTimeSlotSet(Set<TimeSlotRequest> timeSlotRequests); // Đổi thành Set
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "giangVien", ignore = true)
+    void updateCourse(@MappingTarget Course course, CourseRequest courseRequest);
 }
 
 

@@ -4,6 +4,7 @@ import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.CourseResponse;
+import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.service.CourseService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -62,5 +63,29 @@ public class CourseController {
         return ApiResponse.<String>builder()
                 .result(courseService.addGiangVienToCourse(course_id, giangVienRequest))
                 .build();
+    }
+    @PutMapping("/edit/{course_id}")
+    public ApiResponse<String> editCourse(@PathVariable("course_id") Long courseId, @RequestBody CourseRequest courseRequest) {
+        log.info("in edit course controller");
+
+        try {
+            String message = courseService.editCourse(courseId, courseRequest);
+            return ApiResponse.<String>builder()
+                    .message(message)
+                    .result("Success")
+                    .build();
+        } catch (AppException e) {
+            // Trả về thông báo thất bại nếu xảy ra ngoại lệ
+            return ApiResponse.<String>builder()
+                    .message(e.getMessage())
+                    .result("Fail")
+                    .build();
+        } catch (Exception e) {
+            // Xử lý ngoại lệ chung
+            return ApiResponse.<String>builder()
+                    .message("Đã xảy ra lỗi: " + e.getMessage())
+                    .result("Fail")
+                    .build();
+        }
     }
 }

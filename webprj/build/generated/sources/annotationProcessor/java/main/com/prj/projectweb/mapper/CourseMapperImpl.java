@@ -22,7 +22,11 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
+<<<<<<< HEAD
     date = "2024-10-05T10:02:42+0700",
+=======
+    date = "2024-10-05T10:22:55+0700",
+>>>>>>> BackEnd-Phan
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -112,6 +116,7 @@ public class CourseMapperImpl implements CourseMapper {
     }
 
     @Override
+<<<<<<< HEAD
     public Set<TimeSlotRequest> toTimeSlotRequestSet(Set<TimeSlot> timeSlots) {
         if ( timeSlots == null ) {
             return null;
@@ -137,6 +142,75 @@ public class CourseMapperImpl implements CourseMapper {
         }
 
         return set;
+=======
+    public void updateCourse(Course course, CourseRequest courseRequest) {
+        if ( courseRequest == null ) {
+            return;
+        }
+
+        if ( courseRequest.getCertificate() != null ) {
+            if ( course.getCertificate() == null ) {
+                course.setCertificate( Certificate.builder().build() );
+            }
+            certificateRequestToCertificate1( courseRequest.getCertificate(), course.getCertificate() );
+        }
+        else {
+            course.setCertificate( null );
+        }
+        course.setCourseName( courseRequest.getCourseName() );
+        if ( course.getCourseContent() != null ) {
+            List<CourseContent> list = courseContentRequestListToCourseContentList( courseRequest.getCourseContent() );
+            if ( list != null ) {
+                course.getCourseContent().clear();
+                course.getCourseContent().addAll( list );
+            }
+            else {
+                course.setCourseContent( null );
+            }
+        }
+        else {
+            List<CourseContent> list = courseContentRequestListToCourseContentList( courseRequest.getCourseContent() );
+            if ( list != null ) {
+                course.setCourseContent( list );
+            }
+        }
+        course.setObjective( courseRequest.getObjective() );
+        course.setDuration( courseRequest.getDuration() );
+        course.setTuitionFee( courseRequest.getTuitionFee() );
+        course.setLearningMethod( courseRequest.getLearningMethod() );
+        if ( courseRequest.getStartTime() != null ) {
+            course.setStartTime( LocalDate.parse( courseRequest.getStartTime() ) );
+        }
+        else {
+            course.setStartTime( null );
+        }
+        if ( courseRequest.getEndTime() != null ) {
+            course.setEndTime( LocalDate.parse( courseRequest.getEndTime() ) );
+        }
+        else {
+            course.setEndTime( null );
+        }
+        if ( course.getSchedule() != null ) {
+            Set<TimeSlot> set = timeSlotRequestListToTimeSlotSet( courseRequest.getSchedule() );
+            if ( set != null ) {
+                course.getSchedule().clear();
+                course.getSchedule().addAll( set );
+            }
+            else {
+                course.setSchedule( null );
+            }
+        }
+        else {
+            Set<TimeSlot> set = timeSlotRequestListToTimeSlotSet( courseRequest.getSchedule() );
+            if ( set != null ) {
+                course.setSchedule( set );
+            }
+        }
+        course.setLikes( courseRequest.getLikes() );
+        course.setImage( courseRequest.getImage() );
+        course.setNumberOfStudents( courseRequest.getNumberOfStudents() );
+        course.setObject( courseRequest.getObject() );
+>>>>>>> BackEnd-Phan
     }
 
     protected CourseContent courseContentRequestToCourseContent(CourseContentRequest courseContentRequest) {
@@ -246,6 +320,7 @@ public class CourseMapperImpl implements CourseMapper {
         return giangVien.getName();
     }
 
+<<<<<<< HEAD
     protected TimeSlotRequest timeSlotToTimeSlotRequest(TimeSlot timeSlot) {
         if ( timeSlot == null ) {
             return null;
@@ -270,5 +345,14 @@ public class CourseMapperImpl implements CourseMapper {
         timeSlot.timeRange( timeSlotRequest.getTimeRange() );
 
         return timeSlot.build();
+=======
+    protected void certificateRequestToCertificate1(CertificateRequest certificateRequest, Certificate mappingTarget) {
+        if ( certificateRequest == null ) {
+            return;
+        }
+
+        mappingTarget.setIssued( certificateRequest.getIssued() );
+        mappingTarget.setDetails( certificateRequest.getDetails() );
+>>>>>>> BackEnd-Phan
     }
 }
