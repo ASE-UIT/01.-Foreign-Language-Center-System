@@ -17,14 +17,13 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreationRequest {
     String email;
-    String username;
-    String password;
     String fullName;
     String phone;
     String address;
     LocalDate dob;
 
-    String role;
+    int flag;
+//    String role;
 
     // Dành cho Học Sinh: ID của Phụ Huynh
     Long parentId;
