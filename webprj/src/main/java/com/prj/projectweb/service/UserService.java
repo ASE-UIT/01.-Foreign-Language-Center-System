@@ -1,5 +1,6 @@
 package com.prj.projectweb.service;
 
+import com.prj.projectweb.dto.request.ChangePasswordRequest;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
@@ -115,6 +116,34 @@ public class UserService {
             password.append(characters.charAt(index));
         }
         return password.toString();
+    }
+
+    public String changePassword(ChangePasswordRequest request) {
+        if (!userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.USER_NOTFOUND);
+        }
+
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if (!user.getPassword().equals(request.getOldPass())) {
+            throw  new AppException(ErrorCode.PASSWORD_WRONG);
+        }
+
+        if (!request.getNewPass().equals(request.getReNewPass())) {
+            throw new AppException(ErrorCode.NEW_PASSWORD_NOTMATCH);
+        }
+
+        user.setPassword(request.getNewPass());
+        userRepository.save(user);
+
+        return "Change password successfully";
+    }
+
+    public UserResponse getInfoById (Long id) {
+        User user  = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+
+        return userMapper.toUserResponse(user);
     }
 }
 
