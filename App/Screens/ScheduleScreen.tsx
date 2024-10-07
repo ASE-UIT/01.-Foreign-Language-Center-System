@@ -4,6 +4,10 @@ import hambuger_icon from '../../assets/images/hamburger_icon.png'
 import teacher_image from '../../assets/images/teacher_image.jpg'
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { RootStackParamList } from '../Types/types';
+
 
 
 const ScheduleScreen: React.FC = () => {
@@ -43,6 +47,12 @@ const ScheduleScreen: React.FC = () => {
     { ...course },
     { ...course },
     { ...course },
+    { ...course },
+    { ...course },
+    { ...course },
+    { ...course },
+    { ...course },
+    { ...course },
   ];
   const [courseList, setCourseList] = useState(coursesArray);
 
@@ -74,50 +84,56 @@ const ScheduleScreen: React.FC = () => {
     setCourseList(coursesArray2);
   }
 
+  const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>()
   return (
-    <ScrollView >
-      <View style={scheduleStyles.container}>
-        <Image source={hambuger_icon} />
-        <View style={scheduleStyles.header_text_layout}>
-          <Text style={scheduleStyles.header_text}>Lịch Học</Text>
-        </View>
-        <View>
-          <Text style={scheduleStyles.month_year_text}>Tháng {today.getMonth() + 1} năm {today.getFullYear()}</Text>
-        </View>
-        <View style={scheduleStyles.weekLayout}>
-          {daysOfWeek.map((day, index) => {
-            const dayOffset = index - today.getDay(); // Tính toán độ lệch ngày
-            const displayDate = new Date(today);
-            displayDate.setDate(today.getDate() + dayOffset); // Cập nhật ngày hiển thị
+    // <ScrollView > sửa lỗi nested virturalize list
+    <View style={scheduleStyles.container}>
+      <TouchableOpacity onPress={()=>navigation.openDrawer()}>
+        <Image source={hambuger_icon} style={{marginTop:20}}/>
+        
+      </TouchableOpacity>
 
-            return (
-              <TouchableOpacity key={index} onPress={() => handleChangeDate(index)} style={[scheduleStyles.dayContainer,
-              selectedDay === index && scheduleStyles.selectedDay]}>
-                <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectedDayText]
-                }>
-                  {day}
-                </Text>
-                <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectDateText]}>
-                  {displayDate.getDate()} {/* Hiển thị ngày tương ứng */}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-        <View style={scheduleStyles.noteLayout}>
-          <Text style={scheduleStyles.month_year_text}>Ghi chú trong ngày</Text>
-        </View>
-        <FlatList
-          data={courseList}
-          renderItem={renderCourseItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={2} // Hiển thị 2 cột
-        />
-        <TouchableOpacity style={scheduleStyles.addButton} onPress={() => {/* Thêm hành động ở đây */ }}>
-          <Ionicons name="add" size={24} color="white" />
-        </TouchableOpacity>
+      <View style={scheduleStyles.header_text_layout}>
+        <Text style={scheduleStyles.header_text}>Lịch Học</Text>
       </View>
-    </ScrollView >
+      <View>
+        <Text style={scheduleStyles.month_year_text}>Tháng {today.getMonth() + 1} năm {today.getFullYear()}</Text>
+      </View>
+      <View style={scheduleStyles.weekLayout}>
+        {daysOfWeek.map((day, index) => {
+          const dayOffset = index - today.getDay(); // Tính toán độ lệch ngày
+          const displayDate = new Date(today);
+          displayDate.setDate(today.getDate() + dayOffset); // Cập nhật ngày hiển thị
+
+          return (
+            <TouchableOpacity key={index} onPress={() => handleChangeDate(index)} style={[scheduleStyles.dayContainer,
+            selectedDay === index && scheduleStyles.selectedDay]}>
+              <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectedDayText]
+              }>
+                {day}
+              </Text>
+              <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectDateText]}>
+                {displayDate.getDate()} {/* Hiển thị ngày tương ứng */}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+      <View style={scheduleStyles.noteLayout}>
+        <Text style={scheduleStyles.month_year_text}>Ghi chú trong ngày</Text>
+      </View>
+
+      <FlatList
+        data={courseList}
+        renderItem={renderCourseItem}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={2} // Hiển thị 2 cột
+      />
+      <TouchableOpacity style={scheduleStyles.addButton} onPress={() => {/* Thêm hành động ở đây */ }}>
+        <Ionicons name="add" size={24} color="white" />
+      </TouchableOpacity>
+    </View>
+    // </ScrollView >
   )
 }
 const { height } = Dimensions.get('window'); // Lấy chiều dài thiết bị

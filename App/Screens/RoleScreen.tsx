@@ -4,7 +4,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { styles } from "../Styles/globaStyles";
 import CustomButton from "../Components/CustomButton";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../Navigation/AppNavigator";
+import { RootStackParamList } from "../Types/types"; 
 import { StackNavigationProp } from "@react-navigation/stack";
 
 
@@ -66,13 +66,11 @@ const RoleScreen: React.FC = () => {
                     setValue(item.keyParent);
                 }}
                 renderItem={renderItem}
-
             />
-
             <View style={styles.loginButton}>
                 <CustomButton
                     title="Tiếp tục"
-                    onPress={() => navigation.navigate('Schedule')}
+                    onPress={() => navigation.navigate('Menu')}
                     primary
                 />
             </View>

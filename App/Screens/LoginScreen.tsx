@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../Navigation/AppNavigator';
+import { RootStackParamList } from '../Types/types';
 import CustomButton from '../Components/CustomButton';
 import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { userInfo } from '../Types/types';
 
 
 
@@ -89,7 +90,8 @@ const LoginScreen: React.FC = () => {
         //         setPassword('')
         //     }
 
-        navigation.navigate('Schedule')
+        navigation.navigate('Menu')
+       
 
 
 

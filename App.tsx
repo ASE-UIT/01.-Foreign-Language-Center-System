@@ -1,6 +1,8 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import AppNavigator from './App/Navigation/AppNavigator';
+// Only import react-native-gesture-handler on native platforms
+import 'react-native-gesture-handler';
 // import libs to use fonts
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
