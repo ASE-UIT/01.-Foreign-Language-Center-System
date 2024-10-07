@@ -6,8 +6,9 @@ import ClassScreen from '../Screens/ClassScreen';
 import CourseScreen from '../Screens/CourseScreen';
 import ScheduleScreen from '../Screens/ScheduleScreen';
 
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import hambuger_icon from '../../assets/images/hamburger_icon.png'
 
 
 const Drawer = createDrawerNavigator();
@@ -92,9 +93,11 @@ const SlideMenu: React.FC = () => {
                         fontSize: 20,
                         color: 'black'
                     },
+
                     drawerItemStyle: {
                         marginBottom: 0,
-                    }
+                    },
+
                 }} />
             <Drawer.Screen name="Schedule" component={ScheduleScreen}
                 options={{
