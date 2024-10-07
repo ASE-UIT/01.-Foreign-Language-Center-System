@@ -1,4 +1,4 @@
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
 
 import ProfileScreen from '../Screens/ProfileScreen';
 import NotificationScreen from '../Screens/NotificationScreen';
@@ -8,17 +8,35 @@ import ScheduleScreen from '../Screens/ScheduleScreen';
 
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import hambuger_icon from '../../assets/images/hamburger_icon.png'
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../Types/types';
 
 
 const Drawer = createDrawerNavigator();
 
 const SlideMenu: React.FC = () => {
 
+
     let count = 20;
     let showCount = count < 1 ? '' : `(${count}+)` // sau này truyền biến môi trường đếm số lượng thông báo
 
+    const Back_Btn = () => {
+        const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>()
+
+        const openMenu = () => {
+            navigation.toggleDrawer();
+        };
+        return (
+            <TouchableOpacity style={{ marginLeft: 20, marginRight: -5 }} onPress={openMenu}>
+                <AntDesign name="left" size={24} color="black" />
+            </TouchableOpacity>
+
+
+        )
+    }
+
     const CustomDrawerContent = (props: any) => {
+
         return (
             <DrawerContentScrollView {...props}>
                 <View style={styles.container}>
@@ -67,14 +85,7 @@ const SlideMenu: React.FC = () => {
                     drawerItemStyle: {
                         marginBottom: 0,
                     },
-                    headerLeft: () => (
-                        <View>
-                            <TouchableOpacity style={{ marginLeft: 20, marginRight: -5 }}>
-                                <AntDesign name="left" size={24} color="black" />
-                            </TouchableOpacity>
-                        </View>
-
-                    )
+                    headerLeft: () => (<Back_Btn />)
                 }} />
             <Drawer.Screen name="Class" component={ClassScreen} options={{
                 title: 'Lớp học',
