@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +21,7 @@ public class CourseRequest {
     CertificateRequest certificate;
     String startTime;
     String endTime;
-    List<String> schedule;
+    Set<TimeSlotRequest> schedule;
     Integer likes;
     String image;
     Integer numberOfStudents;
