@@ -226,4 +226,21 @@ public class CourseService {
             throw new AppException(ErrorCode.COURSE_UPDATE_FAILED);
         }
     }
+    @Autowired
+    private CourseRegistrationRepository courseRegistrationRepository;
+    public List<CourseResponse> getCoursesByStudentId(Long studentId) throws Exception {
+        log.info("in get courses by student id service");
+
+        List<CourseRegistration> registrations = courseRegistrationRepository.findByStudentId(studentId);
+
+        // Lấy danh sách các khóa học từ danh sách đăng ký
+        List<Course> courses = registrations.stream()
+                .map(CourseRegistration::getCourse)
+                .collect(Collectors.toList());
+
+        // Chuyển đổi danh sách khóa học thành danh sách CourseResponse
+        return courses.stream()
+                .map(courseMapper::toCourseResponse)
+                .collect(Collectors.toList());
+    }
 }
