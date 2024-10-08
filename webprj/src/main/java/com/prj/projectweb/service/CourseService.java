@@ -5,15 +5,18 @@ import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
+import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.GiangVien;
 import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.CourseMapper;
 import com.prj.projectweb.mapper.TimeSlotMapper;
+import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
 import com.prj.projectweb.repositories.TimeSlotRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
