@@ -93,7 +93,24 @@ public class UserService {
 
         return response;
     }
+     // Phương thức kiểm tra thông báo cho lớp học sắp tới
+    public NotificationResponse checkUpcomingClass(NotificationRequest request) {
+        Optional<User> userOpt = userRepository.findById(request.getUserId());
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            LocalDate tomorrow = LocalDate.now().plusDays(1);
+            List<Course> upcomingClasses = courseRepository.findClassesByDate(tomorrow);
 
+            if (!upcomingClasses.isEmpty()) {
+                Course nextClass = upcomingClasses.get(0); // Giả sử lấy lớp đầu tiên
+                NotificationResponse response = new NotificationResponse();
+                response.setNotificationTime(LocalDateTime.now());
+                response.setClassTime(LocalDateTime.from(nextClass.getStartTime()));
+                return response;
+            }
+        }
+        return null; // Không có lớp học nào
+    }
 }
 
 
