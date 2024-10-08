@@ -1,5 +1,6 @@
 package com.prj.projectweb.service;
 
+import com.prj.projectweb.dto.request.ChangePasswordRequest;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
 import com.prj.projectweb.dto.request.NotificationRequest;
@@ -20,8 +21,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+
+import java.security.SecureRandom;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,6 +39,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     RoleRepository roleRepository;
+    private static final SecureRandom random = new SecureRandom();
 
     public UserResponse createUser(UserCreationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -41,12 +47,21 @@ public class UserService {
         }
 
         var user = userMapper.toUser(request);
+        user.setUsername(user.getEmail());
+        user.setPassword(randomPassword(8));
 
-        if (!roleRepository.existsByRoleName(request.getRole())) {
+        String roleName = null;
+        if (request.getFlag() == 1)
+            roleName = "PhuHuynh";
+        else if (request.getFlag() == 2)
+            roleName = "HocVien";
+
+        if (!roleRepository.existsByRoleName(roleName)) {
+            log.info(roleName);
             throw new AppException(ErrorCode.ROLE_NOTFOUND);
         }
 
-        var role = roleRepository.findByRoleName(request.getRole());
+        var role = roleRepository.findByRoleName(roleName);
         user.setRole(role);
 
         // Lưu User vào database
@@ -56,7 +71,7 @@ public class UserService {
         UserResponse response = userMapper.toUserResponse(savedUser);
 
         // Xử lý dựa trên vai trò
-        if ("PhuHuynh".equals(request.getRole())) {
+        if ("PhuHuynh".equals(roleName)) {
             List<User> children = userRepository.findAllByParentId(savedUser.getUserId());
             List<ChildOfParentResponse> childResponses = children.stream()
                     .map(child -> ChildOfParentResponse.builder()
@@ -66,7 +81,7 @@ public class UserService {
                     .collect(Collectors.toList());
 
             response.setChildren(childResponses);
-        } else if ("HocVien".equalsIgnoreCase(request.getRole())) {
+        } else if ("HocVien".equalsIgnoreCase(roleName)) {
             Long parentId = request.getParentId();
             if (parentId == null) {
                 throw new AppException(ErrorCode.PARENT_NOTFOUND);
@@ -98,6 +113,47 @@ public class UserService {
 
         return response;
     }
+
+
+    public String randomPassword(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+
+        StringBuilder password = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(characters.length());
+            password.append(characters.charAt(index));
+        }
+        return password.toString();
+    }
+
+    public String changePassword(ChangePasswordRequest request) {
+        if (!userRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.USER_NOTFOUND);
+        }
+
+        User user = userRepository.findByEmail(request.getEmail());
+
+        if (!user.getPassword().equals(request.getOldPass())) {
+            throw  new AppException(ErrorCode.PASSWORD_WRONG);
+        }
+
+        if (!request.getNewPass().equals(request.getReNewPass())) {
+            throw new AppException(ErrorCode.NEW_PASSWORD_NOTMATCH);
+        }
+
+        user.setPassword(request.getNewPass());
+        userRepository.save(user);
+
+        return "Change password successfully";
+    }
+
+    public UserResponse getInfoById (Long id) {
+        User user  = userRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+
+        return userMapper.toUserResponse(user);
+
     // Phương thức kiểm tra thông báo cho lớp học sắp tới
     public NotificationResponse checkUpcomingClass(NotificationRequest request) {
         Optional<User> userOpt = userRepository.findById(request.getUserId());
@@ -115,6 +171,7 @@ public class UserService {
             }
         }
         return null; // Không có lớp học nào
+
     }
 }
 

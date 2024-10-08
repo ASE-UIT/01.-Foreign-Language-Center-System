@@ -23,6 +23,8 @@ public enum ErrorCode {
     TIMESLOT_EXISTED(1016, "Timeslot existed", HttpStatus.BAD_REQUEST),
     TEACHER_NOTFOUND(1017, "Teacher not found", HttpStatus.NOT_FOUND),
     COURSE_UPDATE_FAILED(1018, "Course update failed", HttpStatus.INTERNAL_SERVER_ERROR),
+    USER_NOTFOUND(1019, "User not found", HttpStatus.NOT_FOUND),
+    NEW_PASSWORD_NOTMATCH(1020, "New passwords not match", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
