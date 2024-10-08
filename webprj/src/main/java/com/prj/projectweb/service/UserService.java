@@ -98,7 +98,7 @@ public class UserService {
 
         return response;
     }
-     // Phương thức kiểm tra thông báo cho lớp học sắp tới
+    // Phương thức kiểm tra thông báo cho lớp học sắp tới
     public NotificationResponse checkUpcomingClass(NotificationRequest request) {
         Optional<User> userOpt = userRepository.findById(request.getUserId());
         if (userOpt.isPresent()) {
