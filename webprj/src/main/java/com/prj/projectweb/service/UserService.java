@@ -1,14 +1,17 @@
 package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.UserCreationRequest;
-import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
+import com.prj.projectweb.dto.request.NotificationRequest;
+import com.prj.projectweb.dto.response.NotificationResponse;
 import com.prj.projectweb.dto.response.ParentResponse;
 import com.prj.projectweb.dto.response.UserResponse;
+import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.User;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.UserMapper;
+import com.prj.projectweb.repositories.CourseRepository; // Thêm repository khóa học
 import com.prj.projectweb.repositories.RoleRepository;
 import com.prj.projectweb.repositories.UserRepository;
 import lombok.AccessLevel;
@@ -17,6 +20,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
