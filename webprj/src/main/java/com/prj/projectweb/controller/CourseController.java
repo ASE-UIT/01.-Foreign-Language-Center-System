@@ -88,4 +88,14 @@ public class CourseController {
                     .build();
         }
     }
+    @GetMapping("/getCoursesByStudent/{studentId}")
+    ApiResponse<List<CourseResponse>> getCoursesByStudentId(@PathVariable("studentId") Long studentId) throws Exception {
+        log.info("in get courses by student controller");
+
+        List<CourseResponse> courses = courseService.getCoursesByStudentId(studentId);
+
+        return ApiResponse.<List<CourseResponse>>builder()
+                .result(courses)
+                .build();
+    }
 }
