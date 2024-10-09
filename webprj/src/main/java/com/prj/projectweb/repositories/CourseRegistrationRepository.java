@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface CourseRegistrationRepository extends JpaRepository<CourseRegistration, Long> {
-    List<CourseRegistration> findByStudentId(Long studentId);
+    List<CourseRegistration> findByStudent_UserId(Long userId); // Tìm kiếm theo userId của học viên
 }
