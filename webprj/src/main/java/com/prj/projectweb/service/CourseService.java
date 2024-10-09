@@ -236,7 +236,7 @@ public class CourseService {
     public List<CourseResponse> getCoursesByStudentId(Long studentId) throws Exception {
         log.info("in get courses by student id service");
 
-        List<CourseRegistration> registrations = courseRegistrationRepository.findByStudentId(studentId);
+        List<CourseRegistration> registrations = courseRegistrationRepository.findByStudent_UserId(studentId);
 
         // Lấy danh sách các khóa học từ danh sách đăng ký
         List<Course> courses = registrations.stream()
