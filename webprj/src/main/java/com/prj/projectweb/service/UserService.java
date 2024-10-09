@@ -8,6 +8,7 @@ import com.prj.projectweb.dto.response.NotificationResponse;
 import com.prj.projectweb.dto.response.ParentResponse;
 import com.prj.projectweb.dto.response.UserResponse;
 import com.prj.projectweb.entities.Course;
+import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.entities.User;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
@@ -21,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.format.DateTimeFormatter;
 
 
 import java.security.SecureRandom;
@@ -160,24 +162,61 @@ public class UserService {
 
     // Phương thức kiểm tra thông báo cho lớp học sắp tới
     public NotificationResponse checkUpcomingClass(NotificationRequest request) {
+
         Optional<User> userOpt = userRepository.findById(request.getUserId());
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             LocalDate tomorrow = LocalDate.now().plusDays(1);
-
-            // Gọi phương thức findClassesByDate thông qua đối tượng courseRepository
-            List<Course> upcomingClasses = courseRepository.findClassesByDate(tomorrow);
-
-            if (!upcomingClasses.isEmpty()) {
-                Course nextClass = upcomingClasses.get(0); // Giả sử lấy lớp đầu tiên
-                NotificationResponse response = new NotificationResponse();
-                response.setNotificationTime(LocalDateTime.now());
-                response.setClassTime(LocalDateTime.from(nextClass.getStartTime()));
-                return response;
+            String tomorrowDay = getDayOfWeekString(tomorrow); // Lấy thứ của ngày mai dưới dạng chuỗi
+            
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+    
+            List<Course> allCourses = courseRepository.findAll();
+    
+            // Duyệt qua tất cả các khóa học để tìm lớp học có TimeSlot trùng với ngày mai
+            for (Course course : allCourses) {
+                for (TimeSlot timeSlot : course.getSchedule()) {
+                    if (timeSlot.getDay().equalsIgnoreCase(tomorrowDay)) {
+                        
+                        NotificationResponse response = new NotificationResponse();
+                        response.setNotificationTime(LocalDateTime.now().format(dateTimeFormatter));
+    
+                        // Set thời gian của lớp học
+                        String startTime = timeSlot.getTimeRange(); 
+                        response.setClassTime(tomorrow.format(dateFormatter) + " at " + startTime);
+                        
+                        return response; // Trả về thông báo lớp học
+                    }
+                }
             }
         }
         return null; // Không có lớp học nào
     }
+    
+    // Hàm chuyển LocalDate thành chuỗi tương ứng với thứ (Mon, Tue, ...)
+    private String getDayOfWeekString(LocalDate date) {
+        switch (date.getDayOfWeek()) {
+            case MONDAY:
+                return "Mon";
+            case TUESDAY:
+                return "Tue";
+            case WEDNESDAY:
+                return "Wed";
+            case THURSDAY:
+                return "Thu";
+            case FRIDAY:
+                return "Fri";
+            case SATURDAY:
+                return "Sat";
+            case SUNDAY:
+                return "Sun";
+            default:
+                return "";
+        }
+    }
+    
+
 }
 
 

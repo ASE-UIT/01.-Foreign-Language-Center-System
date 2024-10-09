@@ -3,11 +3,15 @@ package com.prj.projectweb.controller;
 import com.prj.projectweb.dto.request.NotificationRequest;
 import com.prj.projectweb.dto.response.NotificationResponse;
 import com.prj.projectweb.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/notifications")
+@Slf4j
 public class NotificationController {
 
     private final UserService userService;

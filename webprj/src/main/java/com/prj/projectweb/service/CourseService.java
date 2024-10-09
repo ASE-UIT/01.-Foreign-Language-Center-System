@@ -65,13 +65,13 @@ public class CourseService {
             throw new AppException(ErrorCode.TEACHER_NOTFOUND);
         }
         // Kiểm tra xem lịch đã tồn tại hay không trước khi thêm vào
-        if (courseRequest.getSchedule() != null) {
-            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
-                if (timeSlotRepository.existsByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())) {
-                    throw new AppException(ErrorCode.TIMESLOT_EXISTED);
-                }
-            }
-        }
+        // if (courseRequest.getSchedule() != null) {
+        //     for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
+        //         if (timeSlotRepository.existsByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())) {
+        //             throw new AppException(ErrorCode.TIMESLOT_EXISTED);
+        //         }
+        //     }
+        // }
         
         Course course = courseMapper.toCourse(courseRequest);
 
