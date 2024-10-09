@@ -66,12 +66,6 @@ public class Course {
     @JsonBackReference
     GiangVien giangVien;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    @Builder.Default
-    List<ChatMessage> chatMessages = new ArrayList<>();
-
-
     // Phương thức tiện ích
     public void addCourseContent(CourseContent content) {
         courseContent.add(content);
@@ -98,15 +92,5 @@ public class Course {
         if (certificate != null) {
             certificate.setCourse(this);
         }
-    }
-
-    public void addChatMessage(ChatMessage message) {
-        chatMessages.add(message);
-        message.setCourse(this);
-    }
-
-    public void removeChatMessage(ChatMessage message) {
-        chatMessages.remove(message);
-        message.setCourse(null);
     }
 }
