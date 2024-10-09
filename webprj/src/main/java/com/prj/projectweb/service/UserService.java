@@ -19,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -153,6 +154,9 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
         return userMapper.toUserResponse(user);
+    }
+    @Autowired
+    private CourseRepository courseRepository; // Inject CourseRepository
 
     // Phương thức kiểm tra thông báo cho lớp học sắp tới
     public NotificationResponse checkUpcomingClass(NotificationRequest request) {
@@ -160,6 +164,8 @@ public class UserService {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+            // Gọi phương thức findClassesByDate thông qua đối tượng courseRepository
             List<Course> upcomingClasses = courseRepository.findClassesByDate(tomorrow);
 
             if (!upcomingClasses.isEmpty()) {
@@ -171,7 +177,6 @@ public class UserService {
             }
         }
         return null; // Không có lớp học nào
-
     }
 }
 
