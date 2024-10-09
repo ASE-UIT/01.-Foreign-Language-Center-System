@@ -7,6 +7,7 @@ import RegisterScreen from '../Screens/RegisterScreen';
 import RoleScreen from '../Screens/RoleScreen';
 import ScheduleScreen from '../Screens/ScheduleScreen';
 import StudentHomeScreen from '../Screens/StudentHomeScreen';
+import CommunicationScreen from '../Screens/CommunicationScreen';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   Schedule: undefined;
   Role: undefined | userInfo; // add RoleScreen
   StudentHome: undefined | userInfo;
+  Communication: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -34,6 +36,7 @@ const AppNavigator: React.FC = () => (
       <Stack.Screen name="Schedule" component={ScheduleScreen} />
 
       <Stack.Screen name="StudentHome" component={StudentHomeScreen} />
+      <Stack.Screen name="Communication" component={CommunicationScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

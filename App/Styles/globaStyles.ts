@@ -149,6 +149,12 @@ export const studenthomeStyles = StyleSheet.create({
     width: '100%',
     borderRadius: 11,
   },
+  avatar: {
+    width: 40,        
+    height: 40,       
+    borderRadius: 20, 
+    marginTop: -20,
+  },
   welcomeText: {
     fontSize: 16,
     color: '#FFFFFF',
@@ -188,19 +194,17 @@ export const studenthomeStyles = StyleSheet.create({
     marginRight: 5,
     width: 230,
     marginLeft:20,
-    paddingLeft: 20,
     backgroundColor: '#FFFFFF',
     position: 'relative',
   },
   languageImage: {
     width: '100%',
-    height: 100,
-    borderRadius: 10,
+    height: 120,
   },
   languageText: {
     fontSize: 16,
     marginVertical: 8,
-    marginLeft: -10,
+    marginLeft: 10,
     marginBottom: 60,
   },
   bottomInfo: {
@@ -218,7 +222,6 @@ export const studenthomeStyles = StyleSheet.create({
   priceText: {
     fontSize: 16,
     fontWeight: 'bold',
-    
   },
   oldPriceText: {
     textDecorationLine: 'line-through',
@@ -231,9 +234,10 @@ export const studenthomeStyles = StyleSheet.create({
     marginVertical: 8,
     paddingLeft: 20,
   },
-  flagText: {
-    fontSize: 24,
-    marginRight: 16,
+  coureImage: {
+    width: 65,
+    height: 65,
+    marginRight: 10,
   },
   courseName: {
     fontSize: 16,
@@ -257,7 +261,7 @@ export const studenthomeStyles = StyleSheet.create({
   },
   menu: {
     position: 'absolute',
-    top: 90, // Điều chỉnh để đặt menu dưới header
+    top: 90, 
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
