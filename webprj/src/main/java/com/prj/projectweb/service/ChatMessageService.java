@@ -5,6 +5,8 @@ import com.prj.projectweb.dto.response.ChatMessageResponse;
 import com.prj.projectweb.entities.ChatMessage;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.User;
+import com.prj.projectweb.exception.AppException;
+import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.repositories.ChatMessageRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.UserRepository;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +38,10 @@ public class ChatMessageService {
         }
 
         Course course = courseRepository.findById(request.getCourseId())
-                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
         ChatMessage message = new ChatMessage();
         message.setMessage(request.getMessage().trim());
@@ -54,7 +57,10 @@ public class ChatMessageService {
         dto.setMessage(message.getMessage());
         dto.setUsername(message.getUser().getUsername());
         dto.setUserId(message.getUser().getUserId());
-        dto.setCreatedAt(message.getCreatedAt());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String formattedDate = message.getCreatedAt().format(formatter);
+        dto.setCreatedAt(formattedDate);
         return dto;
     }
 
