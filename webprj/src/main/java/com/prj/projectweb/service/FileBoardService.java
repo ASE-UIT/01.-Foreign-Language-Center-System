@@ -7,6 +7,8 @@ import com.prj.projectweb.entities.FileBoard;
 import com.prj.projectweb.entities.GiangVien;
 import com.prj.projectweb.mapper.FileBoardMapper;
 import com.prj.projectweb.repositories.FileBoardRepository;
+import com.prj.projectweb.repositories.GiangVienRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -27,6 +29,7 @@ public class FileBoardService {
 
     @Autowired
     private FileBoardRepository fileBoardRepository;
+    private GiangVienRepository giangVienRepository;
 
     @Autowired
     private FileBoardMapper fileBoardMapper;
@@ -35,6 +38,13 @@ public class FileBoardService {
     private String uploadDir;
 
     public FileBoardResponse uploadFile(MultipartFile file, FileBoardUploadRequest requestDto) throws IOException {
+        GiangVien giangVien = giangVienRepository.findById(requestDto.getGiangVienId())
+            .orElseThrow(() -> new RuntimeException("GiangVien not found"));
+
+        if (giangVien == null) {
+            throw new RuntimeException("Only GiangVien can upload files");
+        }
+
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir).resolve(fileName);
         Files.copy(file.getInputStream(), filePath);

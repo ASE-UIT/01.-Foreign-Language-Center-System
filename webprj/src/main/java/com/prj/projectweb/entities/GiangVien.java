@@ -38,8 +38,7 @@ public class GiangVien {
     @JsonManagedReference
     @Builder.Default
     List<FileBoard> fileBoards = new ArrayList<>();
-
-
+  
     // Phương thức tiện ích 
     public void addCourse(Course course) {
         courses.add(course);

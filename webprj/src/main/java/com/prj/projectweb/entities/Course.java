@@ -69,6 +69,11 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     @Builder.Default
+    List<ChatMessage> chatMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
     List<FileBoard> fileBoards = new ArrayList<>();
 
     // Phương thức tiện ích
@@ -97,6 +102,15 @@ public class Course {
         if (certificate != null) {
             certificate.setCourse(this);
         }
+    }
+
+    public void addChatMessage(ChatMessage message) {
+        chatMessages.add(message);
+        message.setCourse(this);
+    }
+    public void removeChatMessage(ChatMessage message) {
+        chatMessages.remove(message);
+        message.setCourse(null);
     }
 
     public void addFileBoard(FileBoard fileBoard) {

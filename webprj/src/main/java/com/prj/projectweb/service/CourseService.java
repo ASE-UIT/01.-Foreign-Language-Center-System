@@ -5,15 +5,18 @@ import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
+import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.GiangVien;
 import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.CourseMapper;
 import com.prj.projectweb.mapper.TimeSlotMapper;
+import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
 import com.prj.projectweb.repositories.TimeSlotRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,13 +65,13 @@ public class CourseService {
             throw new AppException(ErrorCode.TEACHER_NOTFOUND);
         }
         // Kiểm tra xem lịch đã tồn tại hay không trước khi thêm vào
-        if (courseRequest.getSchedule() != null) {
-            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
-                if (timeSlotRepository.existsByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())) {
-                    throw new AppException(ErrorCode.TIMESLOT_EXISTED);
-                }
-            }
-        }
+        // if (courseRequest.getSchedule() != null) {
+        //     for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
+        //         if (timeSlotRepository.existsByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())) {
+        //             throw new AppException(ErrorCode.TIMESLOT_EXISTED);
+        //         }
+        //     }
+        // }
         
         Course course = courseMapper.toCourse(courseRequest);
 
@@ -227,5 +230,22 @@ public class CourseService {
             // Nếu có lỗi xảy ra trong quá trình lưu trữ, ném một ngoại lệ
             throw new AppException(ErrorCode.COURSE_UPDATE_FAILED);
         }
+    }
+    @Autowired
+    private CourseRegistrationRepository courseRegistrationRepository;
+    public List<CourseResponse> getCoursesByStudentId(Long studentId) throws Exception {
+        log.info("in get courses by student id service");
+
+        List<CourseRegistration> registrations = courseRegistrationRepository.findByStudent_UserId(studentId);
+
+        // Lấy danh sách các khóa học từ danh sách đăng ký
+        List<Course> courses = registrations.stream()
+                .map(CourseRegistration::getCourse)
+                .collect(Collectors.toList());
+
+        // Chuyển đổi danh sách khóa học thành danh sách CourseResponse
+        return courses.stream()
+                .map(courseMapper::toCourseResponse)
+                .collect(Collectors.toList());
     }
 }
