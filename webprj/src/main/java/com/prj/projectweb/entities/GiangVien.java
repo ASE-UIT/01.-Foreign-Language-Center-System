@@ -33,7 +33,13 @@ public class GiangVien {
     @Builder.Default
     List<Course> courses = new ArrayList<>();
 
-    // Phương thức tiện ích để quản lý mối quan hệ
+    // Mối quan hệ OneToMany với Files
+    @OneToMany(mappedBy = "giangVien", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
+    List<FileBoard> fileBoards = new ArrayList<>();
+  
+    // Phương thức tiện ích 
     public void addCourse(Course course) {
         courses.add(course);
         course.setGiangVien(this);
@@ -42,5 +48,15 @@ public class GiangVien {
     public void removeCourse(Course course) {
         courses.remove(course);
         course.setGiangVien(null);
+    }
+
+    public void addFileBoard(FileBoard fileBoard) {
+        fileBoards.add(fileBoard);
+        fileBoard.setGiangVien(this);
+    }
+
+    public void removeFileBoard(FileBoard fileBoard) {
+        fileBoards.remove(fileBoard);
+        fileBoard.setGiangVien(null);
     }
 }
