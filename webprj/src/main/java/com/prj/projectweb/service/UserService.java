@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
 
@@ -42,6 +44,9 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     RoleRepository roleRepository;
+    PasswordEncoder passwordEncoder;
+
+
     private static final SecureRandom random = new SecureRandom();
 
     public UserResponse createUser(UserCreationRequest request) {
@@ -51,7 +56,9 @@ public class UserService {
 
         var user = userMapper.toUser(request);
         user.setUsername(user.getEmail());
-        user.setPassword(randomPassword(8));
+        String password = randomPassword(8);
+
+        user.setPassword(passwordEncoder.encode(password));
 
         String roleName = null;
         if (request.getFlag() == 1)
@@ -72,6 +79,7 @@ public class UserService {
 
         // Khởi tạo phản hồi
         UserResponse response = userMapper.toUserResponse(savedUser);
+        response.setPassword(password);
 
         // Xử lý dựa trên vai trò
         if ("PhuHuynh".equals(roleName)) {
@@ -137,7 +145,8 @@ public class UserService {
 
         User user = userRepository.findByEmail(request.getEmail());
 
-        if (!user.getPassword().equals(request.getOldPass())) {
+        // boolean authenticated = passwordEncoder.matches(request.getOldPass(), user.getPassword());
+        if (!passwordEncoder.matches(request.getOldPass(), user.getPassword())) {
             throw  new AppException(ErrorCode.PASSWORD_WRONG);
         }
 
@@ -145,7 +154,7 @@ public class UserService {
             throw new AppException(ErrorCode.NEW_PASSWORD_NOTMATCH);
         }
 
-        user.setPassword(request.getNewPass());
+        user.setPassword(passwordEncoder.encode(request.getNewPass()));
         userRepository.save(user);
 
         return "Change password successfully";
