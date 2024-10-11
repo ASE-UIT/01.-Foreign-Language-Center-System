@@ -76,6 +76,10 @@ public class Course {
     @Builder.Default
     List<FileBoard> fileBoards = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_name") 
+    private Room room;
+
     // Phương thức tiện ích
     public void addCourseContent(CourseContent content) {
         courseContent.add(content);

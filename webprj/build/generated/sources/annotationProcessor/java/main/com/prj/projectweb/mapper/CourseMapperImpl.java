@@ -10,6 +10,7 @@ import com.prj.projectweb.entities.Certificate;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseContent;
 import com.prj.projectweb.entities.GiangVien;
+import com.prj.projectweb.entities.Room;
 import com.prj.projectweb.entities.TimeSlot;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -22,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-11T08:48:14+0700",
+    date = "2024-10-11T11:14:57+0700",
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -66,6 +67,7 @@ public class CourseMapperImpl implements CourseMapper {
 
         CourseRequest.CourseRequestBuilder courseRequest = CourseRequest.builder();
 
+        courseRequest.room( courseRoomRoomName( course ) );
         courseRequest.courseName( course.getCourseName() );
         courseRequest.courseContent( courseContentListToCourseContentRequestList( course.getCourseContent() ) );
         courseRequest.objective( course.getObjective() );
@@ -250,6 +252,14 @@ public class CourseMapperImpl implements CourseMapper {
         certificate.details( certificateRequest.getDetails() );
 
         return certificate.build();
+    }
+
+    private String courseRoomRoomName(Course course) {
+        Room room = course.getRoom();
+        if ( room == null ) {
+            return null;
+        }
+        return room.getRoomName();
     }
 
     protected CourseContentRequest courseContentToCourseContentRequest(CourseContent courseContent) {
