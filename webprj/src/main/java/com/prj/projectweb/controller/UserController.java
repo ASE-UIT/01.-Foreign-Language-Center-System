@@ -4,11 +4,15 @@ import com.prj.projectweb.dto.request.ChangePasswordRequest;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.RoleResponse;
+import com.prj.projectweb.dto.response.ScheduleResponse;
 import com.prj.projectweb.dto.response.UserResponse;
 import com.prj.projectweb.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,6 +41,22 @@ public class UserController {
     public ApiResponse<String> changePassword(@RequestBody ChangePasswordRequest request) {
         return ApiResponse.<String>builder()
                 .result(userService.changePassword(request))
+                .build();
+    }
+
+    @GetMapping("/schedule/{id}")
+    public ApiResponse<List<ScheduleResponse>> getWeeklySchedule(@PathVariable Long id) {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .message("Weekly schedule retrieved successfully")
+                .result(userService.getWeeklySchedule(id))
+                .build();
+    }
+
+    @GetMapping("/courseRegistration/{id}")
+    public ApiResponse<List<ScheduleResponse>> getCourseRegistration(@PathVariable Long id) {
+        return ApiResponse.<List<ScheduleResponse>>builder()
+                .message("Get course registratrion successfully")
+                .result(userService.getCourseRegistration(id))
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.prj.projectweb.controller;
 
+import com.prj.projectweb.dto.request.AddRomeInCourseRequest;
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
@@ -64,6 +65,7 @@ public class CourseController {
                 .result(courseService.addGiangVienToCourse(course_id, giangVienRequest))
                 .build();
     }
+    
     @PutMapping("/edit/{course_id}")
     public ApiResponse<String> editCourse(@PathVariable("course_id") Long courseId, @RequestBody CourseRequest courseRequest) {
         log.info("in edit course controller");
@@ -88,6 +90,7 @@ public class CourseController {
                     .build();
         }
     }
+    
     @GetMapping("/getCoursesByStudent/{studentId}")
     ApiResponse<List<CourseResponse>> getCoursesByStudentId(@PathVariable("studentId") Long studentId) throws Exception {
         log.info("in get courses by student controller");
@@ -96,6 +99,18 @@ public class CourseController {
 
         return ApiResponse.<List<CourseResponse>>builder()
                 .result(courses)
+                .build();
+    }
+
+    @PutMapping("/addRoom")
+    public ApiResponse<String> addRoomInCourse(@RequestBody AddRomeInCourseRequest request) throws Exception {
+        log.info("in add room in course controller");
+
+        String message = courseService.addRoomInCourse(request); 
+
+        return ApiResponse.<String>builder()
+                .message(message)
+                .result("Success")
                 .build();
     }
 }

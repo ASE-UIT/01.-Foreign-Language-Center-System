@@ -3,16 +3,20 @@ package com.prj.projectweb.service;
 import com.prj.projectweb.dto.request.ChangePasswordRequest;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
+import com.prj.projectweb.dto.response.CourseRegistrationResponse;
 import com.prj.projectweb.dto.request.NotificationRequest;
 import com.prj.projectweb.dto.response.NotificationResponse;
 import com.prj.projectweb.dto.response.ParentResponse;
+import com.prj.projectweb.dto.response.ScheduleResponse;
 import com.prj.projectweb.dto.response.UserResponse;
 import com.prj.projectweb.entities.Course;
+import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.entities.User;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.UserMapper;
+import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository; // Thêm repository khóa học
 import com.prj.projectweb.repositories.RoleRepository;
 import com.prj.projectweb.repositories.UserRepository;
@@ -24,16 +28,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.format.DateTimeFormatter;
 
 
 import java.security.SecureRandom;
-
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,6 +53,7 @@ public class UserService {
     UserMapper userMapper;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
+    CourseRegistrationRepository registrationRepository;
 
 
     private static final SecureRandom random = new SecureRandom();
@@ -170,6 +179,7 @@ public class UserService {
     private CourseRepository courseRepository; // Inject CourseRepository
 
     // Phương thức kiểm tra thông báo cho lớp học sắp tới
+    @Transactional
     public NotificationResponse checkUpcomingClass(NotificationRequest request) {
 
         Optional<User> userOpt = userRepository.findById(request.getUserId());
@@ -180,28 +190,35 @@ public class UserService {
             
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-    
-            List<Course> allCourses = courseRepository.findAll();
-    
+
+            // Lấy danh sách khóa học mà học sinh đã đăng ký
+            List<CourseRegistration> courseRegistrations = registrationRepository.findByStudent_UserId(user.getUserId()); 
+
             // Duyệt qua tất cả các khóa học để tìm lớp học có TimeSlot trùng với ngày mai
-            for (Course course : allCourses) {
-                for (TimeSlot timeSlot : course.getSchedule()) {
-                    if (timeSlot.getDay().equalsIgnoreCase(tomorrowDay)) {
-                        
-                        NotificationResponse response = new NotificationResponse();
-                        response.setNotificationTime(LocalDateTime.now().format(dateTimeFormatter));
-    
-                        // Set thời gian của lớp học
-                        String startTime = timeSlot.getTimeRange(); 
-                        response.setClassTime(tomorrow.format(dateFormatter) + " at " + startTime);
-                        
-                        return response; // Trả về thông báo lớp học
+            for (CourseRegistration registration : courseRegistrations) {
+                Course course = registration.getCourse();
+
+                // Kiểm tra xem khóa học có thời khóa biểu không
+                if (course.getSchedule() != null) {
+                    for (TimeSlot timeSlot : course.getSchedule()) {
+                        if (timeSlot.getDay().equalsIgnoreCase(tomorrowDay)) {
+
+                            NotificationResponse response = new NotificationResponse();
+                            response.setNotificationTime(LocalDateTime.now().format(dateTimeFormatter));
+
+                            // Set thời gian của lớp học
+                            String startTime = timeSlot.getTimeRange(); 
+                            response.setClassTime(tomorrow.format(dateFormatter) + " at " + startTime);
+
+                            return response; // Trả về thông báo lớp học
+                        }
                     }
                 }
             }
         }
         return null; // Không có lớp học nào
     }
+
     
     // Hàm chuyển LocalDate thành chuỗi tương ứng với thứ (Mon, Tue, ...)
     private String getDayOfWeekString(LocalDate date) {
@@ -225,6 +242,115 @@ public class UserService {
         }
     }
     
+
+    @Transactional
+    // lấy lịch sinh viên trong tuần
+    public List<ScheduleResponse> getWeeklySchedule(Long userId) {
+        // Lấy user theo userId
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    
+        // Lấy danh sách các khóa học đã đăng ký của user
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId); 
+    
+        // Lấy ngày hiện tại
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+        
+        // Tạo mảng 7 phần tử để lưu lịch học từ thứ 2 đến chủ nhật
+        List<ScheduleResponse> schedule = new ArrayList<>(Collections.nCopies(7, null));
+    
+        // Định dạng ngày
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    
+        // Lặp qua tất cả các khóa học đã đăng ký
+        for (CourseRegistration registration : registrations) {
+            Course course = registration.getCourse();
+            Set<TimeSlot> timeSlots = course.getSchedule();
+            String roomName = course.getRoom() != null ? course.getRoom().getRoomName() : null; 
+            String giangVien = course.getGiangVien() != null ? course.getGiangVien().getName() : null;
+    
+            // Lặp qua các TimeSlot
+            for (TimeSlot timeSlot : timeSlots) {
+                // Lấy ngày trong tuần (có thể là một phần của logic tùy thuộc vào bạn đã định nghĩa TimeSlot như thế nào)
+                LocalDate dayOfWeek = getDateOfWeek(startOfWeek, timeSlot.getDay());
+                if (dayOfWeek != null) {
+                    // Tạo ScheduleResponse cho ca học
+                    ScheduleResponse lessonInfo = new ScheduleResponse();
+                    lessonInfo.setCa(getCaFromTimeRange(timeSlot.getTimeRange()));
+                    lessonInfo.setCourseName(course.getCourseName());
+                    lessonInfo.setCourseSchedule(course.getStartTime() + " - " + course.getEndTime() );
+                    lessonInfo.setRoomName(roomName );
+                    lessonInfo.setGiangVien(giangVien);
+    
+                    // Thêm thông tin vào mảng theo chỉ số ngày trong tuần
+                    int index = dayOfWeek.getDayOfWeek().getValue() - 1; 
+                    schedule.set(index, lessonInfo);
+                }
+            }
+        }
+    
+        return schedule;
+    }
+    
+    @Transactional
+    public List<ScheduleResponse> getCourseRegistration(Long userId) {
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId);
+        List<ScheduleResponse> responses = new ArrayList<>();
+
+        for (CourseRegistration registration : registrations) {
+            Course course = registration.getCourse();
+
+
+            responses.add(ScheduleResponse.builder()
+                                        .courseName(course.getCourseName())
+                                        .courseSchedule(course.getStartTime() + " - " + course.getEndTime())
+                                        .roomName(course.getRoom() != null ? course.getRoom().getRoomName() : null)
+                                        .giangVien(course.getGiangVien() != null ? course.getGiangVien().getName() : null)
+                                        .build()
+            );
+        }
+
+        return responses;
+    }
+
+    private LocalDate getDateOfWeek(LocalDate startOfWeek, String day) {
+        switch (day) {
+            case "Mon":
+                return startOfWeek;
+            case "Tue":
+                return startOfWeek.plusDays(1);
+            case "Wed":
+                return startOfWeek.plusDays(2);
+            case "Thu":
+                return startOfWeek.plusDays(3);
+            case "Fri":
+                return startOfWeek.plusDays(4);
+            case "Sat":
+                return startOfWeek.plusDays(5);
+            case "Sun":
+                return startOfWeek.plusDays(6);
+            default:
+                return null;
+        }
+    }
+
+    private String getCaFromTimeRange(String timeRange) {
+        switch (timeRange) {
+            case "7h - 9h":
+                return "Ca 1";
+            case "9h30 - 11h30":
+                return "Ca 2";
+            case "13h - 15h":
+                return "Ca 3"; 
+            case "15h30 - 17h30":
+                return "Ca 4";
+            case "19h - 21h":
+                return "Ca 5"; 
+            default:
+                return null; 
+        }
+    }
 
 }
 

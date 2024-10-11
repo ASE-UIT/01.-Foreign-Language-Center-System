@@ -1,5 +1,7 @@
 package com.prj.projectweb.service;
 
+import com.prj.projectweb.dto.request.AddRomeInCourseRequest;
+import com.prj.projectweb.dto.request.AvailableRoomRequest;
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
@@ -7,6 +9,7 @@ import com.prj.projectweb.dto.response.CourseResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.GiangVien;
+import com.prj.projectweb.entities.Room;
 import com.prj.projectweb.entities.TimeSlot;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
@@ -15,6 +18,7 @@ import com.prj.projectweb.mapper.TimeSlotMapper;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
+import com.prj.projectweb.repositories.RoomRepository;
 import com.prj.projectweb.repositories.TimeSlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +48,10 @@ public class CourseService {
     CourseMapper courseMapper;
     TimeSlotRepository timeSlotRepository;
     GiangVienService giangVienService;
+    RoomService roomService;
+    RoomRepository roomRepository;
+    CourseRegistrationRepository courseRegistrationRepository;
+    TimeSlotMapper timeSlotMapper;
 
 
     @Transactional
@@ -64,19 +72,19 @@ public class CourseService {
                 !giangVienRepository.existsById(courseRequest.getGiangVien().getId())) {
             throw new AppException(ErrorCode.TEACHER_NOTFOUND);
         }
-        // Kiểm tra xem lịch đã tồn tại hay không trước khi thêm vào
-        // if (courseRequest.getSchedule() != null) {
-        //     for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
-        //         if (timeSlotRepository.existsByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())) {
-        //             throw new AppException(ErrorCode.TIMESLOT_EXISTED);
-        //         }
-        //     }
-        // }
         
         Course course = courseMapper.toCourse(courseRequest);
 
         course.setStartTime(LocalDate.parse(courseRequest.getStartTime()));
         course.setEndTime(LocalDate.parse(courseRequest.getEndTime()));
+
+        if (courseRequest.getRoom() != null) {
+            Room room = roomRepository.findById(courseRequest.getRoom())
+                        .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOTFOUND));
+            
+            course.setRoom(room);
+            room.addCourse(course);
+        } 
 
         if (courseRequest.getGiangVien() != null) {
             GiangVien giangVien = giangVienRepository.findById(courseRequest.getGiangVien().getId())
@@ -179,8 +187,6 @@ public class CourseService {
     }
 
 
-
-
     // lay lich cua khoa hoc
     public Set<TimeSlot> getSchedulesOfCourse(Long courseId) throws Exception {
         Course course = courseRepository.findById(courseId)
@@ -213,6 +219,13 @@ public class CourseService {
         try {
             // Cập nhật các trường khác của Course từ CourseRequest
             courseMapper.updateCourse(existingCourse, courseRequest);
+            
+            if (courseRequest.getRoom() != null) {
+                addRoomInCourse(AddRomeInCourseRequest.builder()
+                    .courseId(courseId)
+                    .roomName(courseRequest.getRoom())
+                    .build());
+            }
 
             if (courseRequest.getGiangVien().getId() != null) {
                 addGiangVienToCourse(courseId, GiangVienRequest.builder()
@@ -231,8 +244,8 @@ public class CourseService {
             throw new AppException(ErrorCode.COURSE_UPDATE_FAILED);
         }
     }
-    @Autowired
-    private CourseRegistrationRepository courseRegistrationRepository;
+    
+    @Transactional
     public List<CourseResponse> getCoursesByStudentId(Long studentId) throws Exception {
         log.info("in get courses by student id service");
 
@@ -247,5 +260,37 @@ public class CourseService {
         return courses.stream()
                 .map(courseMapper::toCourseResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public String addRoomInCourse(AddRomeInCourseRequest request) throws Exception {
+        Course course = courseRepository.findById(request.getCourseId())
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
+
+        // Lấy lịch trình khóa học
+        Set<TimeSlotRequest> courseSchedule = course.getSchedule().stream()
+                .map(timeSlotMapper::toTimeSlotRequest) // Chuyển đổi từ TimeSlot sang TimeSlotRequest
+                .collect(Collectors.toSet());
+        LocalDate startDate = course.getStartTime();
+        LocalDate endDate = course.getEndTime();
+
+        // Lấy danh sách phòng trống
+        List<Room> availableRooms = roomService.getAvailableRooms(AvailableRoomRequest.builder()
+                                                            .timeSlots(courseSchedule)
+                                                            .startDate(startDate)
+                                                            .endDate(endDate)
+                                                            .build());
+
+        // Kiểm tra nếu roomName nằm trong danh sách phòng trống
+        Room selectedRoom = availableRooms.stream()
+                .filter(room -> room.getRoomName().equals(request.getRoomName()))
+                .findFirst()
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_AVAILABLE));
+
+        // Thêm phòng vào khoá học
+        course.setRoom(selectedRoom);
+        courseRepository.save(course);
+
+        return "Add room " + request.getRoomName() + " in course with id = " + request.getCourseId();
     }
 }
