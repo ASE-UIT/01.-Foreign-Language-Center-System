@@ -13,7 +13,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
     String email;
@@ -30,3 +29,4 @@ public class UserResponse {
 
     ParentResponse parent;
 }
+

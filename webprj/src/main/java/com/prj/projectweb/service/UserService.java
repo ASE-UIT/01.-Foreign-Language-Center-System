@@ -173,8 +173,34 @@ public class UserService {
         User user  = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
-        return userMapper.toUserResponse(user);
+        UserResponse response = userMapper.toUserResponse(user);
+
+        if ("HocVien".equalsIgnoreCase(user.getRole().getRoleName())) {
+            User parent = userRepository.findById(user.getParentId())
+            .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOTFOUND));
+
+            response.setParent(ParentResponse.builder()
+                                                .email(parent.getEmail())
+                                                .userId(parent.getUserId())
+                                                .fullName(parent.getFullName())
+                                                .build());
+        } else if ("PhuHuynh".equalsIgnoreCase(user.getRole().getRoleName())) {
+            List<ChildOfParentResponse> child = null;
+            List<User> listUser = userRepository.findAllByParentId(user.getUserId());
+            child = listUser.stream()
+                    .map(child1 -> ChildOfParentResponse.builder()
+                            .id(child1.getUserId())
+                            .name(child1.getFullName())
+                            .build())
+                    .collect(Collectors.toList());
+
+            response.setChildren(child);
+        }
+                
+
+        return response;
     }
+
     @Autowired
     private CourseRepository courseRepository; // Inject CourseRepository
 

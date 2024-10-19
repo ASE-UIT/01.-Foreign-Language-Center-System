@@ -29,6 +29,7 @@ public enum ErrorCode {
     ROOM_EXISTED(1022, "Room existed", HttpStatus.BAD_REQUEST),
     ROOM_NOT_AVAILABLE(1023, "Room not available", HttpStatus.BAD_REQUEST),
     ROOM_NOTFOUND(1024, "Room not found", HttpStatus.NOT_FOUND),
+    INVALID_VOTE(1025, "Invalid vote", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
