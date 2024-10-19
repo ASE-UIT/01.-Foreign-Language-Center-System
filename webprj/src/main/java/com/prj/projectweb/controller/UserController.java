@@ -10,6 +10,7 @@ import com.prj.projectweb.service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class UserController {
 
     UserService userService;
@@ -31,11 +33,13 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<UserResponse> getInfoById(@PathVariable Long id) {
+    public ApiResponse<UserResponse> getInfoById(@PathVariable("id") Long id) {
+        log.info("in controller get info user");
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getInfoById(id))
                 .build();
     }
+    
 
     @PutMapping("/changePass")
     public ApiResponse<String> changePassword(@RequestBody ChangePasswordRequest request) {
