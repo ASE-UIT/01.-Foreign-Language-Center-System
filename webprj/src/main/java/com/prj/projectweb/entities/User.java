@@ -42,6 +42,16 @@ public class User {
     @Builder.Default
     List<ChatMessage> chatMessages = new ArrayList<>();
 
+     // Messages sent by the user
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    List<ChatCenter> sentMessages = new ArrayList<>();
+
+     // Messages received by the user
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    List<ChatCenter> receivedMessages = new ArrayList<>();
+
      // Phương thức tiện ích cho ChatMessage
     public void addChatMessage(ChatMessage message) {
         chatMessages.add(message);
@@ -50,6 +60,17 @@ public class User {
     public void removeChatMessage(ChatMessage message) {
         chatMessages.remove(message);
         message.setUser(null);
+    }
+
+    // Phương thức tiện ích cho ChatCenter
+    public void addSentMessage(ChatCenter message) {
+        sentMessages.add(message);
+        message.setSender(this);
+    }
+
+    public void addReceivedMessage(ChatCenter message) {
+        receivedMessages.add(message);
+        message.setReceiver(this);
     }
 }
 
