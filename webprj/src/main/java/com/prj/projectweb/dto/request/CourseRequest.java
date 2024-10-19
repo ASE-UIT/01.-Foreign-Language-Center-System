@@ -26,6 +26,7 @@ public class CourseRequest {
     String image;
     Integer numberOfStudents;
     String object;
+    String room;
 
     GiangVienRequest giangVien;
 }

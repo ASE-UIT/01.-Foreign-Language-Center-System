@@ -57,7 +57,7 @@ public class CourseRegistrationService {
                     .build();
 
             registrationRepository.save(registration);
-            return createResponse(registration.getRegistrationId(), registration.getStudent(), registration.getParent(), registration.getCourse(), registration.getStatus(), "Đăng ký thành công");
+            return createResponse(registration.getRegistrationId(), student.getUserId(), parent != null ? parent.getUserId() : null, course.getId(), registration.getStatus(), "Đăng ký thành công");
         }
 
         // Trường hợp không tìm thấy học viên hoặc khóa học
@@ -70,12 +70,12 @@ public class CourseRegistrationService {
         return false; // Giả sử không có kẹt lịch
     }
 
-    private CourseRegistrationResponse createResponse(Long registrationId, User student, User parent, Course course, RegistrationStatus status, String message) {
+    private CourseRegistrationResponse createResponse(Long registrationId, Long studentId, Long parentId, Long courseId, RegistrationStatus status, String message) {
         return CourseRegistrationResponse.builder()
                 .registrationId(registrationId)
-                .student(student)
-                .parent(parent)
-                .course(course)
+                .studentId(studentId)
+                .parentId(parentId)
+                .courseId(courseId)
                 .status(status)
                 .message(message)
                 .build();

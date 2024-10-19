@@ -8,5 +8,5 @@ public class ChatMessageResponse {
     private String message;
     private Long userId;
     private String username; 
-    private LocalDateTime createdAt;
+    private String createdAt;
 }
