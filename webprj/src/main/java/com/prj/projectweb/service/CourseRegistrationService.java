@@ -7,6 +7,8 @@ import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.User;
 
 import com.prj.projectweb.dto.response.UserCourseResponse;
+import com.prj.projectweb.exception.AppException;
+import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.exception.RegistrationStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
@@ -87,7 +89,7 @@ public class CourseRegistrationService {
     }
 
     public UserCourseResponse getUserCourses(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
         List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId);
 
         List<UserCourseResponse.CourseInfo> courseInfos = registrations.stream()

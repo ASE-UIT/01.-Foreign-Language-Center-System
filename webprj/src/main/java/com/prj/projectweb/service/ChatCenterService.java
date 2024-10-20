@@ -4,6 +4,9 @@ import com.prj.projectweb.entities.ChatCenter;
 import com.prj.projectweb.entities.User;
 import com.prj.projectweb.repositories.ChatCenterRepository;
 import com.prj.projectweb.repositories.UserRepository;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ChatCenterService {
 
     @Autowired
@@ -48,10 +52,11 @@ public class ChatCenterService {
     private boolean isMessageAllowed(User sender, User receiver) {
         String senderRole = sender.getRole().getRoleName();
         String receiverRole = receiver.getRole().getRoleName();
+        log.info("ROLE: " + senderRole + " ---- " +  receiverRole);
 
         // Students and Parents can only message center staff (but not each other)
-        if (("HocVien".equals(senderRole) || "PhuHuynh".equals(senderRole)) && !isCenterRole(receiverRole)) {
-            return false;
+        if (("HocVien".equals(senderRole) || "PhuHuynh".equals(senderRole)) && isCenterRole(receiverRole)) {
+            return true;
         }
 
         // Center staff can message students and parents

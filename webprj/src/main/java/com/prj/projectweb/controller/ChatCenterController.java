@@ -1,8 +1,12 @@
 package com.prj.projectweb.controller;
 
+import com.prj.projectweb.dto.request.ChatCenterRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.entities.ChatCenter;
 import com.prj.projectweb.service.ChatCenterService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chatcenter")
+@Slf4j
 public class ChatCenterController {
 
     @Autowired
@@ -19,11 +24,9 @@ public class ChatCenterController {
 
     @PostMapping("/send")
     public ResponseEntity<ApiResponse<?>> sendMessage(
-            @RequestParam Long senderId,
-            @RequestParam Long receiverId,
-            @RequestParam String messageContent) {
+            @RequestBody ChatCenterRequest request) {
         try {
-            ChatCenter chatCenter = chatCenterService.sendMessage(senderId, receiverId, messageContent);
+            ChatCenter chatCenter = chatCenterService.sendMessage(request.getSenderId(), request.getReceiverId(), request.getMessageContent());
             ApiResponse<ChatCenter> response = ApiResponse.<ChatCenter>builder()
                     .message("Message sent successfully")
                     .code(HttpStatus.CREATED.value())
@@ -48,7 +51,8 @@ public class ChatCenterController {
     }
 
     @GetMapping("/messages")
-    public ResponseEntity<List<ChatCenter>> getMessagesForUser(@RequestParam Long userId) {
+    public ResponseEntity<List<ChatCenter>> getMessagesForUser(@RequestParam(name="userId") Long userId) {
+        log.info("id = " + userId);
         List<ChatCenter> messages = chatCenterService.getMessagesForUser(userId);
         return ResponseEntity.ok(messages);
     }

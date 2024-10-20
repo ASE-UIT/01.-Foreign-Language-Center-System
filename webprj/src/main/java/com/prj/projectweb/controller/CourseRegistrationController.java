@@ -42,7 +42,7 @@ public class CourseRegistrationController {
     }
 
     @GetMapping("/userCourses/{userId}")
-    public ResponseEntity<ApiResponse<UserCourseResponse>> getUserCourses(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse<UserCourseResponse>> getUserCourses(@PathVariable("userId") Long userId) {
         UserCourseResponse response = courseRegistrationService.getUserCourses(userId);
         return ResponseEntity.ok(ApiResponse.<UserCourseResponse>builder()
                 .message("User courses retrieved successfully")
