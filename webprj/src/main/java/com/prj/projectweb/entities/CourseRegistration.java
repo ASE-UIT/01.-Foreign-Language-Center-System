@@ -38,5 +38,10 @@ public class CourseRegistration {
     // Trạng thái đăng ký
     @Enumerated(EnumType.STRING)
     RegistrationStatus status;
+
+    //Trạng thái đăng ký đã trả tiền cho môn học chưa
+    @Column(name = "has_paid", nullable = false)
+    @Builder.Default
+    Boolean hasPaid = false;
 }
 

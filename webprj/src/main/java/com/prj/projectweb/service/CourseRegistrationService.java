@@ -5,13 +5,18 @@ import com.prj.projectweb.dto.response.CourseRegistrationResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.User;
+
+import com.prj.projectweb.dto.response.UserCourseResponse;
 import com.prj.projectweb.exception.RegistrationStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 @Service
 public class CourseRegistrationService {
@@ -78,6 +83,24 @@ public class CourseRegistrationService {
                 .courseId(courseId)
                 .status(status)
                 .message(message)
+                .build();
+    }
+
+    public UserCourseResponse getUserCourses(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId);
+
+        List<UserCourseResponse.CourseInfo> courseInfos = registrations.stream()
+                .map(registration -> new UserCourseResponse.CourseInfo(
+                        registration.getCourse().getCourseName(),
+                        registration.getHasPaid()
+                ))
+                .collect(Collectors.toList());
+
+        return UserCourseResponse.builder()
+                .name(user.getFullName())
+                .phoneNumber(user.getPhone())
+                .courses(courseInfos)
                 .build();
     }
 }

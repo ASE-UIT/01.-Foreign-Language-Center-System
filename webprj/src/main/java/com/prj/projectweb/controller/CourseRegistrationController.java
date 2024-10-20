@@ -2,6 +2,7 @@ package com.prj.projectweb.controller;
 
 import com.prj.projectweb.dto.request.CourseRegistrationRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
+import com.prj.projectweb.dto.response.UserCourseResponse;
 import com.prj.projectweb.dto.response.CourseRegistrationResponse;
 import com.prj.projectweb.service.CourseRegistrationService;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,15 @@ public class CourseRegistrationController {
                     .build()
             );
         }
+    }
+
+    @GetMapping("/userCourses/{userId}")
+    public ResponseEntity<ApiResponse<UserCourseResponse>> getUserCourses(@PathVariable Long userId) {
+        UserCourseResponse response = courseRegistrationService.getUserCourses(userId);
+        return ResponseEntity.ok(ApiResponse.<UserCourseResponse>builder()
+                .message("User courses retrieved successfully")
+                .result(response)
+                .build());
     }
 }
 
