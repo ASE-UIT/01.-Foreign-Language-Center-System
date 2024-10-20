@@ -5,13 +5,21 @@ import com.prj.projectweb.dto.response.CourseRegistrationResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.User;
+
+import com.prj.projectweb.dto.response.UserCourseResponse;
+import com.prj.projectweb.exception.AppException;
+import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.exception.RegistrationStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.UserRepository;
+
+import org.hibernate.engine.internal.Collections;
+import org.hibernate.mapping.Map;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseRegistrationService {
@@ -80,4 +88,75 @@ public class CourseRegistrationService {
                 .message(message)
                 .build();
     }
+
+    public UserCourseResponse getUserCourses(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId);
+
+        List<UserCourseResponse.CourseInfo> courseInfos = registrations.stream()
+                .map(registration -> new UserCourseResponse.CourseInfo(
+                        registration.getCourse().getId(),
+                        registration.getCourse().getCourseName(),
+                        registration.getHasPaid()
+                ))
+                .collect(Collectors.toList());
+
+        return UserCourseResponse.builder()
+                .id(userId)
+                .name(user.getFullName())
+                .phoneNumber(user.getPhone())
+                .courses(courseInfos)
+                .build();
+    }
+
+    public List<UserCourseResponse> getAllUserCourses() {
+        // Lấy tất cả các đăng ký khóa học của tất cả người dùng
+        List<CourseRegistration> registrations = registrationRepository.findAll();
+    
+        // Khởi tạo danh sách để chứa thông tin tất cả người dùng
+        List<UserCourseResponse> userCourseResponses = new ArrayList<>();
+    
+        // Duyệt qua từng đăng ký khóa học
+        for (CourseRegistration registration : registrations) {
+            Long userId = registration.getStudent().getUserId();
+            
+            // Kiểm tra xem người dùng đã có trong danh sách chưa
+            if (!userCourseResponses.stream().anyMatch(response -> response.getId().equals(userId))) {
+                // Lấy thông tin khóa học cho từng người dùng
+                UserCourseResponse userCourseResponse = getUserCourses(userId);
+                userCourseResponses.add(userCourseResponse);
+            }
+        }
+    
+        // Trả về danh sách các UserCourseResponse
+        return userCourseResponses;
+    }
+
+    public List<UserCourseResponse> getUsersByCourseAndUnpaid(Long courseId) {
+        // Lấy tất cả các đăng ký khóa học của khóa học đã cho, và chỉ lấy những người chưa thanh toán
+        List<CourseRegistration> registrations = registrationRepository.findByCourse_IdAndHasPaid(courseId, false);
+    
+        // Dùng Set để lưu các thông tin user đã đăng ký (không trùng lặp)
+        Set<Long> userIds = new HashSet<>();
+        List<UserCourseResponse> userCourseResponses = new ArrayList<>();
+    
+        // Duyệt qua các đăng ký và nhóm thông tin các user chưa thanh toán
+        for (CourseRegistration registration : registrations) {
+            Long userId = registration.getStudent().getUserId();
+            
+            // Kiểm tra xem user đã có trong danh sách chưa
+            if (!userIds.contains(userId)) {
+                // Lấy thông tin khóa học của user này
+                UserCourseResponse userCourseResponse = getUserCourses(userId); // Gọi lại hàm getUserCourses để lấy thông tin của user
+    
+                // Thêm thông tin vào danh sách và đánh dấu user đã được thêm
+                userCourseResponses.add(userCourseResponse);
+                userIds.add(userId);
+            }
+        }
+    
+        return userCourseResponses;
+    }
+    
+    
 }
