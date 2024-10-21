@@ -2,37 +2,64 @@ package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.PaymentProofRequest;
 import com.prj.projectweb.dto.response.PaymentProofResponse;
+import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.PaymentProof;
+import com.prj.projectweb.entities.User;
+import com.prj.projectweb.exception.PaymentStatus;
 import com.prj.projectweb.mapper.PaymentProofMapper;
+import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.PaymentProofRepository;
+import com.prj.projectweb.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 public class PaymentProofService {
 
     @Autowired
-    private PaymentProofRepository paymentProofRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    private PaymentProofMapper paymentProofMapper;
+    private CourseRegistrationRepository courseRegistrationRepository;
 
-    public PaymentProofResponse uploadProof(MultipartFile file, String uploadedBy) {
-        try {
-            byte[] fileData = file.getBytes();
-            PaymentProofRequest request = new PaymentProofRequest();
-            request.setFile(file);
-            request.setUploadedBy(uploadedBy);
+    @Autowired
+    private PaymentProofRepository paymentProofRepository;
 
-            PaymentProof paymentProof = paymentProofMapper.toEntity(request, fileData);
-            paymentProof = paymentProofRepository.save(paymentProof);
+    public void uploadPaymentProof(Long userId, Long courseRegistrationId, MultipartFile file) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-            return paymentProofMapper.toResponse(paymentProof);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload file", e);
+        // Kiểm tra role của người dùng
+        if (!user.getRole().getRoleName().equals("NhanVienHoTroHocVu")) {
+            throw new RuntimeException("Bạn không có quyền upload");
         }
+
+        CourseRegistration courseRegistration = courseRegistrationRepository.findById(courseRegistrationId)
+                .orElseThrow(() -> new RuntimeException("Course registration not found"));
+
+        // Tạo và lưu ảnh minh chứng
+        PaymentProof paymentProof = new PaymentProof();
+        paymentProof.setFileName(file.getOriginalFilename());
+        paymentProof.setFileType(file.getContentType());
+        paymentProof.setFileData(file.getBytes());
+        paymentProof.setUploadedBy(user.getFullName());
+        paymentProof.setUploadTime(LocalDateTime.now());
+        paymentProof.setCourseRegistration(courseRegistration);
+
+        // Lưu ID người upload
+        paymentProof.setUserId(user.getUserId());
+        
+        // Lưu thông tin vào CSDL
+        paymentProofRepository.save(paymentProof);
+
+        // Cập nhật trạng thái học viên
+        courseRegistration.setHasPaid(true);
+        courseRegistration.setPaymentStatus(PaymentStatus.PAID);
+        courseRegistrationRepository.save(courseRegistration);
     }
 }
+
