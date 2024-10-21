@@ -1,5 +1,6 @@
 package com.prj.projectweb.entities;
 
+import com.prj.projectweb.exception.PaymentStatus;
 import com.prj.projectweb.exception.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -43,5 +44,9 @@ public class CourseRegistration {
     @Column(name = "has_paid", nullable = false)
     @Builder.Default
     Boolean hasPaid = false;
+
+    // Trạng thái thanh toán
+    @Enumerated(EnumType.STRING)
+    PaymentStatus paymentStatus;
 }
 
