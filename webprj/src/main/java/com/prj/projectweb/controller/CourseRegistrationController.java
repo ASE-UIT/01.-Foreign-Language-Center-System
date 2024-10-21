@@ -66,5 +66,15 @@ public class CourseRegistrationController {
                 .result(responses)
                 .build());
     }
+    @PostMapping("/complete-payment")
+    public ResponseEntity<ApiResponse<?>> completePayment(@RequestParam Long userId,
+                                                          @RequestParam List<Long> courseIds,
+                                                          @RequestParam Double amount) {
+        CourseRegistrationResponse response = courseRegistrationService.completePayment(userId, courseIds, amount);
+        return ResponseEntity.ok(ApiResponse.<CourseRegistrationResponse>builder()
+                .message("Payment completed successfully")
+                .result(response)
+                .build());
+    }
 }
 
