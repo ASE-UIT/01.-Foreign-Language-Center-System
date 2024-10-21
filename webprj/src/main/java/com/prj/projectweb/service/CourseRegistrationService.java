@@ -9,11 +9,13 @@ import com.prj.projectweb.entities.User;
 import com.prj.projectweb.dto.response.UserCourseResponse;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
+import com.prj.projectweb.exception.PaymentStatus;
 import com.prj.projectweb.exception.RegistrationStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.UserRepository;
 
+import jakarta.mail.MessagingException;
 import org.hibernate.engine.internal.Collections;
 import org.hibernate.mapping.Map;
 import org.springframework.stereotype.Service;
@@ -27,13 +29,16 @@ public class CourseRegistrationService {
     private final CourseRegistrationRepository registrationRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final EmailService emailService;  // Thêm service gửi email
 
     public CourseRegistrationService(CourseRegistrationRepository registrationRepository,
                                      UserRepository userRepository,
-                                     CourseRepository courseRepository) {
+                                     CourseRepository courseRepository,
+                                     EmailService emailService) { // Nhận EmailService
         this.registrationRepository = registrationRepository;
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
+        this.emailService = emailService; // Khởi tạo
     }
 
     public CourseRegistrationResponse registerCourse(CourseRegistrationRequest request) {
@@ -65,6 +70,7 @@ public class CourseRegistrationService {
                     .build();
 
             registrationRepository.save(registration);
+
             return createResponse(registration.getRegistrationId(), student.getUserId(), parent != null ? parent.getUserId() : null, course.getId(), registration.getStatus(), "Đăng ký thành công");
         }
 
@@ -157,6 +163,44 @@ public class CourseRegistrationService {
     
         return userCourseResponses;
     }
-    
-    
+    public CourseRegistrationResponse completePayment(Long userId, List<Long> courseIds, Double amount) {
+        // Tìm tất cả các đăng ký của học viên dựa trên userId và courseIds
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId).stream()
+                .filter(registration -> courseIds.contains(registration.getCourse().getId()))
+                .collect(Collectors.toList());
+
+        if (registrations.isEmpty()) {
+            throw new AppException(ErrorCode.REGISTRATION_NOT_FOUND);
+        }
+        // Duyệt qua danh sách đăng ký và chuyển trạng thái thanh toán
+        registrations.forEach(registration -> {
+            if (!registration.getHasPaid()) {
+                registration.setHasPaid(true);
+                registration.setPaymentStatus(PaymentStatus.COMPLETED);
+                registrationRepository.save(registration); // Cập nhật vào database
+            }
+        });
+        // Gửi email thông báo sau khi hoàn tất thanh toán
+        String userEmail = getUserEmailById(userId); // Lấy email của người dùng
+        String courseList = registrations.stream()
+                .map(registration -> registration.getCourse().getCourseName())
+                .collect(Collectors.joining(", "));
+
+        String subject = "Thông báo thanh toán thành công";
+        String text = String.format("Cảm ơn bạn đã thanh toán thành công số tiền %.2f.\n\nKhóa học của bạn: %s", amount, courseList);
+
+        try {
+            emailService.sendEmail(userEmail, subject, text);
+        } catch (MessagingException e) {
+            // Xử lý lỗi gửi email
+            e.printStackTrace();
+        }
+        return createResponse(null, userId, null, null, RegistrationStatus.SUCCESS, "Đã hoàn tất thanh toán");
+    }
+    // Phương thức để lấy email của người dùng dựa trên userId
+    private String getUserEmailById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+        return user.getEmail(); 
+    }
 }
