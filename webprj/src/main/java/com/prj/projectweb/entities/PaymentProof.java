@@ -21,5 +21,11 @@ public class PaymentProof {
     private byte[] fileData;
     private String uploadedBy;
     private LocalDateTime uploadTime;
+    private Long userId; // Lưu ID của người upload
+
+    // Quan hệ với CourseRegistration
+    @ManyToOne
+    @JoinColumn(name = "course_registration_id")
+    private CourseRegistration courseRegistration;
 }
 
