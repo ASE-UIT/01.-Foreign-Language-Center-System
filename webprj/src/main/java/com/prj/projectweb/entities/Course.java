@@ -66,6 +66,20 @@ public class Course {
     @JsonBackReference
     GiangVien giangVien;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
+    List<ChatMessage> chatMessages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @Builder.Default
+    List<FileBoard> fileBoards = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_name") 
+    private Room room;
+
     // Phương thức tiện ích
     public void addCourseContent(CourseContent content) {
         courseContent.add(content);
@@ -92,5 +106,24 @@ public class Course {
         if (certificate != null) {
             certificate.setCourse(this);
         }
+    }
+
+    public void addChatMessage(ChatMessage message) {
+        chatMessages.add(message);
+        message.setCourse(this);
+    }
+    public void removeChatMessage(ChatMessage message) {
+        chatMessages.remove(message);
+        message.setCourse(null);
+    }
+
+    public void addFileBoard(FileBoard fileBoard) {
+        fileBoards.add(fileBoard);
+        fileBoard.setCourse(this);
+    }
+
+    public void removeFileBoard(FileBoard fileBoard) {
+        fileBoards.remove(fileBoard);
+        fileBoard.setCourse(null);
     }
 }

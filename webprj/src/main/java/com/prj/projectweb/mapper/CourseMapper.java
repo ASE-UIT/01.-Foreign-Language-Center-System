@@ -14,8 +14,10 @@ public interface CourseMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "giangVien", ignore = true)
-    Course toCourse(CourseRequest courseRequest);
+    @Mapping(target = "room", ignore = true)
+    Course toCourse(CourseRequest courseRequest);   
 
+    @Mapping(source = "room.roomName", target = "room")
     CourseRequest toCourseRequest(Course course);
 
     @Mapping(source = "giangVien.name", target = "nameOfGiangVien")
@@ -27,6 +29,7 @@ public interface CourseMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "giangVien", ignore = true)
+    @Mapping(target = "room", ignore = true)
     void updateCourse(@MappingTarget Course course, CourseRequest courseRequest);
 }
 

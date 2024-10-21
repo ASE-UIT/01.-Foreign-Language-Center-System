@@ -13,6 +13,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthenticationService {
     UserRepository userRepository;
+    PasswordEncoder passwordEncoder;
 
     public LoginResponse login(LoginRequest request) {
         if (!userRepository.existsByEmail(request.getEmail()))
@@ -31,8 +34,9 @@ public class AuthenticationService {
 
         User user = userRepository.findByEmail(request.getEmail());
 
-        if (!user.getPassword().equals(request.getPassword()))
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw  new AppException(ErrorCode.PASSWORD_WRONG);
+        }
 
         String role = user.getRole().getRoleName();
         List<ChildOfParentResponse> child = null;

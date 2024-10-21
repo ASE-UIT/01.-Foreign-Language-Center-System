@@ -25,6 +25,11 @@ public enum ErrorCode {
     COURSE_UPDATE_FAILED(1018, "Course update failed", HttpStatus.INTERNAL_SERVER_ERROR),
     USER_NOTFOUND(1019, "User not found", HttpStatus.NOT_FOUND),
     NEW_PASSWORD_NOTMATCH(1020, "New passwords not match", HttpStatus.BAD_REQUEST),
+    FILE_NOTFOUND(1021, "File not found", HttpStatus.NOT_FOUND),
+    ROOM_EXISTED(1022, "Room existed", HttpStatus.BAD_REQUEST),
+    ROOM_NOT_AVAILABLE(1023, "Room not available", HttpStatus.BAD_REQUEST),
+    ROOM_NOTFOUND(1024, "Room not found", HttpStatus.NOT_FOUND),
+    INVALID_VOTE(1025, "Invalid vote", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
