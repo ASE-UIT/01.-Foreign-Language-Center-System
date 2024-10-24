@@ -15,7 +15,6 @@ public class Refund {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String studentEmail;
     private String courseName;
     private String reason;
@@ -23,7 +22,6 @@ public class Refund {
 
     // Constructor, Getter và Setter
     public Refund() {}
-
     public Refund(String studentEmail, String courseName, String reason, double refundAmount) {
         this.studentEmail = studentEmail;
         this.courseName = courseName;
