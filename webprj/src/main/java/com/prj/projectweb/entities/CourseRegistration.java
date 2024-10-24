@@ -1,11 +1,14 @@
 package com.prj.projectweb.entities;
 
-import com.prj.projectweb.exception.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.prj.projectweb.enumType.PaymentStatus;
+import com.prj.projectweb.enumType.RegistrationStatus;
 
 @Entity
 @Getter
@@ -43,5 +46,26 @@ public class CourseRegistration {
     @Column(name = "has_paid", nullable = false)
     @Builder.Default
     Boolean hasPaid = false;
+    
+    // Trạng thái thanh toán
+    @Enumerated(EnumType.STRING)
+    PaymentStatus paymentStatus;
+
+    // Thời điểm thanh toán
+    LocalDateTime paymentTime;
+
+    // Setter cho paymentStatus
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = (paymentStatus != null) ? paymentStatus : PaymentStatus.PENDING;
+        if (paymentStatus == PaymentStatus.PAID) {
+            this.paymentTime = LocalDateTime.now();
+        }
+    }
+
+    // Optional: Phương thức để kiểm tra trạng thái thanh toán
+    public PaymentStatus getPaymentStatus() {
+        return (this.paymentStatus != null) ? this.paymentStatus : PaymentStatus.PENDING;
+    }
+    private Double paidAmount;
 }
 
