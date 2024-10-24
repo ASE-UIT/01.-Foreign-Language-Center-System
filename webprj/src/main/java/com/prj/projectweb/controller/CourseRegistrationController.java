@@ -1,5 +1,6 @@
 package com.prj.projectweb.controller;
 
+import com.prj.projectweb.dto.request.CompletePaymentRequest;
 import com.prj.projectweb.dto.request.CourseRegistrationRequest;
 import com.prj.projectweb.dto.response.ApiResponse;
 import com.prj.projectweb.dto.response.UserCourseResponse;
@@ -67,14 +68,13 @@ public class CourseRegistrationController {
                 .build());
     }
     @PostMapping("/complete-payment")
-    public ResponseEntity<ApiResponse<?>> completePayment(@RequestParam Long userId,
-                                                          @RequestParam List<Long> courseIds,
-                                                          @RequestParam Double amount) {
-        CourseRegistrationResponse response = courseRegistrationService.completePayment(userId, courseIds, amount);
+    public ResponseEntity<ApiResponse<?>> completePayment(@RequestBody CompletePaymentRequest request) {
+        CourseRegistrationResponse response = courseRegistrationService.completePayment(request.getUserId(), request.getCourseIds(), request.getAmount());
         return ResponseEntity.ok(ApiResponse.<CourseRegistrationResponse>builder()
                 .message("Payment completed successfully")
                 .result(response)
                 .build());
     }
+
 }
 

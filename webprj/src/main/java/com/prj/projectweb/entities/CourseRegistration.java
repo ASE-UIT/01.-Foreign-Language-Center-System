@@ -44,9 +44,19 @@ public class CourseRegistration {
     @Column(name = "has_paid", nullable = false)
     @Builder.Default
     Boolean hasPaid = false;
-
+    
     // Trạng thái thanh toán
     @Enumerated(EnumType.STRING)
     PaymentStatus paymentStatus;
+
+    // Setter cho paymentStatus
+    public void setPaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = (paymentStatus != null) ? paymentStatus : PaymentStatus.PENDING;
+    }
+
+    // Optional: Phương thức để kiểm tra trạng thái thanh toán
+    public PaymentStatus getPaymentStatus() {
+        return (this.paymentStatus != null) ? this.paymentStatus : PaymentStatus.PENDING;
+    }
 }
 

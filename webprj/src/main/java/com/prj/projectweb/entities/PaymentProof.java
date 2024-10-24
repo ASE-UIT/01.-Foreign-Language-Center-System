@@ -18,6 +18,7 @@ public class PaymentProof {
 
     private String fileName;
     private String fileType;
+    @Lob
     private byte[] fileData;
     private String uploadedBy;
     private LocalDateTime uploadTime;
