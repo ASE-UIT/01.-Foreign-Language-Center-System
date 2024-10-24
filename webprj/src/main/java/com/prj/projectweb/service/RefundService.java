@@ -17,6 +17,8 @@ import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class RefundService {
 
@@ -37,8 +39,11 @@ public class RefundService {
         }
 
         // Tìm khóa học đã đăng ký dựa trên courseId
-        CourseRegistration registration = courseRegistrationRepository.findByUserIdAndCourseId(user.getUserId(), refundRequest.getCourseId())
-                .orElseThrow(() -> new AppException(ErrorCode.REGISTRATION_NOT_FOUND));
+        Optional<CourseRegistration> registrationOptional = courseRegistrationRepository.findByStudent_UserIdAndCourse_Id(user.getUserId(), refundRequest.getCourseId());
+        if (registrationOptional.isEmpty()) {
+            throw new AppException(ErrorCode.REGISTRATION_NOT_FOUND);
+        }
+        CourseRegistration registration = registrationOptional.get();
 
         // Tính toán số tiền hoàn lại dựa trên mức refund (cần chuyển RefundAmount thành chuỗi nếu cần)
         Double refundAmount = calculateRefundAmount(registration.getPaidAmount(), refundRequest.getRefundAmount().toString());
