@@ -12,6 +12,8 @@ public class RefundRequest {
     private String courseName;
     private String reason;
     private RefundAmount refundAmount; // Enum chỉ định loại hoàn tiền
+    private Long courseId;
+    private String email; // Đảm bảo có thuộc tính này
 
     // Constructor
     public RefundRequest(String studentEmail, String courseName, String reason, RefundAmount refundAmount) {
@@ -20,6 +22,4 @@ public class RefundRequest {
         this.reason = reason;
         this.refundAmount = refundAmount;
     }
-
 }
-
