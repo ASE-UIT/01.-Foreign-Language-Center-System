@@ -43,17 +43,17 @@ public class RefundService {
         return new RefundResponse(message, studentEmail, courseName, refundAmount, reason);
     }
 
-    private double calculateRefundAmount(RefundAmount refundAmount) {
-        double totalAmount = 1000; // Giả sử tổng tiền khóa học là 1000
-        switch (refundAmount) {
-            case FULL:
-                return totalAmount;
-            case QUARTER:
-                return totalAmount / 4;
-            case HALF:
-                return totalAmount / 2;
+    // Phương thức tính số tiền hoàn lại
+    private Double calculateRefundAmount(Double paidAmount, String refundType) {
+        switch (refundType.toLowerCase()) {
+            case "full":
+                return paidAmount;
+            case "quarter":
+                return paidAmount / 4;
+            case "half":
+                return paidAmount / 2;
             default:
-                return 0;
+                throw new IllegalArgumentException("Invalid refund type");
         }
     }
 }
