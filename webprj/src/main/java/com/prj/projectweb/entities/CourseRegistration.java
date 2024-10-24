@@ -58,5 +58,6 @@ public class CourseRegistration {
     public PaymentStatus getPaymentStatus() {
         return (this.paymentStatus != null) ? this.paymentStatus : PaymentStatus.PENDING;
     }
+    private Double paidAmount;
 }
 
