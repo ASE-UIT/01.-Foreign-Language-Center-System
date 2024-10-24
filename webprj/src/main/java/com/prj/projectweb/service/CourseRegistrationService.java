@@ -5,12 +5,11 @@ import com.prj.projectweb.dto.response.CourseRegistrationResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.User;
-
+import com.prj.projectweb.enumType.PaymentStatus;
+import com.prj.projectweb.enumType.RegistrationStatus;
 import com.prj.projectweb.dto.response.UserCourseResponse;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
-import com.prj.projectweb.exception.PaymentStatus;
-import com.prj.projectweb.exception.RegistrationStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.UserRepository;
@@ -191,6 +190,11 @@ public class CourseRegistrationService {
             if (!registration.getHasPaid()) {
                 registration.setHasPaid(true);
                 registration.setPaymentStatus(PaymentStatus.PAID);
+
+                // lưu số tiền thanh toán
+                Double currentPaidAmount = registration.getPaidAmount();
+                registration.setPaidAmount((currentPaidAmount != null ? currentPaidAmount : 0.0) + amount);
+
                 registrationRepository.save(registration); 
             }
         });

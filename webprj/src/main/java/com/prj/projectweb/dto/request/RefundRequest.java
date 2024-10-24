@@ -1,25 +1,17 @@
 package com.prj.projectweb.dto.request;
 
-import com.prj.projectweb.exception.RefundAmount;
-import lombok.Getter;
-import lombok.Setter;
+import com.prj.projectweb.enumType.RefundAmount;
 
-@Setter
-@Getter
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RefundRequest {
-    // Getter và Setter
-    private String studentEmail;
-    private String courseName;
+    private String studentEmail; 
+    private Long courseId; 
     private String reason;
-    private RefundAmount refundAmount; // Enum chỉ định loại hoàn tiền
-    private Long courseId;
-    private String email; 
-
-    // Constructor
-    public RefundRequest(String studentEmail, String courseName, String reason, RefundAmount refundAmount) {
-        this.studentEmail = studentEmail;
-        this.courseName = courseName;
-        this.reason = reason;
-        this.refundAmount = refundAmount;
-    }
+    private RefundAmount refundAmount; 
 }
+

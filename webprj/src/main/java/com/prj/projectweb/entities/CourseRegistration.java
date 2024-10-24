@@ -1,13 +1,14 @@
 package com.prj.projectweb.entities;
 
-import com.prj.projectweb.exception.PaymentStatus;
-import com.prj.projectweb.exception.RegistrationStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.prj.projectweb.enumType.PaymentStatus;
+import com.prj.projectweb.enumType.RegistrationStatus;
 
 @Entity
 @Getter

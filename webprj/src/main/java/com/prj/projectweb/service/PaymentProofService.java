@@ -1,12 +1,13 @@
 package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.DownloadPaymentProofRequest;
+import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.PaymentProof;
 import com.prj.projectweb.entities.User;
+import com.prj.projectweb.enumType.PaymentStatus;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
-import com.prj.projectweb.exception.PaymentStatus;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.PaymentProofRepository;
 import com.prj.projectweb.repositories.UserRepository;
@@ -81,12 +82,28 @@ public class PaymentProofService {
         // Lưu thông tin vào CSDL
         paymentProofRepository.save(paymentProof);
 
-        // Cập nhật trạng thái học viên
+        // Cập nhật trạng thái thanh toán của học viên
         courseRegistration.setHasPaid(true);
         courseRegistration.setPaymentStatus(PaymentStatus.PAID);
-        courseRegistrationRepository.save(courseRegistration);
 
+        // Cập nhật paidAmount từ tuitionFee (học phí khóa học)
+        Course course = courseRegistration.getCourse();
+        if (course != null) {
+            String tuitionFee = course.getTuitionFee();
+            Double amountPaid = convertTuitionFeeToDouble(tuitionFee);
+            courseRegistration.setPaidAmount(amountPaid);
+        }
+
+        courseRegistrationRepository.save(courseRegistration);
         return 0;
+    }
+
+    private Double convertTuitionFeeToDouble(String tuitionFee) {
+        if (tuitionFee == null || tuitionFee.isEmpty()) {
+            return 0.0;
+        }
+        // Loại bỏ ký tự không cần thiết và chuyển đổi
+        return Double.parseDouble(tuitionFee.replaceAll("[^\\d]", ""));
     }
 
     private boolean isValidImageType(String fileType) {
