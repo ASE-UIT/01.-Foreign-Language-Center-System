@@ -191,7 +191,7 @@ public class CourseRegistrationService {
             if (!registration.getHasPaid()) {
                 registration.setHasPaid(true);
                 registration.setPaymentStatus(PaymentStatus.PAID);
-                registrationRepository.save(registration); // Cập nhật vào database
+                registrationRepository.save(registration); 
             }
         });
         // Gửi email thông báo sau khi hoàn tất thanh toán

@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -49,9 +50,15 @@ public class CourseRegistration {
     @Enumerated(EnumType.STRING)
     PaymentStatus paymentStatus;
 
+    // Thời điểm thanh toán
+    LocalDateTime paymentTime;
+
     // Setter cho paymentStatus
     public void setPaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = (paymentStatus != null) ? paymentStatus : PaymentStatus.PENDING;
+        if (paymentStatus == PaymentStatus.PAID) {
+            this.paymentTime = LocalDateTime.now();
+        }
     }
 
     // Optional: Phương thức để kiểm tra trạng thái thanh toán
