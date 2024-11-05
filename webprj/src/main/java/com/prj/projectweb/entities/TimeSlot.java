@@ -6,7 +6,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -25,5 +27,5 @@ public class TimeSlot {
 
     @ManyToMany(mappedBy = "schedule")
     @JsonBackReference
-    List<Course> courses = new ArrayList<>();
+    Set<Course> courses = new HashSet();
 }
