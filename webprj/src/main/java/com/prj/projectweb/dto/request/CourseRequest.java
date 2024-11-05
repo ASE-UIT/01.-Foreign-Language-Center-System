@@ -21,7 +21,7 @@ public class CourseRequest {
     CertificateRequest certificate;
     String startTime;
     String endTime;
-    Set<TimeSlotRequest> schedule;
+    Set<Long> schedule;
     Integer likes;
     String image;
     Integer numberOfStudents;
