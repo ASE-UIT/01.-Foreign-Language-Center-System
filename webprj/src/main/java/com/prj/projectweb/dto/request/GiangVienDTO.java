@@ -15,4 +15,5 @@ public class GiangVienDTO {
     LocalDate dob;
     Integer likes;
     Integer dislikes;
+    String image;
 }
