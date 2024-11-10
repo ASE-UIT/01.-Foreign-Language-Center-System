@@ -27,6 +27,9 @@ public class GiangVien {
     Integer likes;
     Integer dislikes;
 
+    @Lob
+    String image;
+    
     // Mối quan hệ OneToMany với Course
     @OneToMany(mappedBy = "giangVien", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

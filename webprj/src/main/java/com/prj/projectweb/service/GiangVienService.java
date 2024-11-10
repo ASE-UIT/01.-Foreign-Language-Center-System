@@ -31,7 +31,7 @@ public class GiangVienService {
     GiangVienMapper giangVienMapper;
 
     public GiangVienResponse addGiangVien(GiangVienDTO giangVienDTO) {
-        log.info("service add gia");
+        log.info("service add giang vien");
         GiangVien giangVien = giangVienMapper.dtoToGiangVien(giangVienDTO);
 
         giangVienRepository.save(giangVien);
