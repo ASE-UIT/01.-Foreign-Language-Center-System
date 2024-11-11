@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-10-11T11:14:57+0700",
+    date = "2024-11-10T22:08:01+0700",
     comments = "version: 1.6.2, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.10.1.jar, environment: Java 21.0.2 (Oracle Corporation)"
 )
 @Component
@@ -50,7 +50,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( courseRequest.getEndTime() != null ) {
             course.endTime( LocalDate.parse( courseRequest.getEndTime() ) );
         }
-        course.schedule( toTimeSlotSet( courseRequest.getSchedule() ) );
+        course.schedule( map( courseRequest.getSchedule() ) );
         course.likes( courseRequest.getLikes() );
         course.image( courseRequest.getImage() );
         course.numberOfStudents( courseRequest.getNumberOfStudents() );
@@ -81,7 +81,7 @@ public class CourseMapperImpl implements CourseMapper {
         if ( course.getEndTime() != null ) {
             courseRequest.endTime( DateTimeFormatter.ISO_LOCAL_DATE.format( course.getEndTime() ) );
         }
-        courseRequest.schedule( toTimeSlotRequestSet( course.getSchedule() ) );
+        courseRequest.schedule( mapToIds( course.getSchedule() ) );
         courseRequest.likes( course.getLikes() );
         courseRequest.image( course.getImage() );
         courseRequest.numberOfStudents( course.getNumberOfStudents() );
@@ -190,7 +190,7 @@ public class CourseMapperImpl implements CourseMapper {
             course.setEndTime( null );
         }
         if ( course.getSchedule() != null ) {
-            Set<TimeSlot> set = toTimeSlotSet( courseRequest.getSchedule() );
+            Set<TimeSlot> set = map( courseRequest.getSchedule() );
             if ( set != null ) {
                 course.getSchedule().clear();
                 course.getSchedule().addAll( set );
@@ -200,7 +200,7 @@ public class CourseMapperImpl implements CourseMapper {
             }
         }
         else {
-            Set<TimeSlot> set = toTimeSlotSet( courseRequest.getSchedule() );
+            Set<TimeSlot> set = map( courseRequest.getSchedule() );
             if ( set != null ) {
                 course.setSchedule( set );
             }

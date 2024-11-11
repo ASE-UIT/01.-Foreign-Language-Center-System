@@ -14,6 +14,7 @@ import com.prj.projectweb.dto.request.VoteCourseRequest;
 import com.prj.projectweb.dto.request.VoteGiangVienRequest;
 import com.prj.projectweb.dto.response.VoteInfoResponse;
 import com.prj.projectweb.dto.response.ApiResponse;
+import com.prj.projectweb.dto.response.GiangVienWithVote;
 import com.prj.projectweb.service.VoteService;
 
 import lombok.AccessLevel;
@@ -72,9 +73,9 @@ public class VoteController {
     }
 
     @GetMapping("/giangVien")
-    public ApiResponse<List<VoteInfoResponse>> getListGiangVien() {
-        List<VoteInfoResponse> result = voteService.getListGiangVien();
-        return ApiResponse.<List<VoteInfoResponse>>builder()
+    public ApiResponse<List<GiangVienWithVote>> getListGiangVien() {
+        List<GiangVienWithVote> result = voteService.getListGiangVien();
+        return ApiResponse.<List<GiangVienWithVote>>builder()
                     .message(result.size() + " giang vien")
                     .result(result)
                     .build();

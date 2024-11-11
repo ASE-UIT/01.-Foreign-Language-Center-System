@@ -30,6 +30,11 @@ public enum ErrorCode {
     ROOM_NOT_AVAILABLE(1023, "Room not available", HttpStatus.BAD_REQUEST),
     ROOM_NOTFOUND(1024, "Room not found", HttpStatus.NOT_FOUND),
     INVALID_VOTE(1025, "Invalid vote", HttpStatus.BAD_REQUEST),
+    REGISTRATION_NOT_FOUND(1026, "Registration not found", HttpStatus.NOT_FOUND),
+    UNAUTHORIZED_ACTION(1027, "You do not have permission to perform this action", HttpStatus.FORBIDDEN),
+    COURSE_REGISTRATION_NOTFOUND(1028, "Course registration not found", HttpStatus.NOT_FOUND),
+    PAYMENT_PROOF_NOTFOUND(1029, "Payment proof not found", HttpStatus.NOT_FOUND),
+    SEND_EMAIL_FAILED(1030, "Send email failed", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
@@ -37,9 +42,7 @@ public enum ErrorCode {
         this.message = message;
         this.statusCode = statusCode;
     }
-
     private int code;
     private String message;
     private HttpStatusCode statusCode;
-
 }

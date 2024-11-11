@@ -49,6 +49,9 @@ dependencies {
 
     // crypto
     implementation 'org.springframework.security:spring-security-crypto'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'com.sun.mail:jakarta.mail:2.0.0'
+
 }
 
 tasks.named("test") {

@@ -3,7 +3,8 @@ package com.prj.projectweb.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.User;
-import com.prj.projectweb.exception.RegistrationStatus;
+import com.prj.projectweb.enumType.RegistrationStatus;
+
 import lombok.Builder;
 import lombok.Data;
 
