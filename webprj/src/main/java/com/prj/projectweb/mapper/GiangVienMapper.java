@@ -6,6 +6,7 @@ import com.prj.projectweb.dto.response.GiangVienResponse;
 import com.prj.projectweb.entities.GiangVien;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.time.LocalDate;
@@ -22,6 +23,9 @@ public interface GiangVienMapper {
 
     @Mapping(target = "courses", ignore = true)
     GiangVien dtoToGiangVien(GiangVienDTO giangVienDTO);
+
+    @Mapping(target = "courses", ignore = true) // Bỏ qua trường courses khi cập nhật Giang Viên
+    void updateGiangVienFromDto(GiangVienDTO giangVienDTO, @MappingTarget GiangVien giangVien);
 
     @Named("stringToLocalDate")
     default LocalDate stringToLocalDate(String dob) {

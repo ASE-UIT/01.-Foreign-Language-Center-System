@@ -40,6 +40,28 @@ public class GiangVienService {
     }
 
     @Transactional
+    public GiangVienResponse updateGiangVien(Long id, GiangVienDTO giangVienDTO) {
+        log.info("service update giang vien");
+        GiangVien existingGiangVien = giangVienRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
+
+        giangVienMapper.updateGiangVienFromDto(giangVienDTO, existingGiangVien);
+        
+        giangVienRepository.save(existingGiangVien);
+
+        return giangVienMapper.toGiangVienResponse(existingGiangVien);
+    }
+
+    @Transactional
+    public void deleteGiangVien(Long id) {
+        log.info("service delete giang vien");
+        GiangVien giangVien = giangVienRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
+
+        giangVienRepository.delete(giangVien);
+    }
+
+    @Transactional
     public List<String> addList(List<GiangVienDTO> requests) throws Exception {
         log.info("in add list courses service");
 

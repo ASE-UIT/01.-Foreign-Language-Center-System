@@ -53,4 +53,22 @@ public class GiangVienController {
                 .result(giangVienService.getList())
                 .build();
     }
+
+    @PutMapping("/update/{id}")
+    public ApiResponse<GiangVienResponse> updateGiangVien(@PathVariable("id") Long id, 
+                                                           @RequestBody @Validated GiangVienDTO giangVienDTO) {
+        return ApiResponse.<GiangVienResponse>builder()
+                .message("Update giangvien successfully")
+                .result(giangVienService.updateGiangVien(id, giangVienDTO))
+                .build();
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<Void> deleteGiangVien(@PathVariable("id") Long id) {
+        giangVienService.deleteGiangVien(id);
+        return ApiResponse.<Void>builder()
+                .message("Delete giangvien successfully")
+                .result(null)
+                .build();
+    }
 }
