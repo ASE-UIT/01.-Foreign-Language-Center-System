@@ -11,6 +11,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -112,5 +114,15 @@ public class CourseController {
                 .message(message)
                 .result("Success")
                 .build();
+    }
+
+    @DeleteMapping("/{courseId}")
+    public ResponseEntity<String> deleteCourse(@PathVariable Long courseId) {
+        boolean isDeleted = courseService.deleteCourseById(courseId);
+        if (isDeleted) {
+            return ResponseEntity.ok("Khóa học đã được xóa thành công");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy khóa học");
+        }
     }
 }
