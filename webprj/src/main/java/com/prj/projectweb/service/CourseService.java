@@ -293,4 +293,12 @@ public class CourseService {
 
         return "Add room " + request.getRoomName() + " in course with id = " + request.getCourseId();
     }
+    @Transactional
+    public boolean deleteCourseById(Long courseId) {
+        if (courseRepository.existsById(courseId)) {
+            courseRepository.deleteById(courseId);
+            return true; // Xóa thành công
+        }
+        return false; // Không tìm thấy khóa học với ID này
+    }
 }
