@@ -31,12 +31,34 @@ public class GiangVienService {
     GiangVienMapper giangVienMapper;
 
     public GiangVienResponse addGiangVien(GiangVienDTO giangVienDTO) {
-        log.info("service add gia");
+        log.info("service add giang vien");
         GiangVien giangVien = giangVienMapper.dtoToGiangVien(giangVienDTO);
 
         giangVienRepository.save(giangVien);
 
         return giangVienMapper.toGiangVienResponse(giangVien);
+    }
+
+    @Transactional
+    public GiangVienResponse updateGiangVien(Long id, GiangVienDTO giangVienDTO) {
+        log.info("service update giang vien");
+        GiangVien existingGiangVien = giangVienRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
+
+        giangVienMapper.updateGiangVienFromDto(giangVienDTO, existingGiangVien);
+        
+        giangVienRepository.save(existingGiangVien);
+
+        return giangVienMapper.toGiangVienResponse(existingGiangVien);
+    }
+
+    @Transactional
+    public void deleteGiangVien(Long id) {
+        log.info("service delete giang vien");
+        GiangVien giangVien = giangVienRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
+
+        giangVienRepository.delete(giangVien);
     }
 
     @Transactional

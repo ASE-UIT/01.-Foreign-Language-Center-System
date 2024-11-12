@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.prj.projectweb.dto.request.VoteCourseRequest;
 import com.prj.projectweb.dto.request.VoteGiangVienRequest;
+import com.prj.projectweb.dto.response.GiangVienWithVote;
 import com.prj.projectweb.dto.response.VoteInfoResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.GiangVien;
@@ -127,17 +128,18 @@ public class VoteService {
     }
 
     @Transactional
-    public List<VoteInfoResponse> getListGiangVien() {
+    public List<GiangVienWithVote> getListGiangVien() {
         List<GiangVien> giangVienList = giangVienRepository.findAll();
-        List<VoteInfoResponse> voteResponses = new ArrayList<>();
+        List<GiangVienWithVote> voteResponses = new ArrayList<>();
 
         for (GiangVien gv: giangVienList) {
             int neutralVote = voteGiangVienRepository.countByGiangVienIdAndVoteType(gv.getId(), VoteType.NEUTRAL);
             int likeVote = voteGiangVienRepository.countByGiangVienIdAndVoteType(gv.getId(), VoteType.LIKE);
             int dislikeVote = voteGiangVienRepository.countByGiangVienIdAndVoteType(gv.getId(), VoteType.DISLIKE);
 
-            voteResponses.add(VoteInfoResponse.builder()
+            voteResponses.add(GiangVienWithVote.builder()
                                             .id(gv.getId())
+                                            .image(gv.getImage())
                                             .name(gv.getName())
                                             .neutral(neutralVote)
                                             .like(likeVote)

@@ -44,7 +44,7 @@ public class Course {
     LocalDate startTime;
     LocalDate endTime;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany(cascade = {CascadeType.MERGE})
     @JoinTable(
             name = "course_time_slot",
             joinColumns = @JoinColumn(name = "course_id"),
@@ -89,16 +89,6 @@ public class Course {
     public void removeCourseContent(CourseContent content) {
         courseContent.remove(content);
         content.setCourse(null);
-    }
-
-    public void addTimeSlot(TimeSlot timeSlot) {
-        schedule.add(timeSlot);
-        timeSlot.getCourses().add(this);
-    }
-
-    public void removeTimeSlot(TimeSlot timeSlot) {
-        schedule.remove(timeSlot);
-        timeSlot.getCourses().remove(this);
     }
 
     public void setCertificate(Certificate certificate) {

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -57,11 +58,10 @@ public class CourseService {
     @Transactional
     public String addCourse(CourseRequest courseRequest) throws Exception {
         log.info("in add course service");
-
-
+    
         // Kiểm tra tên khóa học đã tồn tại chưa
         if (courseRepository.existsByCourseName(courseRequest.getCourseName())) {
-            throw  new AppException(ErrorCode.COURSE_EXISTED);
+            throw new AppException(ErrorCode.COURSE_EXISTED);
         }
         // Kiểm tra thời gian bắt đầu và kết thúc có hợp lệ không
         if (LocalDate.parse(courseRequest.getStartTime()).isAfter(LocalDate.parse(courseRequest.getEndTime()))) {
@@ -74,10 +74,9 @@ public class CourseService {
         }
         
         Course course = courseMapper.toCourse(courseRequest);
-
         course.setStartTime(LocalDate.parse(courseRequest.getStartTime()));
         course.setEndTime(LocalDate.parse(courseRequest.getEndTime()));
-
+    
         if (courseRequest.getRoom() != null) {
             Room room = roomRepository.findById(courseRequest.getRoom())
                         .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOTFOUND));
@@ -85,45 +84,46 @@ public class CourseService {
             course.setRoom(room);
             room.addCourse(course);
         } 
-
+    
         if (courseRequest.getGiangVien() != null) {
             GiangVien giangVien = giangVienRepository.findById(courseRequest.getGiangVien().getId())
                     .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
-
+    
             // Thiết lập mối quan hệ giữa Course và GiangVien
             course.setGiangVien(giangVien);
             giangVien.addCourse(course); // Phương thức tiện ích trong GiangVien
         }
-
-
+    
         // Thiết lập mối quan hệ cho CourseContent
         if (course.getCourseContent() != null) {
             course.getCourseContent().forEach(content -> content.setCourse(course));
         }
-
-        // Thiết lập mối quan hệ cho TimeSlot
-        if (courseRequest.getSchedule() != null) {
-            for (TimeSlotRequest timeSlotRequest : courseRequest.getSchedule()) {
-                TimeSlot timeSlot = timeSlotRepository
-                        .findByDayAndTimeRange(timeSlotRequest.getDay(), timeSlotRequest.getTimeRange())
-                        .orElseThrow(() -> new AppException(ErrorCode.TIMESLOT_NOTFOUND));
-
-                if (!course.getSchedule().contains(timeSlot)) {
-                    course.addTimeSlot(timeSlot);
-                }
-            }
-        }
-
+    
         // Thiết lập mối quan hệ cho Certificate
         if (course.getCertificate() != null) {
             course.getCertificate().setCourse(course);
         }
 
+        // Thiết lập mối quan hệ cho TimeSlot từ danh sách ID
+        if (courseRequest.getSchedule() != null) {
+            Set<TimeSlot> timeSlots = new HashSet<>();
+            for (Long timeSlotId : courseRequest.getSchedule()) {
+                TimeSlot timeSlot = timeSlotRepository.findById(timeSlotId)
+                        .orElseThrow(() -> new AppException(ErrorCode.TIMESLOT_NOTFOUND));
+                timeSlots.add(timeSlot);
+            }
+            course.setSchedule(timeSlots); // Thiết lập danh sách time slots cho course
+        }
+
         // Lưu course vào database
         courseRepository.save(course);
 
+    
         return course.getCourseName();
     }
+    
+
+
 
     @Transactional
     public List<String> addListCourses(List<CourseRequest> courseRequests) throws Exception {
