@@ -121,7 +121,8 @@ public class CourseController {
         boolean isDeleted = courseService.deleteCourseById(courseId);
         if (isDeleted) {
             return ResponseEntity.ok("Khóa học đã được xóa thành công");
-        } else {
+        }
+        else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy khóa học");
         }
     }
