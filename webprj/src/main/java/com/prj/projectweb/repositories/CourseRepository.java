@@ -13,4 +13,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     // Phương thức tìm lớp học theo ngày
     @Query("SELECT c FROM Course c WHERE DATE(c.startTime) = :date")
     List<Course> findClassesByDate(@Param("date") LocalDate date);
+    List<Course> findByIsDeletedFalse();
 }
