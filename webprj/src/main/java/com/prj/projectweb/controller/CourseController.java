@@ -117,7 +117,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{courseId}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long courseId) {
+    public ResponseEntity<String> deleteCourse(@PathVariable("courseId") Long courseId) {
         boolean isDeleted = courseService.deleteCourseById(courseId);
         if (isDeleted) {
             return ResponseEntity.ok("Khóa học đã được xóa thành công");
