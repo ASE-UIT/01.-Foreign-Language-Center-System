@@ -80,6 +80,16 @@ public class Course {
     @JoinColumn(name = "room_name") 
     private Room room;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
+    public boolean isDeleted() {
+        return isDeleted;
+    }
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
     // Phương thức tiện ích
     public void addCourseContent(CourseContent content) {
         courseContent.add(content);

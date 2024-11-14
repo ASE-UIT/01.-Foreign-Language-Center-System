@@ -293,4 +293,17 @@ public class CourseService {
 
         return "Add room " + request.getRoomName() + " in course with id = " + request.getCourseId();
     }
+
+    @Transactional
+    public boolean deleteCourseById(Long courseId) {
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+
+        if (courseOptional.isPresent()) {
+            Course course = courseOptional.get();
+            course.setIsDeleted(true); // Đánh dấu khóa học là đã bị xóa
+            courseRepository.save(course); // Lưu thay đổi vào DB
+            return true; // Đánh dấu thành công
+        }
+        return false; // Không tìm thấy khóa học với ID này
+    }
 }
