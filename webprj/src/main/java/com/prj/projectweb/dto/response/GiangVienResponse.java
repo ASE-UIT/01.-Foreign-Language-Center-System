@@ -14,5 +14,5 @@ public class GiangVienResponse {
     Long id;
     String name;
     LocalDate dob;
-    Long account_id;
+    Long accountId;
 }

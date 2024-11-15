@@ -6,6 +6,7 @@ import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
+import com.prj.projectweb.entities.Center;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.GiangVien;
@@ -15,6 +16,7 @@ import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.CourseMapper;
 import com.prj.projectweb.mapper.TimeSlotMapper;
+import com.prj.projectweb.repositories.CenterRepository;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
@@ -53,16 +55,27 @@ public class CourseService {
     RoomRepository roomRepository;
     CourseRegistrationRepository courseRegistrationRepository;
     TimeSlotMapper timeSlotMapper;
+    CenterRepository centerRepository;
 
 
     @Transactional
     public String addCourse(CourseRequest courseRequest) throws Exception {
         log.info("in add course service");
     
-        // Kiểm tra tên khóa học đã tồn tại chưa
-        if (courseRepository.existsByCourseName(courseRequest.getCourseName())) {
+        Center center = null;
+        // Thiết lập mối quan hệ cho center
+        if (courseRequest.getCenterId() != null) {
+            center = centerRepository.findById(courseRequest.getCenterId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CENTER_NOTFOUND));
+        } else {
+            throw new AppException(ErrorCode.INVALID_REQUEST);
+        }
+
+        // Kiểm tra tên khóa học đã có trong trung tâm chưa
+        if (courseRepository.existsByCourseNameAndCenter_Id(courseRequest.getCourseName(), center.getId())) {
             throw new AppException(ErrorCode.COURSE_EXISTED);
         }
+
         // Kiểm tra thời gian bắt đầu và kết thúc có hợp lệ không
         if (LocalDate.parse(courseRequest.getStartTime()).isAfter(LocalDate.parse(courseRequest.getEndTime()))) {
             throw new AppException(ErrorCode.INVALID_REQUEST);
@@ -77,6 +90,10 @@ public class CourseService {
         course.setStartTime(LocalDate.parse(courseRequest.getStartTime()));
         course.setEndTime(LocalDate.parse(courseRequest.getEndTime()));
     
+        // Thiết lập mối quan hệ cho center
+        course.setCenter(center);
+
+        // Thiết lập quan hệ với Room
         if (courseRequest.getRoom() != null) {
             Room room = roomRepository.findById(courseRequest.getRoom())
                         .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOTFOUND));
@@ -115,6 +132,7 @@ public class CourseService {
             course.setSchedule(timeSlots); // Thiết lập danh sách time slots cho course
         }
 
+
         // Lưu course vào database
         courseRepository.save(course);
 
@@ -139,10 +157,13 @@ public class CourseService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseResponse> getCourses() {
-        log.info("in get list course service");
+    public List<CourseResponse> getCoursesByCenterId(Long centerId) {
+        log.info("SERVICE: in get list course by center_id");
 
-        List<Course> courses = courseRepository.findAll();
+        Center center = centerRepository.findById(centerId)
+                            .orElseThrow(() -> new AppException(ErrorCode.CENTER_NOTFOUND));
+
+        List<Course> courses = courseRepository.findByCenter(center);
 
         List<CourseResponse> courseResponses = courses.stream()
                 .map(courseMapper::toCourseResponse)

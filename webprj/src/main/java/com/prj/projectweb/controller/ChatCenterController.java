@@ -26,7 +26,7 @@ public class ChatCenterController {
     public ResponseEntity<ApiResponse<?>> sendMessage(
             @RequestBody ChatCenterRequest request) {
         try {
-            ChatCenter chatCenter = chatCenterService.sendMessage(request.getSenderId(), request.getReceiverId(), request.getMessageContent());
+            ChatCenter chatCenter = chatCenterService.sendMessage(request.getSenderId(), request.getReceiverId(), request.getMessageContent(), request.getCenterId());
             ApiResponse<ChatCenter> response = ApiResponse.<ChatCenter>builder()
                     .message("Message sent successfully")
                     .code(HttpStatus.CREATED.value())

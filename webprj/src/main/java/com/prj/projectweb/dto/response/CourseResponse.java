@@ -24,4 +24,5 @@ public class CourseResponse {
     String nameOfGiangVien;     // Tên giảng viên
     Integer numberOfStudents;   // Số lượng học sinh
     Integer likes;              // Số lượt likes
+    Long centerId;
 }

@@ -36,6 +36,7 @@ public enum ErrorCode {
     PAYMENT_PROOF_NOTFOUND(1029, "Payment proof not found", HttpStatus.NOT_FOUND),
     SEND_EMAIL_FAILED(1030, "Send email failed", HttpStatus.BAD_REQUEST),
     INVALID_ROLE_FLAG(1031, "Invalid flag role", HttpStatus.BAD_REQUEST),
+    CENTER_NOTFOUND(1032, "Center not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -24,9 +24,14 @@ public class ChatCenterService {
     private UserRepository userRepository;
 
     // Send message from one user to another
-    public ChatCenter sendMessage(Long senderId, Long receiverId, String messageContent) {
+    public ChatCenter sendMessage(Long senderId, Long receiverId, String messageContent, Long centerId) {
         User sender = userRepository.findById(senderId).orElseThrow(() -> new RuntimeException("Sender not found"));
         User receiver = userRepository.findById(receiverId).orElseThrow(() -> new RuntimeException("Receiver not found"));
+        
+        // Ensure the sender and receiver belong to the same center
+        if (!isSameCenter(sender, receiver, centerId)) {
+            throw new RuntimeException("Sender and receiver must belong to the same center");
+        }
 
         // Ensure the message is allowed based on roles
         if (!isMessageAllowed(sender, receiver)) {
@@ -46,6 +51,14 @@ public class ChatCenterService {
     // Get messages for a specific user
     public List<ChatCenter> getMessagesForUser(Long userId) {
         return chatCenterRepository.findByReceiver_UserId(userId);
+    }
+
+    // Logic to check if sender and receiver belong to the same center
+    private boolean isSameCenter(User sender, User receiver, Long centerId) {
+        return sender.getCenter() != null &&
+            receiver.getCenter() != null &&
+            sender.getCenter().getId().equals(centerId) &&
+            receiver.getCenter().getId().equals(centerId);
     }
 
     // Logic to determine if a message can be sent between the users based on their roles

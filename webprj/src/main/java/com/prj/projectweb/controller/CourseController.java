@@ -47,14 +47,16 @@ public class CourseController {
                 .build();
     }
 
-    @GetMapping("/getCourses")
-    ApiResponse<List<CourseResponse>> getCourses() {
+    @GetMapping("/getCourses/{center_id}")
+    ApiResponse<List<CourseResponse>> getCoursesByCenterId(@PathVariable("center_id") Long center_id) {
+        List<CourseResponse> result = courseService.getCoursesByCenterId(center_id);
         return ApiResponse.<List<CourseResponse>>builder()
-                .result(courseService.getCourses())
+                .message("SUCCESS: " + result.size() + " courses in center with id = " + center_id)
+                .result(result)
                 .build();
     }
 
-    @GetMapping("/getCourses/{course_id}")
+    @GetMapping("/getCourse/{course_id}")
     ApiResponse<CourseRequest> getCourseById(@PathVariable("course_id") Long course_id) throws Exception {
         return ApiResponse.<CourseRequest>builder()
                 .result(courseService.getCourseById(course_id))
@@ -64,6 +66,7 @@ public class CourseController {
     @PutMapping("/addGiangVien/{course_id}")
     ApiResponse<String> addGiangVien(@PathVariable("course_id") Long course_id, @RequestBody GiangVienRequest giangVienRequest) throws Exception {
         return ApiResponse.<String>builder()
+                .message("SUCCESS: get course with id = " + course_id)
                 .result(courseService.addGiangVienToCourse(course_id, giangVienRequest))
                 .build();
     }

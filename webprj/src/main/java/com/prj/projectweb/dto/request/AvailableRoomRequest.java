@@ -14,6 +14,7 @@ import com.prj.projectweb.entities.TimeSlot;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AvailableRoomRequest {
+    Long centerId;
     Set<TimeSlotRequest> timeSlots;
     LocalDate startDate;
     LocalDate endDate;

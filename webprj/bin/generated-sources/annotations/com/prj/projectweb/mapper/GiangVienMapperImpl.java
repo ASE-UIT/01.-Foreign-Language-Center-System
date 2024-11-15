@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-15T10:14:28+0700",
+    date = "2024-11-15T22:53:12+0700",
     comments = "version: 1.6.2, compiler: Eclipse JDT (IDE) 3.40.0.z20241023-1306, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -42,7 +42,7 @@ public class GiangVienMapperImpl implements GiangVienMapper {
         if ( giangVien.getDob() != null ) {
             giangVienResponse.dob( LocalDate.parse( localDateToString( giangVien.getDob() ) ) );
         }
-        giangVienResponse.account_id( giangVienUserUserId( giangVien ) );
+        giangVienResponse.accountId( giangVienUserUserId( giangVien ) );
         giangVienResponse.id( giangVien.getId() );
         giangVienResponse.name( giangVien.getName() );
 

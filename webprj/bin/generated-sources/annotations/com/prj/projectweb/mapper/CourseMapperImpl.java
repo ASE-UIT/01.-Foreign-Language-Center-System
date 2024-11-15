@@ -6,6 +6,7 @@ import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.request.TimeSlotRequest;
 import com.prj.projectweb.dto.response.CourseResponse;
+import com.prj.projectweb.entities.Center;
 import com.prj.projectweb.entities.Certificate;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseContent;
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-15T09:25:28+0700",
+    date = "2024-11-15T22:53:14+0700",
     comments = "version: 1.6.2, compiler: Eclipse JDT (IDE) 3.40.0.z20241023-1306, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -99,6 +100,7 @@ public class CourseMapperImpl implements CourseMapper {
 
         CourseResponse.CourseResponseBuilder courseResponse = CourseResponse.builder();
 
+        courseResponse.centerId( courseCenterId( course ) );
         courseResponse.nameOfGiangVien( courseGiangVienName( course ) );
         courseResponse.courseName( course.getCourseName() );
         courseResponse.duration( course.getDuration() );
@@ -316,6 +318,14 @@ public class CourseMapperImpl implements CourseMapper {
         giangVienRequest.name( giangVien.getName() );
 
         return giangVienRequest.build();
+    }
+
+    private Long courseCenterId(Course course) {
+        Center center = course.getCenter();
+        if ( center == null ) {
+            return null;
+        }
+        return center.getId();
     }
 
     private String courseGiangVienName(Course course) {

@@ -80,6 +80,12 @@ public class Course {
     @JoinColumn(name = "room_name") 
     private Room room;
 
+    // Thêm center_id để biết user thuộc trung tâm nào
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id")
+    @JsonBackReference
+    Center center;
+    
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

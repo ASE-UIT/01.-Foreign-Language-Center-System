@@ -3,6 +3,7 @@ package com.prj.projectweb.mapper;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
 import com.prj.projectweb.dto.response.UserResponse;
+import com.prj.projectweb.entities.Center;
 import com.prj.projectweb.entities.Role;
 import com.prj.projectweb.entities.User;
 import javax.annotation.processing.Generated;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-15T10:00:18+0700",
+    date = "2024-11-15T22:53:14+0700",
     comments = "version: 1.6.2, compiler: Eclipse JDT (IDE) 3.40.0.z20241023-1306, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -44,6 +45,7 @@ public class UserMapperImpl implements UserMapper {
         UserResponse.UserResponseBuilder userResponse = UserResponse.builder();
 
         userResponse.role( userRoleRoleName( user ) );
+        userResponse.centerId( userCenterId( user ) );
         userResponse.address( user.getAddress() );
         userResponse.dob( user.getDob() );
         userResponse.email( user.getEmail() );
@@ -75,5 +77,13 @@ public class UserMapperImpl implements UserMapper {
             return null;
         }
         return role.getRoleName();
+    }
+
+    private Long userCenterId(User user) {
+        Center center = user.getCenter();
+        if ( center == null ) {
+            return null;
+        }
+        return center.getId();
     }
 }

@@ -24,6 +24,7 @@ public class UserResponse {
     LocalDate dob;
 
     String role;
+    Long centerId;
 
     List<ChildOfParentResponse> children;
 
