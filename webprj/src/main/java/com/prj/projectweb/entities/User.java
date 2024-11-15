@@ -30,6 +30,9 @@ public class User {
     String phone;
     String address;
     LocalDate dob;
+    
+    @Lob
+    String image;
 
     @ManyToOne
     Role role;

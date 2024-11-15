@@ -24,11 +24,14 @@ public class GiangVien {
 
     String name;
     LocalDate dob;
-    Integer likes;
-    Integer dislikes;
 
     @Lob
     String image;
+
+    //Liên kết với User
+    @OneToOne
+    @JoinColumn(name="user_id", referencedColumnName = "userId", unique = true)
+    User user;
     
     // Mối quan hệ OneToMany với Course
     @OneToMany(mappedBy = "giangVien", cascade = CascadeType.ALL, orphanRemoval = true)

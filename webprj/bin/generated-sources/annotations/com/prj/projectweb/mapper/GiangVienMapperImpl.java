@@ -4,13 +4,14 @@ import com.prj.projectweb.dto.request.GiangVienDTO;
 import com.prj.projectweb.dto.request.GiangVienRequest;
 import com.prj.projectweb.dto.response.GiangVienResponse;
 import com.prj.projectweb.entities.GiangVien;
+import com.prj.projectweb.entities.User;
 import java.time.LocalDate;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-11-14T19:31:46+0700",
+    date = "2024-11-15T10:14:28+0700",
     comments = "version: 1.6.2, compiler: Eclipse JDT (IDE) 3.40.0.z20241023-1306, environment: Java 17.0.13 (Eclipse Adoptium)"
 )
 @Component
@@ -41,9 +42,8 @@ public class GiangVienMapperImpl implements GiangVienMapper {
         if ( giangVien.getDob() != null ) {
             giangVienResponse.dob( LocalDate.parse( localDateToString( giangVien.getDob() ) ) );
         }
-        giangVienResponse.dislikes( giangVien.getDislikes() );
+        giangVienResponse.account_id( giangVienUserUserId( giangVien ) );
         giangVienResponse.id( giangVien.getId() );
-        giangVienResponse.likes( giangVien.getLikes() );
         giangVienResponse.name( giangVien.getName() );
 
         return giangVienResponse.build();
@@ -57,10 +57,8 @@ public class GiangVienMapperImpl implements GiangVienMapper {
 
         GiangVien.GiangVienBuilder giangVien = GiangVien.builder();
 
-        giangVien.dislikes( giangVienDTO.getDislikes() );
         giangVien.dob( giangVienDTO.getDob() );
         giangVien.image( giangVienDTO.getImage() );
-        giangVien.likes( giangVienDTO.getLikes() );
         giangVien.name( giangVienDTO.getName() );
 
         return giangVien.build();
@@ -72,10 +70,16 @@ public class GiangVienMapperImpl implements GiangVienMapper {
             return;
         }
 
-        giangVien.setDislikes( giangVienDTO.getDislikes() );
         giangVien.setDob( giangVienDTO.getDob() );
         giangVien.setImage( giangVienDTO.getImage() );
-        giangVien.setLikes( giangVienDTO.getLikes() );
         giangVien.setName( giangVienDTO.getName() );
+    }
+
+    private Long giangVienUserUserId(GiangVien giangVien) {
+        User user = giangVien.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        return user.getUserId();
     }
 }

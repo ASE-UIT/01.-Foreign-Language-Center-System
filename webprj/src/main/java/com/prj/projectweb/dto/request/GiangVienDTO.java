@@ -11,9 +11,8 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GiangVienDTO {
+    Long userId;
     String name;
     LocalDate dob;
-    Integer likes;
-    Integer dislikes;
     String image;
 }

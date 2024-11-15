@@ -6,10 +6,13 @@ import com.prj.projectweb.dto.response.GiangVienResponse;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.GiangVien;
 import com.prj.projectweb.entities.TimeSlot;
+import com.prj.projectweb.entities.User;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.GiangVienMapper;
 import com.prj.projectweb.repositories.GiangVienRepository;
+import com.prj.projectweb.repositories.UserRepository;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,12 +31,18 @@ import java.util.Set;
 @Slf4j
 public class GiangVienService {
     GiangVienRepository giangVienRepository;
+    UserRepository userRepository;
     GiangVienMapper giangVienMapper;
 
     public GiangVienResponse addGiangVien(GiangVienDTO giangVienDTO) {
         log.info("service add giang vien");
-        GiangVien giangVien = giangVienMapper.dtoToGiangVien(giangVienDTO);
 
+        // Tìm User từ userId
+        User user = userRepository.findById(giangVienDTO.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+
+        GiangVien giangVien = giangVienMapper.dtoToGiangVien(giangVienDTO);
+        giangVien.setUser(user);
         giangVienRepository.save(giangVien);
 
         return giangVienMapper.toGiangVienResponse(giangVien);

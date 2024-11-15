@@ -19,6 +19,7 @@ public interface GiangVienMapper {
     GiangVien toGiangVien(GiangVienRequest giangVienRequest);
 
     @Mapping(target = "dob", source = "dob", qualifiedByName = "localDateToString")
+    @Mapping(target = "account_id", source = "user.userId")
     GiangVienResponse toGiangVienResponse(GiangVien giangVien);
 
     @Mapping(target = "courses", ignore = true)
