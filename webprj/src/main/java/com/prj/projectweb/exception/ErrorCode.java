@@ -35,6 +35,7 @@ public enum ErrorCode {
     COURSE_REGISTRATION_NOTFOUND(1028, "Course registration not found", HttpStatus.NOT_FOUND),
     PAYMENT_PROOF_NOTFOUND(1029, "Payment proof not found", HttpStatus.NOT_FOUND),
     SEND_EMAIL_FAILED(1030, "Send email failed", HttpStatus.BAD_REQUEST),
+    INVALID_ROLE_FLAG(1031, "Invalid flag role", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

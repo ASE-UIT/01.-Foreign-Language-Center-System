@@ -1,6 +1,7 @@
 package com.prj.projectweb.service;
 
 import com.prj.projectweb.dto.request.ChangePasswordRequest;
+import com.prj.projectweb.dto.request.GiangVienDTO;
 import com.prj.projectweb.dto.request.UserCreationRequest;
 import com.prj.projectweb.dto.response.ChildOfParentResponse;
 import com.prj.projectweb.dto.response.CourseRegistrationResponse;
@@ -54,6 +55,7 @@ public class UserService {
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     CourseRegistrationRepository registrationRepository;
+    GiangVienService giangVienService;
 
 
     private static final SecureRandom random = new SecureRandom();
@@ -70,11 +72,20 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(password));
 
         String roleName = null;
-        if (request.getFlag() == 1)
-            roleName = "PhuHuynh";
-        else if (request.getFlag() == 2)
-            roleName = "HocVien";
-
+        switch (request.getFlag()) {
+            case 1: roleName = "PhuHuynh"; break;
+            case 2: roleName = "HocVien"; break;
+            case 3: roleName = "GiaoVien"; break;
+            case 4: roleName = "KeToan"; break;
+            case 5: roleName = "NhanVienTuyenSinh"; break;
+            case 6: roleName = "NhanVienHoTroHocVu"; break;
+            case 7: roleName = "BanLanhDao"; break;
+            case 8: roleName = "BanDieuHanh"; break;
+            case 9: roleName = "BanDieuHanhHeThong"; break;
+            case 10: roleName = "ChuCongTy"; break;
+            default:
+                throw new AppException(ErrorCode.INVALID_ROLE_FLAG);
+        }
         if (!roleRepository.existsByRoleName(roleName)) {
             log.info(roleName);
             throw new AppException(ErrorCode.ROLE_NOTFOUND);
@@ -83,14 +94,41 @@ public class UserService {
         var role = roleRepository.findByRoleName(roleName);
         user.setRole(role);
 
+        // Xử lý parent_id của "HocVien"
+        if ("HocVien".equals(roleName)) {
+            Long parentId = request.getParentId();
+            if (parentId == null) {
+                throw new AppException(ErrorCode.PARENT_NOTFOUND);
+            }
+    
+            User parent = userRepository.findById(parentId)
+                    .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOTFOUND));
+    
+            if (!"PhuHuynh".equalsIgnoreCase(parent.getRole().getRoleName())) {
+                throw new AppException(ErrorCode.INVALID_REQUEST);
+            }
+    
+            user.setParentId(parentId);
+        }
+
         // Lưu User vào database
         var savedUser = userRepository.save(user);
+
+        // Nếu là Giảng Viên, tạo bản ghi GiangVien tương ứng
+        if ("GiaoVien".equals(roleName)) {
+            giangVienService.addGiangVien(GiangVienDTO.builder()
+            .userId(savedUser.getUserId())
+            .name(savedUser.getFullName())
+            .dob(savedUser.getDob())
+            .image(savedUser.getImage())
+            .build());
+        }
 
         // Khởi tạo phản hồi
         UserResponse response = userMapper.toUserResponse(savedUser);
         response.setPassword(password);
 
-        // Xử lý dựa trên vai trò
+        // Xử lý phản hồi đặc biệt cho "PhuHuynh" và "HocVien"
         if ("PhuHuynh".equals(roleName)) {
             List<User> children = userRepository.findAllByParentId(savedUser.getUserId());
             List<ChildOfParentResponse> childResponses = children.stream()
@@ -99,34 +137,14 @@ public class UserService {
                             .name(child.getFullName())
                             .build())
                     .collect(Collectors.toList());
-
             response.setChildren(childResponses);
-        } else if ("HocVien".equalsIgnoreCase(roleName)) {
-            Long parentId = request.getParentId();
-            if (parentId == null) {
-                throw new AppException(ErrorCode.PARENT_NOTFOUND);
-            }
-
-            // Tìm PhuHuynh theo parentId
-            User parent = userRepository.findById(parentId)
+        } else if ("HocVien".equals(roleName)) {
+            User parent = userRepository.findById(user.getParentId())
                     .orElseThrow(() -> new AppException(ErrorCode.PARENT_NOTFOUND));
-
-            // Kiểm tra role của parent là PhuHuynh
-            if (!"PhuHuynh".equalsIgnoreCase(parent.getRole().getRoleName())) {
-                throw new AppException(ErrorCode.INVALID_REQUEST);
-            }
-
-            // Thiết lập parentId cho HocVien
-            user.setParentId(parentId);
-
-            // Lưu User (HocSinh)
-            userRepository.save(user);
-
-            // Thiết lập lại phản hồi cho HocVien
 
             response.setParent(ParentResponse.builder()
                     .email(parent.getEmail())
-                    .userId(parentId)
+                    .userId(parent.getUserId())
                     .fullName(parent.getFullName())
                     .build());
         }

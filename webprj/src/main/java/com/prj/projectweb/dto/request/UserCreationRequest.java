@@ -21,6 +21,7 @@ public class UserCreationRequest {
     String phone;
     String address;
     LocalDate dob;
+    String image;
 
     int flag;
 //    String role;
