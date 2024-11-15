@@ -3,12 +3,14 @@ package com.prj.projectweb.service;
 import com.prj.projectweb.dto.response.FileBoardResponse;
 import com.prj.projectweb.dto.request.FileBoardDownloadRequest;
 import com.prj.projectweb.dto.request.FileBoardUploadRequest;
+import com.prj.projectweb.entities.Center;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.FileBoard;
 import com.prj.projectweb.entities.GiangVien;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.FileBoardMapper;
+import com.prj.projectweb.repositories.CenterRepository;
 import com.prj.projectweb.repositories.FileBoardRepository;
 import com.prj.projectweb.repositories.GiangVienRepository;
 
@@ -36,6 +38,9 @@ public class FileBoardService {
     private  GiangVienRepository giangVienRepository;
 
     @Autowired
+    private CenterRepository centerRepository;
+
+    @Autowired
     private FileBoardMapper fileBoardMapper;
 
     @Value("${file.upload-dir}")
@@ -48,6 +53,9 @@ public class FileBoardService {
         if (giangVien == null) {
             throw new AppException(ErrorCode.TEACHER_NOTFOUND);
         }
+            // Lấy thông tin Trung tâm
+        Center center = centerRepository.findById(requestDto.getCenterId())
+            .orElseThrow(() -> new AppException(ErrorCode.CENTER_NOTFOUND));
 
         String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         Path filePath = Paths.get(uploadDir).resolve(fileName);
@@ -61,6 +69,7 @@ public class FileBoardService {
                 .course(Course.builder().id(requestDto.getCourseId()).build())
                 .giangVien(GiangVien.builder().id(requestDto.getGiangVienId()).build())
                 .createdAt(LocalDateTime.now())
+                .center(center) 
                 .build();
 
         FileBoard savedFileBoard = fileBoardRepository.save(fileBoard);

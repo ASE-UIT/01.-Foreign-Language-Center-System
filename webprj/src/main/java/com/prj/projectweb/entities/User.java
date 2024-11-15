@@ -55,6 +55,12 @@ public class User {
     @JsonManagedReference
     List<ChatCenter> receivedMessages = new ArrayList<>();
 
+    // Thêm center_id để biết user thuộc trung tâm nào
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id")
+    @JsonBackReference
+    Center center;
+
      // Phương thức tiện ích cho ChatMessage
     public void addChatMessage(ChatMessage message) {
         chatMessages.add(message);

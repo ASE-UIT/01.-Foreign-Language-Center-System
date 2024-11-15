@@ -22,6 +22,7 @@ public interface CourseMapper {
     @Mapping(source = "room.roomName", target = "room")
     CourseRequest toCourseRequest(Course course);
 
+    @Mapping(source = "center.id", target = "centerId")
     @Mapping(source = "giangVien.name", target = "nameOfGiangVien")
     CourseResponse toCourseResponse(Course course);
 

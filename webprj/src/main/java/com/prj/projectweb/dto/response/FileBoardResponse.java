@@ -12,4 +12,5 @@ public class FileBoardResponse {
     private Long courseId;
     private Long giangVienId;
     private LocalDateTime createdAt;
+    private Long centerId;
 }

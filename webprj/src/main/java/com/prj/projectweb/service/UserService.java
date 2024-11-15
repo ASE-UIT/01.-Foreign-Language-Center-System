@@ -10,6 +10,7 @@ import com.prj.projectweb.dto.response.NotificationResponse;
 import com.prj.projectweb.dto.response.ParentResponse;
 import com.prj.projectweb.dto.response.ScheduleResponse;
 import com.prj.projectweb.dto.response.UserResponse;
+import com.prj.projectweb.entities.Center;
 import com.prj.projectweb.entities.Course;
 import com.prj.projectweb.entities.CourseRegistration;
 import com.prj.projectweb.entities.TimeSlot;
@@ -17,6 +18,7 @@ import com.prj.projectweb.entities.User;
 import com.prj.projectweb.exception.AppException;
 import com.prj.projectweb.exception.ErrorCode;
 import com.prj.projectweb.mapper.UserMapper;
+import com.prj.projectweb.repositories.CenterRepository;
 import com.prj.projectweb.repositories.CourseRegistrationRepository;
 import com.prj.projectweb.repositories.CourseRepository; // Thêm repository khóa học
 import com.prj.projectweb.repositories.RoleRepository;
@@ -56,6 +58,7 @@ public class UserService {
     PasswordEncoder passwordEncoder;
     CourseRegistrationRepository registrationRepository;
     GiangVienService giangVienService;
+    CenterRepository centerRepository;
 
 
     private static final SecureRandom random = new SecureRandom();
@@ -93,6 +96,13 @@ public class UserService {
 
         var role = roleRepository.findByRoleName(roleName);
         user.setRole(role);
+        
+        // Thiết lập mối quan hệ cho center
+        if (request.getCenterId() != null) {
+            Center center = centerRepository.findById(request.getCenterId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CENTER_NOTFOUND));
+            user.setCenter(center);
+        }
 
         // Xử lý parent_id của "HocVien"
         if ("HocVien".equals(roleName)) {

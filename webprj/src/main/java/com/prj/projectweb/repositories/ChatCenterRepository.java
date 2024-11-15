@@ -10,4 +10,5 @@ import java.util.List;
 public interface ChatCenterRepository extends JpaRepository<ChatCenter, Long> {
     List<ChatCenter> findBySender_UserId(Long userId); // Query by sender's userId
     List<ChatCenter> findByReceiver_UserId(Long userId); // Query by receiver's userId
+    List<ChatCenter> findByReceiver_UserIdAndCenter_Id(Long userId, Long centerId);
 }

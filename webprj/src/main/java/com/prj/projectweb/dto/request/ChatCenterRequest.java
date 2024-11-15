@@ -9,4 +9,5 @@ public class ChatCenterRequest {
     private Long senderId;
     private Long receiverId;
     private String messageContent;
+    private Long centerId;
 }

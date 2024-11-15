@@ -11,6 +11,7 @@ public interface FileBoardMapper {
 
     @Mapping(target = "courseId", source = "course.id")
     @Mapping(target = "giangVienId", source = "giangVien.id")
+    @Mapping(target = "centerId", source = "center.id") 
     FileBoardResponse toDto(FileBoard fileBoard);
 
     @Mapping(target = "course.id", source = "courseId")

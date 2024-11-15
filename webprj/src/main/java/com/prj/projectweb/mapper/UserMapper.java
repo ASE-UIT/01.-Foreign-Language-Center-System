@@ -18,6 +18,7 @@ public interface UserMapper {
 
     @Mapping(target = "role", source = "role.roleName")
     @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "centerId", source = "center.id")
     UserResponse toUserResponse(User user);
 
     @Mapping(source = "userId", target = "id")

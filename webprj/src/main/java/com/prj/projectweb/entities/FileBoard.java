@@ -36,4 +36,9 @@ public class FileBoard {
     GiangVien giangVien;
 
     LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "center_id")
+    @JsonBackReference
+    Center center;
 }

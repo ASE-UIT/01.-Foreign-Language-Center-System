@@ -27,6 +27,7 @@ public class CourseRequest {
     Integer numberOfStudents;
     String object;
     String room;
+    Long centerId;
 
     GiangVienRequest giangVien;
 }

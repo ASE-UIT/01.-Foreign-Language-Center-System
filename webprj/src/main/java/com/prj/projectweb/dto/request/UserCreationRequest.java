@@ -28,4 +28,5 @@ public class UserCreationRequest {
 
     // Dành cho Học Sinh: ID của Phụ Huynh
     Long parentId;
+    Long centerId;
 }
