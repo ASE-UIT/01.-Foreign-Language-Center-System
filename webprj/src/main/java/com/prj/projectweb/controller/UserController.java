@@ -49,7 +49,7 @@ public class UserController {
     }
 
     @GetMapping("/schedule/{id}")
-    public ApiResponse<List<ScheduleResponse>> getWeeklySchedule(@PathVariable Long id) {
+    public ApiResponse<List<ScheduleResponse>> getWeeklySchedule(@PathVariable("id") Long id) {
         return ApiResponse.<List<ScheduleResponse>>builder()
                 .message("Weekly schedule retrieved successfully")
                 .result(userService.getWeeklySchedule(id))

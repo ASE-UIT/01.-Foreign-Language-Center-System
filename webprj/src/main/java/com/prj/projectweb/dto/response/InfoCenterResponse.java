@@ -1,18 +1,16 @@
-package com.prj.projectweb.dto.request;
+package com.prj.projectweb.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CenterCreationRequest {
-    Long userId;
+public class InfoCenterResponse {
+    Long id;
     String name;
     String address;
-    String ward;  
-    String district; 
-    String city;    
     String email;
 }

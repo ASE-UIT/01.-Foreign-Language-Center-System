@@ -37,6 +37,7 @@ public enum ErrorCode {
     SEND_EMAIL_FAILED(1030, "Send email failed", HttpStatus.BAD_REQUEST),
     INVALID_ROLE_FLAG(1031, "Invalid flag role", HttpStatus.BAD_REQUEST),
     CENTER_NOTFOUND(1032, "Center not found", HttpStatus.NOT_FOUND),
+    CENTER_NOTMATCH(1033, "Not in the same center", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

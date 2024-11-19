@@ -12,7 +12,8 @@ public class CenterResponse {
     Long id;
     String name;
     String address;
-    String phone;
+    String ward;   
+    String district; 
+    String city;   
     String email;
-    String managerName;
 }
