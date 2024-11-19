@@ -26,10 +26,11 @@ public class Center {
     Long id;
 
     String name;
-    String address;
-    String phone;
+    String address; // Số nhà, tên đường
+    String ward;    // Phường/xã
+    String district; // Quận/huyện
+    String city;    // Tỉnh/thành phố
     String email;
-    String managerName;
 
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

@@ -98,7 +98,7 @@ public class UserService {
         user.setRole(role);
         
         // Thiết lập mối quan hệ cho center
-        if (request.getCenterId() != null) {
+        if (!"ChuCongTy".equals(roleName) && request.getCenterId() != null) {
             Center center = centerRepository.findById(request.getCenterId())
                     .orElseThrow(() -> new AppException(ErrorCode.CENTER_NOTFOUND));
             user.setCenter(center);
@@ -298,54 +298,54 @@ public class UserService {
     
 
     @Transactional
-    // lấy lịch sinh viên trong tuần
+    // Lấy lịch sinh viên trong tuần
     public List<ScheduleResponse> getWeeklySchedule(Long userId) {
         // Lấy user theo userId
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-    
+
         // Lấy danh sách các khóa học đã đăng ký của user
-        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId); 
-    
+        List<CourseRegistration> registrations = registrationRepository.findByStudent_UserId(userId);
+
         // Lấy ngày hiện tại
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
-        
+
         // Tạo mảng 7 phần tử để lưu lịch học từ thứ 2 đến chủ nhật
         List<ScheduleResponse> schedule = new ArrayList<>(Collections.nCopies(7, null));
-    
+
         // Định dạng ngày
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    
+
         // Lặp qua tất cả các khóa học đã đăng ký
         for (CourseRegistration registration : registrations) {
             Course course = registration.getCourse();
             Set<TimeSlot> timeSlots = course.getSchedule();
-            String roomName = course.getRoom() != null ? course.getRoom().getRoomName() : null; 
+            String roomName = course.getRoom() != null ? course.getRoom().getRoomName() : ""; 
             String giangVien = course.getGiangVien() != null ? course.getGiangVien().getName() : null;
-    
+
             // Lặp qua các TimeSlot
             for (TimeSlot timeSlot : timeSlots) {
-                // Lấy ngày trong tuần (có thể là một phần của logic tùy thuộc vào bạn đã định nghĩa TimeSlot như thế nào)
                 LocalDate dayOfWeek = getDateOfWeek(startOfWeek, timeSlot.getDay());
                 if (dayOfWeek != null) {
                     // Tạo ScheduleResponse cho ca học
                     ScheduleResponse lessonInfo = new ScheduleResponse();
                     lessonInfo.setCa(getCaFromTimeRange(timeSlot.getTimeRange()));
                     lessonInfo.setCourseName(course.getCourseName());
-                    lessonInfo.setCourseSchedule(course.getStartTime() + " - " + course.getEndTime() );
-                    lessonInfo.setRoomName(roomName );
+                    lessonInfo.setCourseSchedule(course.getStartTime() + " - " + course.getEndTime());
+                    lessonInfo.setRoomName(roomName);
                     lessonInfo.setGiangVien(giangVien);
-    
+
                     // Thêm thông tin vào mảng theo chỉ số ngày trong tuần
-                    int index = dayOfWeek.getDayOfWeek().getValue() - 1; 
+                    int index = dayOfWeek.getDayOfWeek().getValue() - 1;
                     schedule.set(index, lessonInfo);
                 }
             }
         }
-    
+
         return schedule;
     }
+
     
     @Transactional
     public List<ScheduleResponse> getCourseRegistration(Long userId) {

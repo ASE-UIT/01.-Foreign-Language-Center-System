@@ -1,5 +1,6 @@
 package com.prj.projectweb.service;
 
+import com.prj.projectweb.dto.request.AddGiangVienInCourseRequest;
 import com.prj.projectweb.dto.request.AddRomeInCourseRequest;
 import com.prj.projectweb.dto.request.AvailableRoomRequest;
 import com.prj.projectweb.dto.request.CourseRequest;
@@ -181,31 +182,43 @@ public class CourseService {
     }
 
     @Transactional
-    public String addGiangVienToCourse(Long courseId, GiangVienRequest giangVienRequest) throws Exception {
-        Course course = courseRepository.findById(courseId)
+    public String addGiangVienToCourse(AddGiangVienInCourseRequest request) throws Exception {
+        // Lấy thông tin khóa học
+        Course course = courseRepository.findById(request.getCourseId())
                 .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOTFOUND));
-
-        GiangVien giangVien = giangVienRepository.findById(giangVienRequest.getId())
+    
+        // Lấy thông tin giảng viên
+        GiangVien giangVien = giangVienRepository.findById(request.getGiangVienId())
                 .orElseThrow(() -> new AppException(ErrorCode.TEACHER_NOTFOUND));
-
+    
+        // Lấy center_id của giảng viên thông qua User
+        Long giangVienCenterId = giangVien.getUser().getCenter().getId();
+    
+        // Kiểm tra center_id của course và giangVien
+        if (!course.getCenter().getId().equals(giangVienCenterId)) {
+            throw new AppException(ErrorCode.CENTER_NOTMATCH);
+        }
+    
         // Lấy lịch của giảng viên và khóa học
         Set<TimeSlot> giangVienSchedules = giangVienService.getSchedulesOfGiangVien(giangVien.getId());
-        Set<TimeSlot> courseSchedules = this.getSchedulesOfCourse(courseId);
-
+        Set<TimeSlot> courseSchedules = this.getSchedulesOfCourse(request.getCourseId());
+    
         // Kiểm tra xem lịch có trùng không
         if (isScheduleConflict(giangVienSchedules, courseSchedules)) {
             return "Giảng viên bị trùng lịch";
         }
-
+    
         // Thêm giảng viên vào khóa học
         course.setGiangVien(giangVien);
         giangVien.addCourse(course); // Phương thức tiện ích đã có trong GiangVien
-
+    
         // Lưu khóa học với giảng viên mới
         courseRepository.save(course);
-
-        return "Đã thêm thành công giảng viên " + giangVienRequest.getName() + " vào khóa hoc id = " + courseId;
+    
+        return "Đã thêm thành công giảng viên ID = " + request.getGiangVienId() 
+               + " vào khóa học ID = " + request.getCourseId();
     }
+    
 
 
     // lay lich cua khoa hoc
@@ -249,9 +262,9 @@ public class CourseService {
             }
 
             if (courseRequest.getGiangVien().getId() != null) {
-                addGiangVienToCourse(courseId, GiangVienRequest.builder()
-                        .id(courseRequest.getGiangVien().getId())
-                        .name(courseRequest.getGiangVien().getName())
+                addGiangVienToCourse(AddGiangVienInCourseRequest.builder()
+                        .courseId(courseId)
+                        .giangVienId(courseRequest.getGiangVien().getId())
                         .build());
             }
 
@@ -297,6 +310,7 @@ public class CourseService {
 
         // Lấy danh sách phòng trống
         List<Room> availableRooms = roomService.getAvailableRooms(AvailableRoomRequest.builder()
+                                                            .centerId(course.getId())
                                                             .timeSlots(courseSchedule)
                                                             .startDate(startDate)
                                                             .endDate(endDate)

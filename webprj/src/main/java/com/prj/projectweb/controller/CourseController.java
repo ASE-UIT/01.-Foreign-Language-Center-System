@@ -1,5 +1,6 @@
 package com.prj.projectweb.controller;
 
+import com.prj.projectweb.dto.request.AddGiangVienInCourseRequest;
 import com.prj.projectweb.dto.request.AddRomeInCourseRequest;
 import com.prj.projectweb.dto.request.CourseRequest;
 import com.prj.projectweb.dto.request.GiangVienRequest;
@@ -63,11 +64,11 @@ public class CourseController {
                 .build();
     }
 
-    @PutMapping("/addGiangVien/{course_id}")
-    ApiResponse<String> addGiangVien(@PathVariable("course_id") Long course_id, @RequestBody GiangVienRequest giangVienRequest) throws Exception {
+    @PutMapping("/addGiangVien")
+    ApiResponse<String>  addGiangVienInCourse(@RequestBody AddGiangVienInCourseRequest request) throws Exception {
         return ApiResponse.<String>builder()
-                .message("SUCCESS: get course with id = " + course_id)
-                .result(courseService.addGiangVienToCourse(course_id, giangVienRequest))
+                .message("SUCCESS: get course with id = " + request.getCourseId())
+                .result(courseService.addGiangVienToCourse(request))
                 .build();
     }
     

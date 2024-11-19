@@ -8,9 +8,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CenterCreationRequest {
+    Long userId;
     String name;
     String address;
-    String phone;
+    String ward;  
+    String district; 
+    String city;    
     String email;
-    String managerName;
 }
