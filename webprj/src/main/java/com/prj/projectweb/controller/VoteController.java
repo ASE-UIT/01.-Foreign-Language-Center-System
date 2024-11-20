@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,18 +73,18 @@ public class VoteController {
         );
     }
 
-    @GetMapping("/giangVien")
-    public ApiResponse<List<GiangVienWithVote>> getListGiangVien() {
-        List<GiangVienWithVote> result = voteService.getListGiangVien();
+    @GetMapping("/giangVien/{id}")
+    public ApiResponse<List<GiangVienWithVote>> getListGiangVien(@PathVariable("id") Long id) {
+        List<GiangVienWithVote> result = voteService.getListGiangVien(id);
         return ApiResponse.<List<GiangVienWithVote>>builder()
                     .message(result.size() + " giang vien")
                     .result(result)
                     .build();
 
     }
-    @GetMapping("/course")
-    public ApiResponse<List<VoteInfoResponse>> getListCourse() {
-        List<VoteInfoResponse> result = voteService.getListCourse();
+    @GetMapping("/course/{id}")
+    public ApiResponse<List<VoteInfoResponse>> getListCourse(@PathVariable("id") Long id) {
+        List<VoteInfoResponse> result = voteService.getListCourse(id);
         return ApiResponse.<List<VoteInfoResponse>>builder()
                     .message(result.size() + " course")
                     .result(result)

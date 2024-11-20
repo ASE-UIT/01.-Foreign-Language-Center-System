@@ -1,13 +1,9 @@
 package com.prj.projectweb.entities;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
-import java.util.*;
 @Setter
 @Getter
 @Entity
@@ -28,10 +24,8 @@ public class Salary {
     Double baseSalary;      // Lương cơ bản
     Double coefficient;     // Hệ số lương
     Double allowance;       // Phụ cấp
-    LocalDateTime paymentDate; // Ngày thanh toán
-    Boolean isPaid;         // Trạng thái đã thanh toán
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "center_id")
-    Center center;
+    Center center;          // Trung tâm làm việc
 }

@@ -128,8 +128,8 @@ public class VoteService {
     }
 
     @Transactional
-    public List<GiangVienWithVote> getListGiangVien() {
-        List<GiangVien> giangVienList = giangVienRepository.findAll();
+    public List<GiangVienWithVote> getListGiangVien(Long centerId) {
+        List<GiangVien> giangVienList = giangVienRepository.findByUserCenterId(centerId);
         List<GiangVienWithVote> voteResponses = new ArrayList<>();
 
         for (GiangVien gv: giangVienList) {
@@ -151,8 +151,8 @@ public class VoteService {
     }
 
     @Transactional
-    public List<VoteInfoResponse> getListCourse() {
-        List<Course> courseList = courseRepository.findAll();
+    public List<VoteInfoResponse> getListCourse(Long centerId) {
+        List<Course> courseList = courseRepository.findByCenterId(centerId);
         List<VoteInfoResponse> voteResponses = new ArrayList<>();
 
         for (Course course: courseList) {

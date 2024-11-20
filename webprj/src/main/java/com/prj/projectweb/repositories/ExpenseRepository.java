@@ -18,4 +18,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     @Query("SELECT e FROM Expense e WHERE e.center.id = :centerId AND YEAR(e.paymentDate) = :year")
     List<Expense> findByCenterIdAndPaymentDateYear(@Param("centerId") Long centerId, @Param("year") int year);
+
+    @Query("SELECT SUM(e.amount) FROM Expense e WHERE e.center.id = :centerId")
+    Double sumExpensesByCenterId(@Param("centerId") Long centerId);
 }
