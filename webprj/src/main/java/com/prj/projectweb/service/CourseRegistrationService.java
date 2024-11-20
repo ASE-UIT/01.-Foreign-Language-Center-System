@@ -59,6 +59,12 @@ public class CourseRegistrationService {
             User parent = parentOpt.orElse(null);
             Course course = courseOpt.get();
     
+            // Kiểm tra xem học viên có vai trò là "HocVien" không
+            if (!student.getRole().equals("HocVien")) {
+                return createResponse(null, null, null, null, RegistrationStatus.FAILURE, "Chỉ học viên mới được đăng ký khóa học");
+            }
+
+
             // Kiểm tra xem học sinh đã đăng ký khóa học này chưa
             boolean isAlreadyRegistered = registrationRepository.existsByStudentAndCourse(student, course);
             if (isAlreadyRegistered) {
@@ -212,10 +218,6 @@ public class CourseRegistrationService {
         return createResponse(null, userId, null, null, RegistrationStatus.SUCCESS, "Đã hoàn tất thanh toán");
     }
 
-    // // test api gửi mail
-    // public void sendEmail() {
-    //     utilsHandleEmail.sendPayment("pntg2903@gmail.com", "GỬI MAIL THANH TOÁN", "Cảm ơn đã thanh toán");
-    // }
 
     //Phương thức để lấy email của người dùng dựa trên userId
     private String getUserEmailById(Long userId) {
