@@ -11,9 +11,11 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LoginResponse {
+    String token;
+    boolean authenticated;  
     String role;
     List<ChildOfParentResponse> child;
 }
+

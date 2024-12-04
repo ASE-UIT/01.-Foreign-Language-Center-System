@@ -33,7 +33,9 @@ public class RefundService {
 
     public String processRefund(RefundRequest refundRequest) throws MessagingException {
         // Tìm học viên dựa trên email
-        User user = userRepository.findByEmail(refundRequest.getStudentEmail());
+        User user = userRepository.findByEmail(refundRequest.getStudentEmail())
+        .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+
         if (user == null) {
             throw new AppException(ErrorCode.USER_NOTFOUND);
         }

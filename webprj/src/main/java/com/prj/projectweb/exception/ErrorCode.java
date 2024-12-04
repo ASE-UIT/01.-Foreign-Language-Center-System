@@ -41,6 +41,7 @@ public enum ErrorCode {
     EXPENSE_NOTFOUND(1034, "Expense not found", HttpStatus.NOT_FOUND),
     SALARY_NOTFOUND(1035, "Salary not found", HttpStatus.NOT_FOUND),
     CENTER_BULLETIN_BOARD_NOTFOUND(1036, "Bulletin not found", HttpStatus.NOT_FOUND),
+    UNAUTHENTICATED(1037, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

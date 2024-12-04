@@ -176,11 +176,8 @@ public class UserService {
     }
 
     public String changePassword(ChangePasswordRequest request) {
-        if (!userRepository.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.USER_NOTFOUND);
-        }
-
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail())
+                                   .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
         // boolean authenticated = passwordEncoder.matches(request.getOldPass(), user.getPassword());
         if (!passwordEncoder.matches(request.getOldPass(), user.getPassword())) {
