@@ -32,11 +32,11 @@ public class UserController {
                 .result(userService.createUser(request)).build();
     }
 
-    @GetMapping("/{id}")
-    public ApiResponse<UserResponse> getInfoById(@PathVariable("id") Long id) {
+    @GetMapping("/my-info")
+    public ApiResponse<UserResponse> getInfoById() {
         log.info("in controller get info user");
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getInfoById(id))
+                .result(userService.getInfoById())
                 .build();
     }
     

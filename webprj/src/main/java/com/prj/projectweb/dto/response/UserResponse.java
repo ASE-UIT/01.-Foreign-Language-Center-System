@@ -15,6 +15,7 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
+    String userId;
     String email;
     String username;
     String password;

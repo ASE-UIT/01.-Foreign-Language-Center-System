@@ -23,6 +23,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long userId;
 
+    @Column(name = "email", unique = true, columnDefinition = "VARCHAR(255)")
     String email;
     String username;
     String password;

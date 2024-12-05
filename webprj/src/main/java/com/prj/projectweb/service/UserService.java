@@ -28,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -122,7 +124,14 @@ public class UserService {
         }
 
         // Lưu User vào database
-        var savedUser = userRepository.save(user);
+        User savedUser = null;
+
+        try {
+            savedUser = userRepository.save(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
+
 
         // Nếu là Giảng Viên, tạo bản ghi GiangVien tương ứng
         if ("GiaoVien".equals(roleName)) {
@@ -176,11 +185,8 @@ public class UserService {
     }
 
     public String changePassword(ChangePasswordRequest request) {
-        if (!userRepository.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.USER_NOTFOUND);
-        }
-
-        User user = userRepository.findByEmail(request.getEmail());
+        User user = userRepository.findByEmail(request.getEmail())
+                                   .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
         // boolean authenticated = passwordEncoder.matches(request.getOldPass(), user.getPassword());
         if (!passwordEncoder.matches(request.getOldPass(), user.getPassword())) {
@@ -197,9 +203,12 @@ public class UserService {
         return "Change password successfully";
     }
 
-    public UserResponse getInfoById (Long id) {
-        User user  = userRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
+    public UserResponse getInfoById () {
+        var context = SecurityContextHolder.getContext().getAuthentication();
+        String email = context.getName();
+        
+        User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOTFOUND));
 
         UserResponse response = userMapper.toUserResponse(user);
 
