@@ -55,7 +55,7 @@
 ### 1. **Khi chạy lần đầu tiên**
 
 Sử dụng tài khoản mặc định (được tạo với role là ChuCongTy) để đăng nhập
-<br> Email: `admin@gmail.com` <br> Password: `PassAdmin123@`
+<br> Email: `admin@gmail.com` <br> Password: `admin`
 
 ### 2. **Token sau khi đăng nhập thành công**
 
