@@ -60,7 +60,7 @@ public class CourseRegistrationService {
             Course course = courseOpt.get();
     
             // Kiểm tra xem học viên có vai trò là "HocVien" không
-            if (!student.getRole().equals("HocVien")) {
+            if (!student.getRole().getRoleName().equals("HocVien")) {
                 return createResponse(null, null, null, null, RegistrationStatus.FAILURE, "Chỉ học viên mới được đăng ký khóa học");
             }
 
