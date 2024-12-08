@@ -131,3 +131,10 @@ Sau khi đăng nhập thành công, bạn sẽ nhận được một **Bearer To
 | PUT             | `/api/users/changePass`    | Đổi mật khẩu: gồm email, oldPass, newPass, reNewPass                                                                                                          |
 | PUT             | `/api/users/schedule/{id}` | Lấy lịch học trong tuần hiện tại của hocvien qua id user                                                                                                      |
 | POST            | `/api/registrations`       | Đăng ký khóa học gồm studentId, parentId và courseId                                                                                                          |
+| POST            | `/center`                  | Thêm trung tâm                                                                                                                                                |
+| GET             | `/center/{id}`             | Lấy info của trung tâm theo id                                                                                                                                |
+| GET             | `/center-statistic/{id}`   | Lấy thống kê của trung tâm theo id                                                                                                                            |
+| POST            | `/api/chatcenter/send`     | Gửi tin nhắn giữa học viên/ phụ huynh với trung tâm                                                                                                           |
+| GET             | `/api/chatcenter/messages` | Lấy toàn bộ tin nhắn giữa học viên/ phụ huynh tới trung tâm qua id user                                                                                       |
+| POST            | `/api/chat/messages`       | Gửi tin nhắn vào bảng chat của khóa học                                                                                                                       |
+| GET             | `/api/chat/courses/{courseId}/messages`  | Lấy toàn bộ tin nhắn trong khóa học qua course id                                                                                               |
