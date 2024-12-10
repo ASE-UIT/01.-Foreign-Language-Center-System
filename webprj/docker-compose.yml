@@ -1,5 +1,5 @@
 services:
-  # MySQL service (giữ nguyên phần này)
+  # MySQL service
   mysql:
     image: mysql:9.1.0-oracle
     container_name: mysql-container
@@ -24,6 +24,23 @@ services:
       - "8081:80" # phpMyAdmin chạy trên http://localhost:8081
     depends_on:
       - mysql
+    networks:
+      - project-network
+
+  # Spring Boot Application
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot-app
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ProjectWeb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 12345
+    ports:
+      - "8080:8080"
     networks:
       - project-network
 
