@@ -1,34 +1,29 @@
-version: "3.8"
-
 services:
-  # MySQL service
+  # MySQL service (giữ nguyên phần này)
   mysql:
     image: mysql:9.1.0-oracle
     container_name: mysql-container
     environment:
-      MYSQL_ROOT_PASSWORD: 12345 # Mật khẩu root
-      MYSQL_DATABASE: ProjectWeb # Tên database
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: ProjectWeb
     ports:
-      - "3307:3306" # Mở cổng MySQL trên host máy
+      - "3307:3306"
     networks:
       - project-network
     volumes:
-      - mysql-data:/var/lib/mysql # Lưu trữ dữ liệu MySQL ngoài container
+      - mysql-data:/var/lib/mysql
 
-  # Spring Boot application service
-  springboot-app:
-    build:
-      context: . # Build ứng dụng từ thư mục hiện tại
-      dockerfile: Dockerfile # Đảm bảo sử dụng Dockerfile đã sửa
-    container_name: springboot-app
-    ports:
-      - "8080:8080" # Mở cổng của ứng dụng Spring Boot
+  # phpMyAdmin service
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ProjectWeb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 12345
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8081:80" # phpMyAdmin chạy trên http://localhost:8081
     depends_on:
-      - mysql # Đảm bảo Spring Boot khởi động sau MySQL
+      - mysql
     networks:
       - project-network
 
