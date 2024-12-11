@@ -6,8 +6,21 @@ import LoginScreen from '../Screens/LoginScreen';
 import RegisterScreen from '../Screens/RegisterScreen';
 import RoleScreen from '../Screens/RoleScreen';
 import ScheduleScreen from '../Screens/ScheduleScreen';
+import StudentHomeScreen from '../Screens/StudentHomeScreen';
+import CommunicationScreen from '../Screens/CommunicationScreen';
+
+export type RootStackParamList = {
+  Welcome: undefined;
+  Login: undefined | userInfo; // set for passing param
+  Register: undefined; // add RegisterScreen
+  Schedule: undefined;
+  Role: undefined | userInfo; // add RoleScreen
+  StudentHome: undefined | userInfo;
+  Menu: undefined
+  Communication: undefined;
+};
 import SlideMenu from './SlideMenu';
-import { RootStackParamList } from '../Types/types';
+import { userInfo } from '../Types/types';
 
 
 
@@ -27,6 +40,9 @@ const AppNavigator: React.FC = () => (
       {/* add Schedule Screen*/}
       <Stack.Screen name="Menu" component={SlideMenu} />
       
+
+      <Stack.Screen name="StudentHome" component={StudentHomeScreen} />
+      <Stack.Screen name="Communication" component={CommunicationScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );

@@ -5,7 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '../Components/CustomButton';
-import { RootStackParamList } from '../Types/types';
+import { RootStackParamList } from '../Navigation/AppNavigator';
+
 
 
 

@@ -3,8 +3,9 @@ import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from "@react-navigation/native";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
-import { RootStackParamList } from "../Types/types";
+
 import hambuger_icon from '../../assets/images/hamburger_icon.png'
+import { RootStackParamList } from "../Navigation/AppNavigator";
 
 const note = {
   course: 'Tiếng anh giao tiếp',

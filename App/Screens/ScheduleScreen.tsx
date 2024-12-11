@@ -6,7 +6,8 @@ import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { RootStackParamList } from '../Types/types';
+import { RootStackParamList } from '../Navigation/AppNavigator';
+
 
 
 

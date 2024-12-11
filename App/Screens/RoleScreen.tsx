@@ -4,8 +4,9 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { styles } from "../Styles/globaStyles";
 import CustomButton from "../Components/CustomButton";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import { RootStackParamList } from "../Types/types"; 
+
 import { StackNavigationProp } from "@react-navigation/stack";
+import { RootStackParamList } from "../Navigation/AppNavigator";
 
 
 const data = [

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../Types/types';
 import CustomButton from '../Components/CustomButton';
 import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,6 +8,7 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { userInfo } from '../Types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../api/api';
+import { RootStackParamList } from '../Navigation/AppNavigator';
 
 interface LoginResponse{
     code: number,
