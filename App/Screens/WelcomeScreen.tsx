@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../Navigation/AppNavigator';
 import CustomButton from '../Components/CustomButton';
 import { styles, welcomeStyles } from '../Styles/globaStyles';
+import { RootStackParamList } from '../Types/types';
 
 
 type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;

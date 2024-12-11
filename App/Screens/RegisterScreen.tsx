@@ -1,11 +1,11 @@
 import { Image, Keyboard, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, { useState } from 'react'
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../Navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '../Components/CustomButton';
+import { RootStackParamList } from '../Types/types';
 
 
 
