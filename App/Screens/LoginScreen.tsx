@@ -7,8 +7,18 @@ import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { userInfo } from '../Types/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../api/api';
 
-
+interface LoginResponse{
+    code: number,
+    message: string,
+    result:{
+        token: string,
+        authenticated: boolean,
+        role: string
+    }
+}
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -48,7 +58,23 @@ const LoginScreen: React.FC = () => {
         }
     }, [route.params?.keyInfo]); // value from component used inside of the function.
 
-    const handleLogin = () => {
+    const handleLogin = async (email: string, password: string) => {
+        try {
+          // Gửi request đến endpoint /auth/login với phương thức POST
+          const response = await api.post<LoginResponse>('/auth/login', { email, password });
+          const { token } = response.data.result; // Lấy token từ phản hồi của server
+      
+          // Lưu token vào AsyncStorage để sử dụng sau này
+          await AsyncStorage.setItem('token', token);
+          console.log('Token saved successfully:', token); // In thông báo lưu thành công
+          navigation.navigate('Menu')
+         
+        } catch (error) {
+          console.error('Login failed:', error); // In lỗi nếu đăng nhập thất bại
+          ; // Trả về null để báo hiệu lỗi
+        }
+
+        
         //    for (let i = 0; i < users.length; i++) {
         //         if (email == users[i].keyInfo) {
         //             indexUser = i;
@@ -90,7 +116,7 @@ const LoginScreen: React.FC = () => {
         //         setPassword('')
         //     }
 
-        navigation.navigate('Menu')
+       
        
 
 
@@ -164,7 +190,7 @@ const LoginScreen: React.FC = () => {
             <View style={styles.loginButton}>
                 <CustomButton
                     title="Đăng nhập"
-                    onPress={handleLogin}
+                    onPress={()=>handleLogin(email,pwd)}
                     primary
                 />
             </View>
