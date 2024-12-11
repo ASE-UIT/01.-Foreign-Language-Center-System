@@ -1,0 +1,52 @@
+services:
+  # MySQL service
+  mysql:
+    image: mysql:9.1.0-oracle
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: ProjectWeb
+    ports:
+      - "3307:3306"
+    networks:
+      - project-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # phpMyAdmin service
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8081:80" # phpMyAdmin chạy trên http://localhost:8081
+    depends_on:
+      - mysql
+    networks:
+      - project-network
+
+  # Spring Boot Application
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot-app
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ProjectWeb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 12345
+    ports:
+      - "8080:8080"
+    networks:
+      - project-network
+
+networks:
+  project-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
