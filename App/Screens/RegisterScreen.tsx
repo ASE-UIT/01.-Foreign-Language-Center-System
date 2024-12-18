@@ -6,6 +6,9 @@ import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import CustomButton from '../Components/CustomButton';
 import { RootStackParamList } from '../Navigation/AppNavigator';
+import { UserCreationRequest } from '../../api/apiRequest';
+import api from '../../api/api';
+import { ApiResponse, UserResponse } from '../../api/apiResponse';
 
 
 
@@ -18,17 +21,37 @@ const RegisterScreen: React.FC = () => {
   const [accName, setAccName] = useState('');
   const [password, setPassword] = useState('');
   const [rePassword, setRePassword] = useState('');
- 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleRegister = () =>{
-    Keyboard.dismiss
-    navigation.navigate('Login',{keyInfo: keyInfo,fullName: fullName,accName: accName,password:password})
-    setKey('')
-    setFullName('')
-    setAccName('')
-    setPassword('')
-    setRePassword('')
+  let registerReq:UserCreationRequest = {
+    email: keyInfo.includes('@') ? keyInfo:"N/A",
+    fullName: fullName,
+    phone: keyInfo.includes('@') ? "N/A":keyInfo,
+    dob: new Date("2000-12-31"),
+    address: "N/A",
+    image: "N/A",
+    flag: 1,
+    parentId: 1,
+    centerId: 1
+  }
+
+  const handleRegister = async() =>{
+       try {
+      
+      const response = await api.post<ApiResponse<UserResponse>>('/api/users', registerReq);
+      console.log(response.data)
+      Keyboard.dismiss
+      navigation.navigate('Login',{keyInfo: keyInfo,fullName: fullName,accName: accName,password:password})
+      setKey('')
+      setFullName('')
+      setAccName('')
+      setPassword('')
+      setRePassword('')
+      
+  } catch (error) {
+      console.error('Register failed:', error); // In lỗi nếu đăng nhập thất bại
+  }
+    
   }
 
   const handlePress = (socialMedia: string) => {

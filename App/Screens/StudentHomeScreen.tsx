@@ -4,7 +4,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../Navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { studenthomeStyles, styles } from '../Styles/globaStyles';
-import { MaterialCommunityIcons } from 'react-native-vector-icons'; 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 
 interface Course {

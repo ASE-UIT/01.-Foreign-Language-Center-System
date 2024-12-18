@@ -3,9 +3,14 @@ import React from 'react'
 
 
 const ProfileScreen:React.FC = () => {
+
+  
   return (
     <View>
-      <TouchableOpacity>
+      <TouchableOpacity >
+          <Text>ProfileScreen</Text>
+          <Text>ProfileScreen</Text>
+          <Text>ProfileScreen</Text>
           <Text>ProfileScreen</Text>
       </TouchableOpacity>
      

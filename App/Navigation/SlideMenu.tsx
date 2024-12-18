@@ -9,19 +9,25 @@ import ScheduleScreen from '../Screens/ScheduleScreen';
 import { Text, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../Types/types';
+import { RootStackParamList } from './AppNavigator';
+import CommunicationScreen from '../Screens/CommunicationScreen';
+import StudentHomeScreen from '../Screens/StudentHomeScreen';
+import LoginScreen from '../Screens/LoginScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../api/api';
+
 
 
 const Drawer = createDrawerNavigator();
 
 const SlideMenu: React.FC = () => {
-
+    const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>()
 
     let count = 20;
     let showCount = count < 1 ? '' : `(${count}+)` // sau này truyền biến môi trường đếm số lượng thông báo
 
     const Back_Btn = () => {
-        const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>()
+        
 
         const openMenu = () => {
             navigation.toggleDrawer();
@@ -47,9 +53,22 @@ const SlideMenu: React.FC = () => {
             </DrawerContentScrollView>
         );
     }
+
+    const handleLogOut = async () => {
+        
+
+        try {
+          
+          await AsyncStorage.removeItem('token'); // Xóa token đăng nhập
+          navigation.navigate('Login'); // Điều hướng đến màn hình Login sau khi đăng xuất
+        } catch (error) {
+          console.error('Error logging out: ', error);
+        }
+      };
+
     return (
         <Drawer.Navigator
-            initialRouteName='Schedule'
+            initialRouteName='StudentHome'
             drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={{
                 headerShown: false,
@@ -58,6 +77,33 @@ const SlideMenu: React.FC = () => {
                     borderTopRightRadius: 30
                 },
             }} >
+            <Drawer.Screen
+                name="StudentHome"
+                component={StudentHomeScreen}
+                options={{
+                    title: 'Trang chủ',
+                    drawerLabelStyle: {
+                        fontSize: 20,
+                        color: 'black'
+                    },
+                    drawerItemStyle: {
+                        marginBottom: 0,
+                    },
+                }} />
+
+            <Drawer.Screen
+                name="Communication"
+                component={CommunicationScreen}
+                options={{
+                    title: 'Trò chuyện',
+                    drawerLabelStyle: {
+                        fontSize: 20,
+                        color: 'black'
+                    },
+                    drawerItemStyle: {
+                        marginBottom: 0,
+                    },
+                }} />
 
             <Drawer.Screen
                 name="Profile"
@@ -121,6 +167,18 @@ const SlideMenu: React.FC = () => {
                         marginBottom: 0,
                     }
                 }} />
+                  <Drawer.Screen name="LogOut" component={LoginScreen}
+                options={{
+                    drawerLabel: () => (
+                        <TouchableOpacity onPress={handleLogOut}>
+                          <Text style={{ fontSize: 20, color: 'red', fontWeight:'bold' }}>Đăng xuất</Text>
+                        </TouchableOpacity>
+                      ),
+                    drawerItemStyle: {
+                        marginBottom: 0,
+                    },
+                    
+                    }} />
 
         </Drawer.Navigator>
     );

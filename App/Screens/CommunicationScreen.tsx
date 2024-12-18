@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../Navigation/AppNavigator';
-import { MaterialIcons } from 'react-native-vector-icons'; 
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+
 import hambuger_icon from '../../assets/images/hamburger_icon.png'
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 

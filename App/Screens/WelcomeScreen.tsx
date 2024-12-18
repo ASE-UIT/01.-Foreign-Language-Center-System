@@ -3,7 +3,8 @@ import { View, Text, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import CustomButton from '../Components/CustomButton';
 import { styles, welcomeStyles } from '../Styles/globaStyles';
-import { RootStackParamList } from '../Types/types';
+import { RootStackParamList } from '../Navigation/AppNavigator';
+
 
 
 type WelcomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Welcome'>;
@@ -37,7 +38,7 @@ const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
             <View style={welcomeStyles.registerButton}>
                 <CustomButton
                     title="Đăng ký"
-                    onPress={() => navigation.navigate('Communication')}
+                    onPress={() => navigation.navigate('Register')}
                     secondary
                 />
             </View>

@@ -5,20 +5,12 @@ import CustomButton from '../Components/CustomButton';
 import { styles } from '../Styles/globaStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { userInfo } from '../Types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../api/api';
 import { RootStackParamList } from '../Navigation/AppNavigator';
-
-interface LoginResponse{
-    code: number,
-    message: string,
-    result:{
-        token: string,
-        authenticated: boolean,
-        role: string
-    }
-}
+import { ApiResponse, LoginResponse } from '../../api/apiResponse';
+import { userInfo } from '../Types/types';
+import { LoginRequest } from '../../api/apiRequest';
 
 const LoginScreen: React.FC = () => {
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -28,7 +20,7 @@ const LoginScreen: React.FC = () => {
     const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    let indexUser = -1
+    let loginReq: LoginRequest = { email: email, password: pwd }
 
     const route = useRoute<RouteProp<RootStackParamList>>(); // Passing parameters to routes
 
@@ -48,7 +40,6 @@ const LoginScreen: React.FC = () => {
 
     useEffect(() => {
         if (route.params?.keyInfo) { // check if keyInfo updated -> having a registration
-
             setUsers([...users, {
                 keyInfo: keyInfo,
                 fullName: fullName,
@@ -58,95 +49,32 @@ const LoginScreen: React.FC = () => {
         }
     }, [route.params?.keyInfo]); // value from component used inside of the function.
 
-    const handleLogin = async (email: string, password: string) => {
+    const handleLogin = async () => {
         try {
-          // Gửi request đến endpoint /auth/login với phương thức POST
-          const response = await api.post<LoginResponse>('/auth/login', { email, password });
-          const { token } = response.data.result; // Lấy token từ phản hồi của server
-      
-          // Lưu token vào AsyncStorage để sử dụng sau này
-          await AsyncStorage.setItem('token', token);
-          console.log('Token saved successfully:', token); // In thông báo lưu thành công
-          navigation.navigate('Menu')
-         
+            // Gửi request đến endpoint /auth/login với phương thức POST
+            const response = await api.post<ApiResponse<LoginResponse>>('/auth/login', loginReq);
+            const { token } = response.data.result; // Lấy token từ phản hồi của server
+
+            // Lưu token vào AsyncStorage để sử dụng sau này
+            await AsyncStorage.setItem('token', token);
+            console.log('Token saved successfully:', token); // In thông báo lưu thành công
+
+            if (response.data.result.child == null || response.data.result.child.length < 1) {
+                navigation.navigate('Menu')
+
+            }
+            else {
+                navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
+            }
+
         } catch (error) {
-          console.error('Login failed:', error); // In lỗi nếu đăng nhập thất bại
-          ; // Trả về null để báo hiệu lỗi
+            console.error('Login failed:', error); // In lỗi nếu đăng nhập thất bại
         }
-
-        
-        //    for (let i = 0; i < users.length; i++) {
-        //         if (email == users[i].keyInfo) {
-        //             indexUser = i;
-        //         }
-        //     } // find index of account
-
-
-        //      //handle Login
-        //      if (email == '' || pwd == '') {
-        //         Alert.alert('Bạn cần nhập tài khoản và mật khẩu')
-        //     }
-        //     else if (-1 == indexUser) {
-        //         console.log({
-        //             code: 1001,
-        //             message: "email wrong"
-        //         })
-        //         Alert.alert('Tài khoản không tồn tại')
-        //     }
-        //     else if (pwd !== users[indexUser].password) {
-        //         console.log({
-        //             code: 1001,
-        //             message: "password wrong"
-        //         })
-        //         Alert.alert('Bạn đã nhập sai mật khẩu')
-        //     }
-        //     else {
-        //         console.log({
-        //             code: 1000,
-        //             message: "login successful"
-        //         })
-        //         if (email.startsWith('ph', 0)) {
-        //             navigation.navigate('Role', { keyInfo: keyInfo, fullName: fullName, accName: accName, password: password })
-        //         }
-        //         else {
-        //             navigation.navigate('Schedule')
-        //         }
-
-        //         setEmail('')
-        //         setPassword('')
-        //     }
-
-       
-       
-
-
-
-
-        // const validEmail = "abc@gmail.com";
-        // const validPassword = "12345678";
-        // if (email !== validEmail) {
-        //     return {
-        //         code: 1001,
-        //         message: "email wrong"
-        //     };
-        // }
-        // if (password !== validPassword) {
-        //     return {
-        //         code: 1001,
-        //         message: "password wrong"
-        //     };
-        // }
-        // return {
-        //     code: 1000,
-        //     message: "login successful"
-        // };
-
     };
 
     const handlePress = (socialMedia: string) => {
         // Xử lý logic cho đăng nhập mạng xã hội
-        Alert.alert(`Đăng nhập với ${socialMedia}`);
-
+        Alert.alert(`Đăng nhập với ${socialMedia}`)
     };
 
     return (
@@ -190,7 +118,7 @@ const LoginScreen: React.FC = () => {
             <View style={styles.loginButton}>
                 <CustomButton
                     title="Đăng nhập"
-                    onPress={()=>handleLogin(email,pwd)}
+                    onPress={() => handleLogin()}
                     primary
                 />
             </View>

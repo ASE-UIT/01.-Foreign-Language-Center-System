@@ -17,3 +17,4 @@ export type userInfo = {
     accName?: string,
     password?: string,
   } // set a type to handle register and log in
+

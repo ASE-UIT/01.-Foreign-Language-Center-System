@@ -41,8 +41,7 @@ const AppNavigator: React.FC = () => (
       <Stack.Screen name="Menu" component={SlideMenu} />
       
 
-      <Stack.Screen name="StudentHome" component={StudentHomeScreen} />
-      <Stack.Screen name="Communication" component={CommunicationScreen} />
+      
     </Stack.Navigator>
   </NavigationContainer>
 );

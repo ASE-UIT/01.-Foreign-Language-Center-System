@@ -7,9 +7,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootStackParamList } from '../Navigation/AppNavigator';
+import api from '../../api/api';
+import { ApiResponse, ScheduleResponse } from '../../api/apiResponse';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-
+interface ItemSchedule{
+  scheReq:ScheduleResponse,
+  image: any
+}
 
 const ScheduleScreen: React.FC = () => {
   const [today, setToday] = useState(new Date());
@@ -22,76 +28,82 @@ const ScheduleScreen: React.FC = () => {
     'MS-Yahei': require('../../assets/fonts/MS-Yahei.ttf'),
   });
 
+  const [courseArray, setCourse] = useState<ItemSchedule[]>([])
+  const getSchedule = async(id:string) => {
+    const token = await AsyncStorage.getItem('token')
+    try {
+      
+      const response = await api.post<ApiResponse<ScheduleResponse[]>>(`/api/users/schedule/${id}`, null, {
+        headers:{
+          'Authorization':`Bearer ${token}`
+        }
+      } );
+      console.log(response.data)
+
+       response.data.result.forEach((item)=>{
+        const itemSche:ItemSchedule = {
+          scheReq:item,
+          image: teacher_image
+        }
+
+        setCourse([...courseArray,itemSche])
+       })
+      
+      
+  } catch (error) {
+      console.error('Load schedule failed:', error); // In lỗi nếu đăng nhập thất bại
+      return null
+  }
+    
+  }
   // Đối tượng mô tả thông tin khóa học
-  const course = {
-    title: "Tiếng Anh giao tiếp cơ bản",
-    startDate: "20/08/2024",
-    endDate: "20/12/2024",
-    time: "15h - 16h30",
-    room: "P.A123",
-    instructor: "Mỹ Quế Lan",
-    image: teacher_image
-  };
 
   // Mảng chứa các ví dụ khóa học
-  const coursesArray = [
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course }
-  ];
+  useEffect(() => {
+    // Giả sử id là '123'
+    getSchedule('1');  // Gọi getSchedule khi component được mount
+  }, []);
+  
+  
 
-  const coursesArray2 = [
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-    { ...course },
-  ];
-  const [courseList, setCourseList] = useState(coursesArray);
+  
+  const [courseList, setCourseList] = useState(courseArray);
 
 
   // Hàm render cho từng item trong FlatList
-  const renderCourseItem = ({ item }: any) => (
+  const renderCourseItem = ( {item} :any) => (
     <View style={scheduleStyles.courseCard}>
-      <Text style={scheduleStyles.courseTitle}>{item.title}</Text>
+      <Text style={scheduleStyles.courseTitle}>{item.scheReq.courseName}</Text>
       <View style={scheduleStyles.detailLayout}>
-        <Text style={scheduleStyles.courseText}>{item.startDate} - {item.endDate}</Text>
+        <Text style={scheduleStyles.courseText}>{item.scheReq.courseSchedule}</Text>
         <View style={scheduleStyles.timeLayout}>
           <Text style={scheduleStyles.courseText}>Thời gian: </Text>
-          <Text style={scheduleStyles.timeText}>{item.time}</Text>
+          <Text style={scheduleStyles.timeText}>{item.scheReq.ca}</Text>
         </View>
         <View style={scheduleStyles.classLayout}>
           <Text style={scheduleStyles.courseText}>Phòng học: </Text>
-          <Text style={scheduleStyles.classText}>{item.room}</Text>
+          <Text style={scheduleStyles.classText}>{item.scheReq.roomName}</Text>
         </View>
       </View>
       <View style={scheduleStyles.teacherImageLayout}>
         <Image source={item.image} style={scheduleStyles.instructorImage} />
-        <Text style={scheduleStyles.teacherImageText}>{item.instructor}</Text>
+        <Text style={scheduleStyles.teacherImageText}>{item.scheReq.giangVien}</Text>
       </View>
     </View>
   );
 
   const handleChangeDate = (index: number) => {
     setSelectedDay(index);
-    setCourseList(coursesArray2);
+    setCourseList(courseArray);
   }
 
   const navigation = useNavigation<DrawerNavigationProp<RootStackParamList>>()
   return (
     // <ScrollView > sửa lỗi nested virturalize list
     <View style={scheduleStyles.container}>
-      <TouchableOpacity onPress={()=>navigation.openDrawer()}>
-        <Image source={hambuger_icon} style={{marginTop:20}}/>
-        
+      <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        <Image source={hambuger_icon} style={{ marginTop: 20 }} />
+
       </TouchableOpacity>
 
       <View style={scheduleStyles.header_text_layout}>
