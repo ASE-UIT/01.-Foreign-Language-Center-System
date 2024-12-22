@@ -9,7 +9,9 @@ export default function Index() {
         <View>
             <SignedIn>
                 <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+                <Text> screen</Text>
             </SignedIn>
+            
             <SignedOut>
                 <Link href="/(auth)/sign-in">
                     <Text>Sign in</Text>
