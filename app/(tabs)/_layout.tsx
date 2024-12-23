@@ -7,6 +7,9 @@ import { useNavigation } from '@react-navigation/native';
 import Mycourse from './(myCourseNav)/mycourse';
 import Index from './(coursesNav)';
 import { useClerk } from '@clerk/clerk-expo';
+import Classes from './(classesNav)/classes';
+import Schedule from './(scheduleNav)/schedule';
+import Salary from './(salaryNav)/salary';
 
 const Drawer = createDrawerNavigator();
 
@@ -138,7 +141,7 @@ export default function TabLayout() {
         {/* Các màn hình khác với cách tương tự */}
         <Drawer.Screen
           name="Classes"
-          component={Mycourse}
+          component={Classes}
           options={{
             headerShown: true,
             title: 'Danh sách lớp học',
@@ -148,7 +151,7 @@ export default function TabLayout() {
         />
         <Drawer.Screen
           name="ScheduleOrSalary"
-          component={role ? Mycourse : Index}
+          component={role ? Schedule : Salary}
           options={{
             headerShown: true,
             title: role ? 'Thời khóa biểu' : "Lương",
@@ -158,7 +161,7 @@ export default function TabLayout() {
         />
         <Drawer.Screen
           name="Salary"
-          component={Mycourse}
+          component={Salary}
           options={{
             headerShown: true,
             title: 'Lương',
