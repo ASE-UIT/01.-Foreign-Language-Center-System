@@ -3,11 +3,20 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const cors = require('cors')
 const router = express.Router()
-
+const { clerkMiddleware, requireAuth, clerkClient } = require('@clerk/express')
+const { createProxyMiddleware } = require('http-proxy-middleware')
 dotenv.config() // Load các biến môi trường từ file .env
 
 const app = express()
 const PORT = process.env.PORT || 5000
+
+// Kiểm tra xem CLERK_SECRET_KEY và CLERK_PUBLISHABLE_KEY có tồn tại không
+if (!process.env.CLERK_SECRET_KEY || !process.env.CLERK_PUBLISHABLE_KEY) {
+  throw new Error('Missing Clerk API keys!')
+}
+
+// Cấu hình Clerk middleware với apiKey từ environment variables
+app.use(clerkMiddleware({ apiKey: process.env.CLERK_SECRET_KEY }))
 
 // Kết nối MongoDB
 mongoose
@@ -402,16 +411,19 @@ const Manager = mongoose.model('Manager', managerSchema)
 const Admin = mongoose.model('Admin', adminSchema)
 
 // Middleware
-app.use(cors()) // Enable CORS
+// Cấu hình CORS để cho phép frontend gửi yêu cầu từ một domain khác
+const corsOptions = {
+  origin: ['http://localhost:5173'], // Địa chỉ của frontend React (frontend URL)
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'], // Các header cần thiết
+  credentials: true // Quan trọng nếu bạn cần gửi cookies/tokens
+}
+
+app.use(cors(corsOptions))
 app.use(express.json()) // Enable JSON body parsing
 
 // Sử dụng router
 app.use('/api', router)
-
-// Các route API
-app.get('/', (req, res) => {
-  res.send('Hello from Express and MongoDB API!')
-})
 
 // Lắng nghe server
 app.listen(PORT, () => {
@@ -441,6 +453,77 @@ router.get('/students', async (req, res) => {
     res.status(200).json(students)
   } catch (err) {
     res.status(500).json({ error: 'Error fetching students' })
+  }
+})
+
+// API cập nhật thông tin sinh viên
+router.put('/students/:id', async (req, res) => {
+  try {
+    const { id } = req.params // Lấy ID từ URL
+    const updateData = req.body // Lấy dữ liệu từ request body
+
+    // Tìm và cập nhật sinh viên
+    const student = await Student.findByIdAndUpdate(id, updateData, {
+      new: true, // Trả về đối tượng đã cập nhật
+      runValidators: true // Chạy các validator khi cập nhật
+    })
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' })
+    }
+
+    res.status(200).json(student) // Trả về sinh viên đã cập nhật
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Error updating student', message: err.message })
+  }
+})
+
+// API đăng ký khóa học cho sinh viên
+router.put('/enroll-course/:courseId', async (req, res) => {
+  try {
+    const { courseId } = req.params // Lấy courseId từ URL
+    const { mongoID } = req.body // Lấy mongoID từ request body
+
+    // Tìm sinh viên theo mongoID
+    const student = await Student.findOne({ mongoID })
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' })
+    }
+
+    // Kiểm tra xem sinh viên đã đăng ký khóa học này chưa
+    const isCourseEnrolled = student.courses.some(
+      course => course.courseID === courseId
+    )
+
+    if (isCourseEnrolled) {
+      return res
+        .status(400)
+        .json({ error: 'Student already enrolled in this course' })
+    }
+
+    // Tạo 1 courseInfo mới với courseID và isPaid = false, paycheckIMG = rỗng
+    const newCourseInfo = new CourseInfo({
+      courseID: courseId,
+      isPaid: false,
+      paycheckIMG: '' // Không cần thiết phải có giá trị nếu không có ảnh
+    })
+
+    // Thêm courseInfo mới vào danh sách courses của sinh viên
+    student.courses.push(newCourseInfo)
+
+    // Lưu thông tin sinh viên
+    await student.save()
+
+    // Trả về sinh viên đã cập nhật
+    res.status(200).json(student)
+  } catch (err) {
+    res.status(500).json({
+      error: 'Error enrolling student in course',
+      message: err.message
+    })
   }
 })
 
@@ -522,17 +605,20 @@ router.get('/courseinfo/:id', async (req, res) => {
 // API để cập nhật thông tin khóa học
 router.put('/courseinfo/:id', async (req, res) => {
   try {
-    const updatedCourse = await CourseInfo.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true } // Trả về đối tượng mới đã cập nhật
-    )
+    const { id } = req.params
+    const updateData = req.body
 
-    if (!updatedCourse) {
-      return res.status(404).json({ error: 'Course not found' })
+    // Tìm và cập nhật thông tin khóa học
+    const courseInfo = await CourseInfo.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!courseInfo) {
+      return res.status(404).json({ error: 'Course info not found' })
     }
 
-    res.status(200).json(updatedCourse) // Trả về khóa học đã cập nhật
+    res.status(200).json(courseInfo) // Trả về thông tin khóa học đã cập nhật
   } catch (err) {
     res
       .status(500)
@@ -594,6 +680,30 @@ router.get('/teachers', async (req, res) => {
     res
       .status(500)
       .json({ error: 'Error fetching teachers', message: err.message })
+  }
+})
+
+// API để cập nhật thông tin giáo viên
+router.put('/teachers/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    // Tìm và cập nhật giáo viên
+    const teacher = await Teacher.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!teacher) {
+      return res.status(404).json({ error: 'Teacher not found' })
+    }
+
+    res.status(200).json(teacher) // Trả về giáo viên đã cập nhật
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Error updating teacher', message: err.message })
   }
 })
 
@@ -757,6 +867,30 @@ router.get('/courses', async (req, res) => {
   }
 })
 
+// API để cập nhật khóa học
+router.put('/courses/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const updateData = req.body
+
+    // Tìm và cập nhật khóa học
+    const course = await Course.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true
+    })
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' })
+    }
+
+    res.status(200).json(course) // Trả về khóa học đã cập nhật
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Error updating course', message: err.message })
+  }
+})
+
 // API để tạo Salary mới
 router.post('/salaries', async (req, res) => {
   try {
@@ -876,5 +1010,25 @@ router.get('/admins', async (req, res) => {
     res
       .status(500)
       .json({ error: 'Error fetching admins', message: err.message })
+  }
+})
+
+// API để cập nhật private metadata cho người dùng
+app.put('/api/update-metadata', async (req, res) => {
+  const { clerkUserId, metadata } = req.body // Lấy thông tin từ request body
+
+  try {
+    // Cập nhật private metadata cho người dùng
+    await clerkClient.users.updateUserMetadata(clerkUserId, {
+      privateMetadata: metadata
+    })
+
+    // Trả về phản hồi thành công
+    res.status(200).json({ message: 'Metadata updated successfully' })
+  } catch (error) {
+    // Xử lý lỗi
+    res
+      .status(500)
+      .json({ error: 'Failed to update metadata', message: error.message })
   }
 })
