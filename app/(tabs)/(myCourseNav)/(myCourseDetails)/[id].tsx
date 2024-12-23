@@ -9,8 +9,6 @@ import { RootDrawerParamList } from "../../_layout";
 
 
 
-
-
 export default function CourseDetail() {
   const { id } = useLocalSearchParams();
 
@@ -108,7 +106,7 @@ export default function CourseDetail() {
 
       }}>
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => router.push({ pathname: '/(tabs)/(coursesNav)' })}>
+          <TouchableOpacity onPress={() => router.back()}>
             <Image
               source={require('../../../../assets/images/back.png')}
               style={{
@@ -154,8 +152,8 @@ export default function CourseDetail() {
               <Text style={styles.instructor}>Giảng viên: {course.instructor}</Text>
               <View style={{ flexDirection: 'row', marginTop:15 }}>
 
-                <TouchableOpacity style={[styles.registerButton, { width: 100, alignItems: 'center', justifyContent: 'center', marginRight: 15 }]}>
-                  <Text style={styles.registerText}>Đăng ký</Text>
+                <TouchableOpacity style={[styles.registerButton, { width: 100, alignItems: 'center', justifyContent: 'center', marginRight: 15 }]} onPress={() => router.push('/(tabs)/(myCourseNav)/details/score/[id]')}>
+                  <Text style={styles.registerText}>Bảng điểm</Text>
                 </TouchableOpacity>
                 <Text style={styles.studentCount}>Sĩ số: {course.studentCount}</Text>
               </View>
