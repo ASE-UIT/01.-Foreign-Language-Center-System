@@ -7,19 +7,8 @@ export default function Index() {
 
     return (
         <View>
-            <SignedIn>
-                <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
-                <Text> screen</Text>
-            </SignedIn>
-
-            {/* <SignedOut>
-                <Link href="/(auth)/sign-in">
-                    <Text>Sign in</Text>
-                </Link>
-                <Link href="/(auth)/sign-up">
-                    <Text>Sign up</Text>
-                </Link>
-            </SignedOut> */}
+            <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
+            <Text> screen</Text>
         </View>
     )
 }
