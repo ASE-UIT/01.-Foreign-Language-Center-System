@@ -11,15 +11,15 @@ export default function Index() {
                 <Text>Hello {user?.emailAddresses[0].emailAddress}</Text>
                 <Text> screen</Text>
             </SignedIn>
-            
-            <SignedOut>
+
+            {/* <SignedOut>
                 <Link href="/(auth)/sign-in">
                     <Text>Sign in</Text>
                 </Link>
                 <Link href="/(auth)/sign-up">
                     <Text>Sign up</Text>
                 </Link>
-            </SignedOut>
+            </SignedOut> */}
         </View>
     )
 }

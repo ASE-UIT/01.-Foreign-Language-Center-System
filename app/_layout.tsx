@@ -1,13 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
-import { Slot } from 'expo-router';
+import { Link, Redirect, Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { ClerkLoaded, ClerkProvider, useAuth } from '@clerk/clerk-expo';
+import { ClerkLoaded, ClerkProvider, SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
 import { tokenCache } from '@/cache';
-import SignInScreen from './(auth)/sign-in';
-import SignUpScreen from './(auth)/sign-up';
+
+import { Text } from 'react-native';
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -38,10 +38,14 @@ export default function RootLayout() {
     throw new Error('Add EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY to your .env file');
   }
 
+
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
       <ClerkLoaded>
         <Slot />
+        <SignedOut>
+          <Redirect href={'/sign-in'} />
+        </SignedOut>
       </ClerkLoaded>
     </ClerkProvider>
   )

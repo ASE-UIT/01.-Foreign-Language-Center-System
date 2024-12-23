@@ -6,6 +6,7 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerN
 import { useNavigation } from '@react-navigation/native';
 import Mycourse from './(myCourseNav)/mycourse';
 import Index from './(coursesNav)';
+import { useClerk } from '@clerk/clerk-expo';
 
 const Drawer = createDrawerNavigator();
 
@@ -20,11 +21,19 @@ type RootDrawerParamList = {
 
 // Tùy chỉnh nội dung của Drawer
 const CustomDrawerContent = (props: any) => {
+  const { signOut } = useClerk();
+
+  const handleSignOut = async () => {
+    await signOut(); // Đăng xuất
+  };
+
   return (
     <DrawerContentScrollView {...props}>
       <View>
         {/* Nút logout */}
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSignOut}
+        >
           <Image
             source={require('../../assets/images/logout.png')}
             style={{
