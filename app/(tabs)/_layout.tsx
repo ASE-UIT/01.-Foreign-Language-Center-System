@@ -2,14 +2,9 @@
 import React, { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Image, TouchableOpacity, View } from 'react-native';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
+import { DrawerContentScrollView, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import Mycourse from './(myCourseNav)/mycourse';
-import Index from './(coursesNav)';
 import { useClerk } from '@clerk/clerk-expo';
-import Classes from './(classesNav)/classes';
-import Schedule from './(scheduleNav)/schedule';
-import Salary from './(salaryNav)/salary';
 import { Drawer } from 'expo-router/drawer'
 
 
@@ -124,7 +119,6 @@ export default function TabLayout() {
           options={{
             headerShown: false,
             title: 'Danh sách khóa học', // Tiêu đề màn hình
-
             headerLeft: () => <></>, // Ẩn headerLeft (nút quay lại)
             headerRight: () => <Menu />, // Thêm Menu vào headerRight
           }}
@@ -144,7 +138,7 @@ export default function TabLayout() {
         <Drawer.Screen
           name="(classesNav)"
           options={{
-            headerShown: true,
+            headerShown: false,
             title: 'Danh sách lớp học',
             headerLeft: () => <></>,
             headerRight: () => <Menu />,
@@ -153,9 +147,8 @@ export default function TabLayout() {
         <Drawer.Screen
           name='(scheduleNav)'
           options={{
-            headerShown: true,
+            headerShown: false,
             title: 'Thời khóa biểu',
-            drawerLabel: undefined,
             headerLeft: () => <></>,
             headerRight: () => <Menu />,
           }}
@@ -164,7 +157,7 @@ export default function TabLayout() {
           name="(salaryNav)"
           options={{
 
-            headerShown: true,
+            headerShown: false,
             title: 'Lương',
             headerLeft: () => <></>,
             headerRight: () => <Menu />,

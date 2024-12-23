@@ -1,5 +1,8 @@
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { router, useNavigation } from 'expo-router';
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import { RootDrawerParamList } from '../_layout';
 
 const SalaryList = () => {
   const salaryData = [
@@ -29,9 +32,44 @@ const SalaryList = () => {
     },
   ];
 
+  const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+
   return (
     <ScrollView style={styles.container}>
-      <View style={{ marginBottom: 20 }}>
+      <View>
+        <View style={{
+          flexDirection: 'row', // Horizontal layout
+          alignItems: 'center', // Vertical alignment
+          justifyContent: 'space-between', // Space out items
+          height: 92, // Custom header height
+          backgroundColor: '#2A58BA', // Background color
+
+        }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{
+              fontSize: 20, // Kích thước chữ tiêu đề header
+              color: 'white', // Màu chữ tiêu đề
+              marginTop: 30,
+              marginLeft: 15,
+              fontWeight: 'bold'
+            }}> Lương </Text>
+          </View>
+
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Image
+              source={require('../../../assets/images/menu.png')}
+              style={{
+                width: 30,
+                height: 20,
+                marginRight: 20,
+                marginTop: 30,
+                resizeMode: 'contain',
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={{ padding: 20 }}>
         {salaryData.map((salary, index) => (
           <View key={index} style={styles.salaryItem}>
             <Text style={styles.salaryMonth}>{`Lương ${salary.month}`}</Text>
@@ -55,7 +93,6 @@ const SalaryList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: 'white',
   },
   salaryItem: {

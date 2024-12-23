@@ -3,10 +3,14 @@ import { Stack } from 'expo-router'
 
 const _layout = () => {
     return (
-        <Stack>
-            <Stack.Screen name="classes" options={{ headerShown: false }} />
-            <Stack.Screen name="classDetail" options={{ headerShown: false }} />
-        </Stack>
+        <Stack
+            screenOptions={{
+                headerShown: false
+            }}
+        >
+            <Stack.Screen name="classes" />
+            <Stack.Screen name="classDetail" />
+        </Stack >
     );
 };
 

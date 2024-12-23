@@ -1,7 +1,9 @@
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import teacher_image from '../../../assets/images/image-teacher.jpg'
-import { router } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { RootDrawerParamList } from '../_layout';
 
 
 
@@ -82,41 +84,80 @@ const Schedule: React.FC = () => {
         </TouchableOpacity>
     );
 
-    return (
-        <View style={scheduleStyles.container}>
-            <View style={scheduleStyles.margin10}>
-                <View style={scheduleStyles.weekLayout}>
-                    {daysOfWeek.map((day, index) => {
-                        const dayOffset = index - today.getDay(); // Tính toán độ lệch ngày
-                        const displayDate = new Date(today);
-                        displayDate.setDate(today.getDate() + dayOffset); // Cập nhật ngày hiển thị
+    const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
-                        return (
-                            <TouchableOpacity key={index} onPress={() => handleChangeDate(index)} style={[scheduleStyles.dayContainer,
-                            selectedDay === index && scheduleStyles.selectedDay]}>
-                                <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectedDayText]
-                                }>
-                                    {day}
-                                </Text>
-                                <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectDateText]}>
-                                    {displayDate.getDate()} {/* Hiển thị ngày tương ứng */}
-                                </Text>
-                            </TouchableOpacity>
-                        );
-                    })}
+
+    return (
+        <View style={{ flex: 1 }}>
+            <View>
+                <View style={{
+                    flexDirection: 'row', // Horizontal layout
+                    alignItems: 'center', // Vertical alignment
+                    justifyContent: 'space-between', // Space out items
+                    height: 92, // Custom header height
+                    backgroundColor: '#2A58BA', // Background color
+
+                }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={{
+                            fontSize: 20, // Kích thước chữ tiêu đề header
+                            color: 'white', // Màu chữ tiêu đề
+                            marginTop: 30,
+                            marginLeft: 15,
+                            fontWeight: 'bold'
+                        }}> Thời khóa biểu </Text>
+                    </View>
+
+                    <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                        <Image
+                            source={require('../../../assets/images/menu.png')}
+                            style={{
+                                width: 30,
+                                height: 20,
+                                marginRight: 20,
+                                marginTop: 30,
+                                resizeMode: 'contain',
+                            }}
+                        />
+                    </TouchableOpacity>
                 </View>
             </View>
+            <View style={scheduleStyles.container}>
+                <View style={scheduleStyles.margin10}>
+                    <View style={scheduleStyles.weekLayout}>
+                        {daysOfWeek.map((day, index) => {
+                            const dayOffset = index - today.getDay(); // Tính toán độ lệch ngày
+                            const displayDate = new Date(today);
+                            displayDate.setDate(today.getDate() + dayOffset); // Cập nhật ngày hiển thị
 
-            <View style={scheduleStyles.flatListContainer}>
-                <FlatList
-                    contentContainerStyle={scheduleStyles.flatListContent}
-                    data={courseList}
-                    renderItem={renderCourseItem}
-                    keyExtractor={(item, index) => index.toString()}
-                    style={scheduleStyles.flatList}
-                />
+                            return (
+                                <TouchableOpacity key={index} onPress={() => handleChangeDate(index)} style={[scheduleStyles.dayContainer,
+                                selectedDay === index && scheduleStyles.selectedDay]}>
+                                    <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectedDayText]
+                                    }>
+                                        {day}
+                                    </Text>
+                                    <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectDateText]}>
+                                        {displayDate.getDate()} {/* Hiển thị ngày tương ứng */}
+                                    </Text>
+                                </TouchableOpacity>
+                            );
+                        })}
+                    </View>
+                </View>
+
+                <View style={scheduleStyles.flatListContainer}>
+                    <FlatList
+                        contentContainerStyle={scheduleStyles.flatListContent}
+                        data={courseList}
+                        renderItem={renderCourseItem}
+                        keyExtractor={(item, index) => index.toString()}
+                        style={scheduleStyles.flatList}
+                    />
+                </View>
             </View>
         </View>
+
     )
 }
 const { height } = Dimensions.get('window'); // Lấy chiều dài thiết bị

@@ -1,6 +1,8 @@
-import { router } from 'expo-router';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { router, useNavigation } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions, Button } from 'react-native';
+import { RootDrawerParamList } from '../_layout';
 
 // Định nghĩa kiểu cho Course
 interface Course {
@@ -67,6 +69,9 @@ const CourseList: React.FC = () => {
         fetchCourses();
     }, []);
 
+    const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+
+
     const handleNavToClassDetail = (course: Course) => {
         router.push({
             pathname: '/(tabs)/(classesNav)/classDetail', // Đảm bảo đường dẫn này đúng
@@ -101,14 +106,48 @@ const CourseList: React.FC = () => {
     );
 
     return (
-        <View style={styles.container}>
-            <FlatList
-                contentContainerStyle={styles.flatListContent}
-                data={courses}
-                renderItem={renderCourseItem}
-                keyExtractor={(item) => item.courseID}
-                style={styles.flatList}
-            />
+        <View style={{ flex: 1 }}>
+            <View style={{
+                flexDirection: 'row', // Horizontal layout
+                alignItems: 'center', // Vertical alignment
+                justifyContent: 'space-between', // Space out items
+                height: 92, // Custom header height
+                backgroundColor: '#2A58BA', // Background color
+
+            }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{
+                        fontSize: 20, // Kích thước chữ tiêu đề header
+                        color: 'white', // Màu chữ tiêu đề
+                        marginTop: 30,
+                        marginLeft: 15,
+                        fontWeight: 'bold'
+                    }}> Danh sách lớp học </Text>
+                </View>
+
+                <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                    <Image
+                        source={require('../../../assets/images/menu.png')}
+                        style={{
+                            width: 30,
+                            height: 20,
+                            marginRight: 20,
+                            marginTop: 30,
+                            resizeMode: 'contain',
+                        }}
+                    />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.container}>
+                <FlatList
+                    contentContainerStyle={styles.flatListContent}
+                    data={courses}
+                    renderItem={renderCourseItem}
+                    keyExtractor={(item) => item.courseID}
+                    style={styles.flatList}
+                />
+            </View>
         </View>
     );
 };

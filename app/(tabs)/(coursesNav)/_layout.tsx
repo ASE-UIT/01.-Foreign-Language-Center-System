@@ -6,14 +6,11 @@ const _layout = () => {
         <Stack screenOptions={{
             headerShown: false
         }
-
         }>
             <Stack.Screen name='index' options={{
                 title: 'Danh sách khóa học',
             }} />
-            <Stack.Screen name='detalis/[1]' />
-
-
+            <Stack.Screen name='detalis/[id]' />
         </Stack>
 
     )
