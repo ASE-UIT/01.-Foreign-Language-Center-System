@@ -7,7 +7,7 @@ import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
 
 
-type Course = {
+export type Course = {
   id: string;
   title: string;
   instructor: string;

@@ -131,7 +131,7 @@ export default function TabLayout() {
         <Drawer.Screen
            name="(myCourseNav)"
           options={{
-            headerShown: true,
+            headerShown: false,
             title: 'Khóa học của bạn',
             headerLeft: () => <></>, // Ẩn headerLeft
             headerRight: () => <Menu />, // Thêm Menu vào headerRight
