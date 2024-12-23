@@ -21,18 +21,15 @@ mongoose
 // Định nghĩa schema cho CourseInfo
 const courseInfoSchema = new mongoose.Schema({
   courseID: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Course',
-    required: true
+    type: String,
+    unique: true
   }, // ID khóa học, tham chiếu tới model Course
   enrollDate: {
     type: String,
-    required: true,
     match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
   },
   isPaid: {
-    type: Boolean,
-    required: true
+    type: Boolean
   },
   paycheckIMG: {
     type: String,
@@ -41,332 +38,360 @@ const courseInfoSchema = new mongoose.Schema({
   }
 })
 
+// Định nghĩa schema cho Assignment
+const assignmentSchema = new mongoose.Schema({
+  score: { type: Number, min: 0, max: 10 },
+  description: { type: String, singleline: true },
+  comment: { type: String, singleline: true }
+})
+
 // Định nghĩa schema cho Student
 const studentSchema = new mongoose.Schema({
-  clerkUserID: {
+  clerkUserId: {
     type: String,
-    required: true,
     unique: true
   },
   userRole: {
     type: String,
-    enum: ['student', 'teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['student', 'teacher', 'accountant', 'manager', 'admin']
   },
   mongoID: {
     type: String,
-    required: true,
     unique: true
   },
-  courses: [courseInfoSchema] // Danh sách các khóa học mà học sinh đã tham gia
+  isActivated: {
+    type: Boolean
+  },
+  courses: [courseInfoSchema], // Danh sách các khóa học mà học sinh tham gia
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 })
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+studentSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.mongoID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
+})
+
+// Cấu hình để trả về `mongoID` thay vì `_id` trong JSON
+// studentSchema.set('toJSON', {
+//   transform: function (doc, ret) {
+//     delete ret._id // Xóa `_id` khỏi kết quả trả về
+//     ret.mongoID = ret.mongoID.toString() // Đảm bảo `mongoID` là kiểu chuỗi
+//   }
+// })
 
 // Định nghĩa schema cho Teacher
 const teacherSchema = new mongoose.Schema({
   clerkUserID: {
     type: String,
-    required: true,
     unique: true
   },
   userRole: {
     type: String,
-    enum: ['student', 'teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['student', 'teacher', 'accountant', 'manager', 'admin']
   },
   mongoID: {
     type: String,
-    required: true,
     unique: true
   },
-  courses: [
-    {
-      type: [String],
-      required: true
-    }
-  ], // Danh sách các id khóa học giảng dạy
+  courses: {
+    type: [String]
+  }, // Danh sách các id khóa học giảng dạy
   monthlySalary: {
     type: Number,
-    required: true,
     min: 0
   },
   courseSalary: {
     type: Number,
-    required: true,
     min: 0
   },
   paycheckList: [
     {
-      type: [String],
-      required: true
+      type: [String]
     }
   ] // Danh sách các bill nhận lương
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+teacherSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.mongoID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Class
 const classSchema = new mongoose.Schema({
   classID: {
     type: String,
-    required: true,
     unique: true
   }, // ID của lớp học
-  type: {
-    type: String,
-    enum: ['repeat', 'oneTime'],
-    required: true
-  }, // Loại lớp học: lặp lại hay một lần
   schedule: {
-    type: [String],
-    required: true
+    type: [String]
   }, // Lịch học của lớp học
   name: {
-    type: String,
-    required: true
+    type: String
   }, // Tên buổi học
   description: {
-    type: [[String]],
-    required: true
+    type: [[String]]
   }, // Thông tin mô tả về buổi học
   teachers: {
-    type: [[String]],
-    required: true
+    type: [[String]]
   }, // Các giảng viên dạy lớp học này
   lessonList: {
-    type: [String],
-    required: true
+    type: [String]
   }, // Danh sách bài học trong lớp học
   progress: {
     type: Number,
-    required: true,
     min: 1
   }, // Buổi học hiện tại là buổi thứ mấy
   documents: {
     type: [String],
-    required: true,
     match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
   }, // Link tài liệu lớp học (phải là URL)
   isActive: {
-    type: Boolean,
-    required: true
+    type: Boolean
   }, // Lớp học còn hoạt động hay không
   meeting: {
     type: String,
-    required: true,
     match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
   }, // Đường dẫn vào meeting của lớp học
   coverIMG: {
     type: String,
-    required: true,
     match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
   }, // Đường dẫn hình ảnh của lớp học
   startDate: {
     type: String,
-    required: true,
     match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
   }, // Ngày bắt đầu lớp học
   endDate: {
     type: String,
-    required: true,
     match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
   } // Ngày kết thúc lớp học
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `classID` trước khi lưu tài liệu
+classSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.classID = this._id // Gán giá trị `_id` vào `classID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Course
 const courseSchema = new mongoose.Schema({
   courseID: {
     type: String,
-    required: true,
     unique: true
   },
   name: {
-    type: String,
-    required: true
+    type: String
   },
   description: {
-    type: String,
-    required: true
+    type: String
   },
   classes: [classSchema], // Danh sách lớp học trong khóa học (mảng ObjectId tham chiếu đến Class)
   teachers: [
     {
-      type: [String],
-      required: true
+      type: [String]
     }
   ], // Danh sách tên các giáo viên giảng dạy khóa học
   price: {
     type: Number,
-    required: true,
     min: 0
   },
   compareAtPrice: {
     type: Number,
-    required: true,
     min: 0
   },
   rating: {
     type: Number,
-    required: true,
     min: 0,
     max: 5
   },
   totalVote: {
     type: Number,
-    required: true,
     min: 0
   },
   target: {
-    type: [String],
-    required: true
+    type: [String]
   },
   sumary: {
-    type: [String],
-    required: true
+    type: [String]
   },
   studentList: {
     type: [String],
-    required: true,
     unique: true
   }, // Danh sách các học sinh tham gia khóa học (lưu = id)
   studentLimit: {
     type: Number,
-    required: true,
     min: 1
   },
   appliedNumber: {
     type: Number,
-    required: true,
     min: 0
+  },
+  currentStudent: {
+    type: Number,
+    min: 0,
+    max: this.studentLimit
   },
   coverIMG: {
     type: String,
-    required: true,
     match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
   },
   startDate: {
     type: String,
-    required: true,
     match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
   },
   endDate: {
     type: String,
-    required: true,
     match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
   }
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+courseSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.courseID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Salary
 const salarySchema = new mongoose.Schema({
   id: {
     type: String,
-    required: true,
     unique: true
   },
   description: {
-    type: String,
-    required: true
+    type: String
   },
   type: {
     type: String,
-    enum: ['teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['teacher', 'accountant', 'manager', 'admin']
   },
   receiverID: {
-    type: String,
-    required: true
+    type: String
   },
   value: {
     type: Number,
-    required: true,
     min: 0
   }
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+teacherSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.id = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Accountant
 const accountantSchema = new mongoose.Schema({
   clerkUserID: {
     type: String,
-    required: true,
     unique: true
   }, // ID người dùng trên hệ thống Clerk
   role: {
     type: String,
-    enum: ['student', 'teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['student', 'teacher', 'accountant', 'manager', 'admin']
   }, // Vai trò của người dùng
   mongoID: {
     type: String,
-    required: true,
     unique: true
   }, // ID MongoDB của đối tượng
   monthlySalary: {
     type: Number,
-    required: true,
     min: 0 // Lương hàng tháng
   },
   paycheckList: {
-    type: [String],
-    required: true // Danh sách các bill chuyển khoản
+    type: [String] // Danh sách các bill chuyển khoản
   }
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+accountantSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.mongoID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Manager
 const managerSchema = new mongoose.Schema({
   clerkUserID: {
     type: String,
-    required: true,
     unique: true
   }, // ID người dùng trên hệ thống Clerk
   role: {
     type: String,
-    enum: ['student', 'teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['student', 'teacher', 'accountant', 'manager', 'admin']
   }, // Vai trò của người dùng
   mongoID: {
     type: String,
-    required: true,
     unique: true
   }, // ID MongoDB của đối tượng
   monthlySalary: {
     type: Number,
-    required: true,
     min: 0 // Lương hàng tháng
   },
   paycheckList: {
-    type: [String],
-    required: true // Danh sách các bill chuyển khoản
+    type: [String] // Danh sách các bill chuyển khoản
   }
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+managerSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.mongoID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Định nghĩa schema cho Admin
 const adminSchema = new mongoose.Schema({
   clerkUserID: {
     type: String,
-    required: true,
     unique: true
   }, // ID người dùng trên hệ thống Clerk
   role: {
     type: String,
-    enum: ['student', 'teacher', 'accountant', 'manager', 'admin'],
-    required: true
+    enum: ['student', 'teacher', 'accountant', 'manager', 'admin']
   }, // Vai trò của người dùng
   mongoID: {
     type: String,
-    required: true,
     unique: true
   }, // ID MongoDB của đối tượng
   monthlySalary: {
     type: Number,
-    required: true,
     min: 0 // Lương hàng tháng
   },
   paycheckList: {
-    type: [String],
-    required: true // Danh sách các bill chuyển khoản
+    type: [String] // Danh sách các bill chuyển khoản
   }
+})
+
+// `pre-save` hook để gán giá trị `_id` vào `mongoID` trước khi lưu tài liệu
+adminSchema.pre('save', function (next) {
+  if (this.isNew) {
+    this.mongoID = this._id // Gán giá trị `_id` vào `mongoID`
+  }
+  next() // Tiếp tục với quá trình lưu tài liệu
 })
 
 // Tạo model từ schema
 const Student = mongoose.model('Student', studentSchema)
 const CourseInfo = mongoose.model('CourseInfo', courseInfoSchema)
+
+const Assignment = mongoose.model('Assignment', assignmentSchema)
+
 const Teacher = mongoose.model('Teacher', teacherSchema)
 const Course = mongoose.model('Course', courseSchema)
 const Class = mongoose.model('Class', classSchema)
@@ -398,11 +423,6 @@ router.post('/students', async (req, res) => {
   try {
     const { clerkUserID, userRole, mongoID, courses } = req.body
 
-    // Kiểm tra xem dữ liệu đầu vào có hợp lệ không
-    if (!clerkUserID || !userRole || !mongoID || !courses) {
-      return res.status(400).json({ error: 'Missing required fields' })
-    }
-
     const newStudent = new Student({ clerkUserID, userRole, mongoID, courses })
     await newStudent.save()
     res.status(201).json(newStudent) // Trả về thông tin sinh viên mới tạo
@@ -421,6 +441,32 @@ router.get('/students', async (req, res) => {
     res.status(200).json(students)
   } catch (err) {
     res.status(500).json({ error: 'Error fetching students' })
+  }
+})
+
+// API để tạo bài tập mới
+router.post('/assignments', async (req, res) => {
+  try {
+    const { score, description, comment } = req.body
+    const newAssignment = new Assignment({ score, description, comment })
+    await newAssignment.save()
+    res.status(201).json(newAssignment) // Trả về bài tập mới tạo
+  } catch (err) {
+    res
+      .status(400)
+      .json({ error: 'Error creating assignment', message: err.message })
+  }
+})
+
+// API để lấy danh sách bài tập
+router.get('/assignments', async (req, res) => {
+  try {
+    const assignments = await Assignment.find()
+    res.status(200).json(assignments) // Trả về danh sách bài tập
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: 'Error fetching assignments', message: err.message })
   }
 })
 
@@ -595,15 +641,57 @@ router.post('/classes', async (req, res) => {
   }
 })
 
-// API để lấy tất cả Class
+// API để lấy class của giáo viên hoặc học sinh đó
 router.get('/classes', async (req, res) => {
+  const { mongoID, userRole } = req.query // Lấy mongoID và userRole từ query params
+
   try {
-    const classes = await Class.find()
-    res.status(200).json(classes) // Trả về danh sách classes
+    if (userRole === 'student') {
+      // Tìm học sinh theo mongoID và lấy danh sách các khóa học của học sinh đó
+      const student = await Student.findOne({ mongoID })
+
+      if (!student) {
+        return res.status(404).json({ error: 'Student not found' })
+      }
+
+      // Tìm các khóa học mà học sinh tham gia (dựa trên `courses`)
+      const courseIds = student.courses.map(course => course.courseID) // Lấy tất cả `courseID` của học sinh
+      const courses = await Course.find({
+        courseID: { $in: courseIds } // Tìm khóa học có `courseID` nằm trong danh sách
+      })
+
+      // Tập hợp tất cả các lớp học từ các khóa học này
+      const allClasses = courses.reduce((acc, course) => {
+        return [...acc, ...course.classes] // Gộp tất cả lớp học từ các khóa học
+      }, [])
+
+      return res.status(200).json(allClasses) // Trả về danh sách lớp học mà học sinh tham gia
+    } else if (userRole === 'teacher') {
+      // Tìm giáo viên theo mongoID và lấy danh sách các khóa học của giáo viên đó
+      const teacher = await Teacher.findOne({ mongoID })
+
+      if (!teacher) {
+        return res.status(404).json({ error: 'Teacher not found' })
+      }
+
+      // Lấy danh sách các `courseId` của giáo viên (dựa trên `courses`)
+      const courseIds = teacher.courses // `courses` là mảng `courseID` chuỗi của giáo viên
+      const courses = await Course.find({
+        courseID: { $in: courseIds } // Tìm khóa học có `courseID` trong danh sách của giáo viên
+      })
+
+      // Tập hợp tất cả các lớp học từ các khóa học này
+      const allClasses = courses.reduce((acc, course) => {
+        return [...acc, ...course.classes] // Gộp tất cả lớp học từ các khóa học
+      }, [])
+
+      return res.status(200).json(allClasses) // Trả về danh sách lớp học mà giáo viên dạy
+    } else {
+      return res.status(400).json({ error: 'Invalid role' }) // Nếu role không hợp lệ
+    }
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching classes', message: err.message })
+    console.error(err)
+    res.status(500).json({ error: 'Server error', message: err.message })
   }
 })
 
