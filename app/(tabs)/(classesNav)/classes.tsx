@@ -72,7 +72,7 @@ const CourseList: React.FC = () => {
             pathname: '/(tabs)/(classesNav)/classDetail', // Đảm bảo đường dẫn này đúng
             params: {
                 courseID: JSON.stringify(course.courseID), // Convert course to a string
-            }
+            },
 
         });
     };
