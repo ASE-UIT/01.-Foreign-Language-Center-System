@@ -102,7 +102,7 @@ const ClassDetail = () => {
             <View style={{ flex: 1, padding: 20 }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View style={styles.header}>
-                        <Text style={styles.subtitle}>{classData.title}</Text>
+                        <Text style={styles.subtitle}>{classData.title} asdf asdf sdf asdf asdf asdf asdf </Text>
                         <Text style={styles.teacher}>Giảng viên: {classData.teacher}</Text>
                     </View>
                     <View style={{ flex: 1 }}>

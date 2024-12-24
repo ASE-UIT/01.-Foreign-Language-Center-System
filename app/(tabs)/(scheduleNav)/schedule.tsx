@@ -254,7 +254,7 @@ const scheduleStyles = StyleSheet.create({
         marginBottom: 5,
     },
     courseTitle: {
-        fontSize: 14,
+        fontSize: 15,
         fontWeight: 'bold',
         color: '#2A58BA',
         fontFamily: 'Inter-Bold',
@@ -264,14 +264,14 @@ const scheduleStyles = StyleSheet.create({
         marginTop: 5,
     },
     courseText: {
-        fontSize: 12,
+        fontSize: 13,
     },
     timeLayout: {
         flexDirection: 'row',
         alignItems: 'center'
     },
     timeText: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 'bold'
     },
     classLayout: {
@@ -279,7 +279,7 @@ const scheduleStyles = StyleSheet.create({
         alignItems: 'center'
     },
     classText: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 'bold'
     },
     instructorImage: {
@@ -294,7 +294,7 @@ const scheduleStyles = StyleSheet.create({
         marginTop: 10
     },
     teacherImageText: {
-        fontSize: 12,
+        fontSize: 13,
         fontWeight: 'bold',
     },
     addButton: {

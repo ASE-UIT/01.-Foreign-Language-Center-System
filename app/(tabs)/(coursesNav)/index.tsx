@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
 import { Link, router } from 'expo-router'
-import { Text, View, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native'
+import { Text, View, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
 import teacher from '../../../assets/images/teacher.png'
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -14,36 +14,30 @@ export type Course = {
   imageUrl: any;
 };
 
-export type RootStackParamList={
+export type RootStackParamList = {
   Course: any,
   CourseDetails: any,
 }
+
 const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
   <View style={styles.courseCard}>
     <Image source={course.imageUrl} style={styles.image} />
     <View style={styles.infoContainer}>
       <Text style={styles.courseTitle}>{course.title}</Text>
       <View style={{ flexDirection: 'row' }}>
-        <Text style={styles.instructor}>Giảng viên:  </Text>
+        <Text style={styles.instructor}>Giảng viên: </Text>
         <Text style={[styles.instructor, { fontWeight: 'bold' }]}>{course.instructor}</Text>
       </View>
-
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.registerButton}>
           <Text style={styles.buttonText}>Đăng ký</Text>
         </TouchableOpacity>
-
-
-        <TouchableOpacity style={styles.detailButton} onPress={()=> router.push({pathname: '/(tabs)/(coursesNav)/(courseDetails)/[id]',
-          params: { id: '1' },})}>
+        <TouchableOpacity style={styles.detailButton} onPress={() => router.push({
+          pathname: '/(tabs)/(coursesNav)/(courseDetails)/[id]',
+          params: { id: '1' },
+        })}>
           <Text style={styles.detailText}>Xem chi tiết</Text>
-        
-          
-
         </TouchableOpacity>
-
-
-
       </View>
     </View>
   </View>
@@ -51,32 +45,26 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
 
 export default function Index() {
   const { user } = useUser()
-  
+
   const courses: Course[] = [
     {
       id: "1",
       title: "Tiếng Anh giao tiếp cơ bản",
       instructor: "Mỹ Quế Lan",
       imageUrl: teacher
-      , // Replace with actual image URL
+
     },
     {
       id: "2",
       title: "Tiếng Anh giao tiếp cơ bản",
       instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
+      imageUrl: teacher
     },
     {
       id: "3",
       title: "Tiếng Anh giao tiếp cơ bản",
       instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "12",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
+      imageUrl: teacher
     },
     {
       id: "4",
@@ -120,57 +108,33 @@ export default function Index() {
       instructor: "Mỹ Quế Lan",
       imageUrl: teacher // Replace with actual image URL
     },
-    {
-      id: "11",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-
-    // Add more courses as needed
+   
   ];
-  const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
-const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>(); 
-  return (
-    <View >
-      <SignedIn>
-        <View >
-          <View style={{flexDirection: 'row', // Horizontal layout
-    alignItems: 'center', // Vertical alignment
-    justifyContent: 'space-between', // Space out items
-    height: 92, // Custom header height
-    backgroundColor: '#2A58BA', // Background color
-    
-     }}>
-            <Text style={{fontSize: 20, // Kích thước chữ tiêu đề header
-            color: 'white', // Màu chữ tiêu đề
-            marginTop: 30,
-            marginLeft: 15,
-            fontWeight:'bold'}}>Danh sách khóa học</Text>
-            
-            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-      <Image
-        source={require('../../../assets/images/menu.png')}
-        style={{
-          width: 30,
-          height: 20,
-          marginRight: 20,
-          marginTop: 30,
-          resizeMode: 'contain',
-        }}
-      />
-    </TouchableOpacity>
-          </View>
 
+  const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
+  const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+
+  return (
+    <View style={{flex:1}}>
+      <SignedIn>
+        <View style={styles.headerNav}>
+          <Text style={styles.headerTitle}>Danh sách khóa học</Text>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Image
+              source={require('../../../assets/images/menu.png')}
+              style={styles.menu}
+            />
+          </TouchableOpacity>
+        </View>
+        <SafeAreaView style={{flex:1}}>
           <FlatList
             data={courses}
             keyExtractor={(item) => item.id}
             renderItem={renderCourse}
             contentContainerStyle={styles.listContainer}
           />
-        </View>
+        </SafeAreaView>
       </SignedIn>
-
       <SignedOut>
         <Link href="/(auth)/sign-in">
           <Text>Sign in</Text>
@@ -184,19 +148,33 @@ const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 }
 
 const styles = StyleSheet.create({
+
+  headerNav: {
+    flexDirection: 'row', // Horizontal layout
+    alignItems: 'center', // Vertical alignment
+    justifyContent: 'space-between', // Space out items
+    height: 92, // Custom header height
+    backgroundColor: '#2A58BA', // Background color
+  },
+  headerTitle: {
+    fontSize: 20, // Kích thước chữ tiêu đề header
+    color: 'white', // Màu chữ tiêu đề
+    marginTop: 30,
+    marginLeft: 15,
+    fontWeight: 'bold'
+  },
+  menu: {
+    width: 30,
+    height: 20,
+    marginRight: 20,
+    marginTop: 30,
+    resizeMode: 'contain',
+  },
   container: {
-   
     backgroundColor: "#f9f9f9",
   },
-  header: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 16,
-    color: "#3a6cb1",
-  },
   listContainer: {
-    paddingBottom: 16,
+    paddingBottom: 50,
   },
   courseCard: {
     flexDirection: "row",
@@ -237,20 +215,32 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-
-
   },
   registerButton: {
     backgroundColor: "#3a6cb1",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
+    marginTop: 5,
+    width: 100,
+    height: 30,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#BABABA',
+    opacity: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   detailButton: {
-    backgroundColor: "#f1f1f1",
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
+    marginTop: 5,
+    width: 100,
+    height: 30,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: '#BABABA',
+    backgroundColor: '#E6E6E6',
+    opacity: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   buttonText: {
     color: "#fff",
