@@ -741,3 +741,174 @@ router.get('/schedule', async (req, res) => {
     res.status(500).json({ error: 'Server error', message: err.message })
   }
 })
+
+// **************************************************************** HA PHAN *****************************************************************************
+
+// API để lấy danh sách tất cả các khóa học
+router.get('/courses', async (req, res) => {
+  try {
+    // Lấy tất cả các khóa học từ cơ sở dữ liệu
+    const courses = await Course.find({}); // Tìm tất cả các khóa học
+
+    // Chọn các trường cần thiết để trả về
+    const courseList = courses.map(course => ({
+      name: course.name,
+      description: course.description,
+      rating: course.rating,
+      totalVote: course.totalVote,
+      studentLimit: course.studentLimit,
+      currentStudent: course.currentStudent,
+      id: course.courseID // Hoặc sử dụng course._id nếu bạn muốn
+    }));
+
+    // Trả về danh sách khóa học
+    res.status(200).json(courseList);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching courses', message: err.message });
+  }
+});
+
+// API để kế toán xem toàn bộ lương của các nhân viên
+router.get('/salaries', async (req, res) => {
+  const { clerkUserId, userRole } = req.query; // Lấy clerkUserId và userRole từ query params
+
+  try {
+    // Kiểm tra vai trò
+    if (userRole !== 'accountant') {
+      return res.status(403).json({ error: 'Only accountants can view salaries' });
+    }
+
+    // Tìm người dùng theo clerkUserId
+    const accountant = await Accountant.findOne({ clerkUserId: clerkUserId });
+
+    if (!accountant) {
+      return res.status(404).json({ error: 'Accountant not found' });
+    }
+
+    // Lấy toàn bộ collection Salary
+    const salaries = await Salary.find({});
+
+    // Trả về danh sách lương
+    res.status(200).json(salaries);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', message: err.message });
+  }
+});
+
+// API để nhân viên xem lương của mình
+router.get('/salary', async (req, res) => {
+  const { clerkUserId, mongoID, userRole } = req.query; // Lấy thông tin từ query params
+
+  try {
+    // Tìm nhân viên theo mongoID
+    let employee;
+    if (userRole === 'teacher') {
+      employee = await Teacher.findOne({ mongoID });
+    } else if (userRole === 'accountant') {
+      employee = await Accountant.findOne({ mongoID });
+    } else if (userRole === 'manager') {
+      employee = await Manager.findOne({ mongoID });
+    } else if (userRole === 'admin') {
+      employee = await Admin.findOne({ mongoID });
+    } else {
+      return res.status(403).json({ error: 'Invalid user role' });
+    }
+
+    if (!employee) {
+      return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    // Lấy danh sách paycheck từ employee
+    const paycheckList = employee.paycheckList;
+
+    // Tìm các salary tương ứng với paycheckList
+    const salaries = await Salary.find({ id: { $in: paycheckList } });
+
+    // Trả về dữ liệu lương
+    res.status(200).json(salaries);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', message: err.message });
+  }
+});
+
+// API để giáo viên upload tài liệu cho học sinh
+router.post('/upload-document', async (req, res) => {
+  const { clerkUserId, userRole, classId, documentLink } = req.body; // Lấy thông tin từ request body
+
+  // Xác thực người dùng
+  if (userRole !== 'teacher') {
+    return res.status(403).json({ message: 'Chưa' }); // Chỉ giáo viên mới có quyền upload tài liệu
+  }
+
+  try {
+    // Tìm lớp học theo classId
+    const classRoom = await Class.findOne({ classID: classId });
+    if (!classRoom) {
+      return res.status(404).json({ message: 'Chưa' }); // Lớp học không tồn tại
+    }
+
+    // Thêm tài liệu vào lớp học
+    classRoom.documents.push(documentLink); // Thêm link tài liệu vào mảng documents
+    await classRoom.save(); // Lưu thay đổi
+
+    // Trả về kết quả
+    return res.status(200).json({ message: 'Đã add thành công tài liệu' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Chưa' }); // Xử lý lỗi
+  }
+});
+
+// API để kế toán xác nhận thanh toán học phí của học sinh cho khóa học
+router.put('/confirm-payment', async (req, res) => {
+  const { clerkUserId, userRole, courseId, studentId } = req.body; // Lấy thông tin từ request body
+
+  try {
+    // Kiểm tra vai trò
+    if (userRole !== 'accountant') {
+      return res.status(403).json({ error: 'Only accountants can confirm payments' });
+    }
+
+    // Tìm học sinh theo studentId
+    const student = await Student.findOne({ mongoID: studentId });
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    // Tìm thông tin khóa học trong danh sách courses của học sinh
+    const courseInfo = student.courses.find(course => course.courseID === courseId);
+
+    if (!courseInfo) {
+      return res.status(404).json({ error: 'Course not found in student records' });
+    }
+
+    // Cập nhật isPaid thành true
+    courseInfo.isPaid = true;
+
+    // Lưu thông tin sinh viên
+    await student.save();
+
+    // Cập nhật studentList của khóa học
+    const course = await Course.findOne({ courseID: courseId });
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Thêm studentId vào studentList của khóa học
+    if (!course.studentList.includes(studentId)) {
+      course.studentList.push(studentId);
+      await course.save();
+    }
+
+    // Trả về thông báo xác nhận thành công
+    res.status(200).json({ message: 'Payment confirmed successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error', message: err.message });
+  }
+});
