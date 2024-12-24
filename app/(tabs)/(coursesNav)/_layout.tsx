@@ -11,7 +11,7 @@ const _layout = () => {
             <Stack.Screen name='index' options={{
                 title:'Danh sách khóa học',
             }}/>
-            <Stack.Screen name='detalis/[id]'/>
+            <Stack.Screen name='(courseDetails)/[id]'/>
 
 
         </Stack>

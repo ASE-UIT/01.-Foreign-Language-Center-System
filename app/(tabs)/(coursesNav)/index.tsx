@@ -34,7 +34,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.detailButton} onPress={()=> router.push({pathname: '/(tabs)/(coursesNav)/details/[id]',
+        <TouchableOpacity style={styles.detailButton} onPress={()=> router.push({pathname: '/(tabs)/(coursesNav)/(courseDetails)/[id]',
           params: { id: '1' },})}>
           <Text style={styles.detailText}>Xem chi tiết</Text>
         

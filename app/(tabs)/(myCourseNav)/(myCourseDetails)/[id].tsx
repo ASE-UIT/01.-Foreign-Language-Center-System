@@ -11,6 +11,7 @@ import { RootDrawerParamList } from "../../_layout";
 
 export default function CourseDetail() {
   const { id } = useLocalSearchParams();
+  const [isTeacher, setTeacher] = useState(false)
 
   const [sections, setSections] = useState({
     overview: false,
@@ -151,10 +152,17 @@ export default function CourseDetail() {
             <View style={styles.infoContainer}>
               <Text style={styles.instructor}>Giảng viên: {course.instructor}</Text>
               <View style={{ flexDirection: 'row', marginTop:15 }}>
-
-                <TouchableOpacity style={[styles.registerButton, { width: 100, alignItems: 'center', justifyContent: 'center', marginRight: 15 }]} onPress={() => router.push('/(tabs)/(myCourseNav)/details/score/[id]')}>
+              {isTeacher ? (
+                <TouchableOpacity style={[styles.registerButton, { width: 100, alignItems: 'center', justifyContent: 'center', marginRight: 15 }]} onPress={() => router.push('/(scores)/[id]')}>
                   <Text style={styles.registerText}>Bảng điểm</Text>
                 </TouchableOpacity>
+                ) : (
+                 
+                  <Text style={[styles.registerText, {color:'black'}]}>Đã đăng ký</Text>
+               
+                )}
+
+                
                 <Text style={styles.studentCount}>Sĩ số: {course.studentCount}</Text>
               </View>
 
@@ -252,7 +260,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#666",
     marginVertical: 8,
-    marginLeft:5,
+    marginLeft: 15,
   },
   registerButton: {
     backgroundColor: "#3a6cb1",
@@ -262,6 +270,8 @@ const styles = StyleSheet.create({
   registerText: {
     color: "#fff",
     fontWeight: "bold",
+    marginVertical: 8,
+    marginLeft:0,
   },
   sectionTitle: {
     fontSize: 16,

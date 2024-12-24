@@ -5,7 +5,7 @@ const _layout = () => {
     return (
         <Stack>
             <Stack.Screen name="[id]" options={{ headerShown: false }} />
-            <Stack.Screen name="score/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="(scores)/[id]" options={{ headerShown: false }} />
         </Stack>
     )
 }
