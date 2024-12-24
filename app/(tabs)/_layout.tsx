@@ -2,12 +2,10 @@
 import React, { useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Image, TouchableOpacity, View } from 'react-native';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
+import { DrawerContentScrollView, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import Mycourse from './(myCourseNav)/mycourse';
-import Index from './(coursesNav)';
 import { useClerk } from '@clerk/clerk-expo';
-import {Drawer} from 'expo-router/drawer'
+import { Drawer } from 'expo-router/drawer'
 
 
 // Định nghĩa kiểu cho các màn hình trong Drawer
@@ -88,7 +86,7 @@ const CustomDrawerContent = (props: any) => {
 
 export default function TabLayout() {
   const [role, setRole] = useState(false) // true là học sinh, false là giáo vi
-  
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
@@ -117,11 +115,10 @@ export default function TabLayout() {
         {/* Màn hình "Courses" */}
         <Drawer.Screen
           name="(coursesNav)"
-          
+
           options={{
             headerShown: false,
             title: 'Danh sách khóa học', // Tiêu đề màn hình
-          
             headerLeft: () => <></>, // Ẩn headerLeft (nút quay lại)
             headerRight: () => <Menu />, // Thêm Menu vào headerRight
           }}
@@ -129,7 +126,7 @@ export default function TabLayout() {
 
         {/* Màn hình "MyCourses" */}
         <Drawer.Screen
-           name="(myCourseNav)"
+          name="(myCourseNav)"
           options={{
             headerShown: false,
             title: 'Khóa học của bạn',
@@ -138,39 +135,34 @@ export default function TabLayout() {
           }}
         />
 
-        {/* Các màn hình khác với cách tương tự
         <Drawer.Screen
-          name="(coursesNav)"
+          name="(classesNav)"
           options={{
-            headerShown: true,
+            headerShown: false,
             title: 'Danh sách lớp học',
             headerLeft: () => <></>,
             headerRight: () => <Menu />,
           }}
         />
-        
         <Drawer.Screen
-          name="(coursesNav)"
-          
+          name='(scheduleNav)'
           options={{
-            headerShown: true,
-            title:'Thời khóa biểu' ,
-            drawerLabel: undefined,
+            headerShown: false,
+            title: 'Thời khóa biểu',
             headerLeft: () => <></>,
             headerRight: () => <Menu />,
           }}
         />
         <Drawer.Screen
-         name="(coursesNav)"
-          
+          name="(salaryNav)"
           options={{
-            
-            headerShown: true,
+
+            headerShown: false,
             title: 'Lương',
             headerLeft: () => <></>,
             headerRight: () => <Menu />,
           }}
-        /> */}
+        />
       </Drawer>
     </GestureHandlerRootView>
   );

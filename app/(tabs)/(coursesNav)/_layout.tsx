@@ -4,9 +4,8 @@ import { Stack } from 'expo-router';
 const _layout = () => {
     return (
         <Stack screenOptions={{
-           headerShown:false
+            headerShown: false
         }
-            
         }>
             <Stack.Screen name='index' options={{
                 title:'Danh sách khóa học',
@@ -15,7 +14,7 @@ const _layout = () => {
 
 
         </Stack>
-       
+
     )
 }
 
