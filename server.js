@@ -455,289 +455,196 @@ app.put('/api/update-metadata', async (req, res) => {
   }
 })
 
-// **************************************************************** 5 API CHỨC NĂNG *****************************************************************************
+// **************************************************************** 4 API CHỨC NĂNG *****************************************************************************
 
-// Học sinh có thể đăng ký vào khóa học
-router.put('/enroll-course/:courseId', async (req, res) => {
+//API thêm course
+router.post('/add-course', async (req, res) => {
+  const { name, description, classes, price, compareAtPrice, target, sumary, studentLimit, coverIMG, startDate, endDate} = req.body;
+
   try {
-    const { courseId } = req.params // Lấy courseId từ URL
-    const { mongoID, userRole } = req.body // Lấy mongoID, userRole từ request body
-
-    // Nếu không phải là sinh viên thì không thể đăng ký khóa học
-    if (userRole !== 'student') {
-      return res.status(403).json({ error: 'Only student can enroll course' })
+    // Kiểm tra xem các trường bắt buộc có đầy đủ không
+    if (!name || !description || !classes || !price || !target || !sumary || !studentLimit || !coverIMG || !startDate || !endDate) {
+      return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Tìm sinh viên theo mongoID
-    const student = await Student.findOne({ mongoID })
-
-    if (!student) {
-      return res.status(404).json({ error: 'Student not found' })
+    if (compareAtPrice && compareAtPrice < price) {
+      return res.status(400).json({ error: 'Compare-at price must be greater than or equal to price.' });
     }
 
-    // Kiểm tra xem sinh viên đã đăng ký khóa học này chưa
-    const isCourseEnrolled = student.courses.some(
-      course => course.courseID === courseId
-    )
+    // Tạo object khóa học mới
+    const newCourse = new Course({
+      name,
+      description,
+      classes,
+      price,
+      compareAtPrice,
+      target,
+      sumary,
+      studentLimit,
+      coverIMG,
+      startDate,
+      endDate
+    });
 
-    if (isCourseEnrolled) {
-      return res
-        .status(400)
-        .json({ error: 'Student already enrolled in this course' })
-    }
+    // Lưu vào database
+    await newCourse.save();
 
-    // Tạo 1 courseInfo mới với courseID và isPaid = false, paycheckIMG = rỗng
-    const newCourseInfo = new CourseInfo({
-      courseID: courseId,
-      isPaid: false,
-      paycheckIMG: '' // Không cần thiết phải có giá trị nếu không có ảnh
-    })
-
-    // Thêm courseInfo mới vào danh sách courses của sinh viên
-    student.courses.push(newCourseInfo)
-
-    // Lưu thông tin sinh viên
-    await student.save()
-
-    // Trả về thông báo đăng ký thành công
-    res.status(200).json({ message: 'Enroll course successfully' })
+    // Trả về kết quả thành công
+    res.status(201).json({
+      message: 'Course added successfully',
+      course: newCourse,
+    });
   } catch (err) {
-    res.status(500).json({
-      error: 'Error enrolling student in course',
-      message: err.message
-    })
+    console.error(err);
+    // Xử lý lỗi server
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
-})
+});
 
-// Học sinh có quyền thanh toán học phí cho khóa học
-router.put('/purchase-course/:courseId', async (req, res) => {
+//API Thêm học sinh vào course
+router.post('/add-student-to-course/:courseId/:studentId', async (req, res) => {
+  const { courseId, studentId } = req.params;
+
   try {
-    const { courseId } = req.params // Lấy courseId từ URL
-    const { mongoID, userRole, paycheckIMG } = req.body // Lấy mongoID, userRole, payCheckIMG từ request body
-
-    // Nếu không phải là sinh viên thì không thể mua khóa học
-    if (userRole !== 'student') {
-      return res.status(403).json({ error: 'Only student can purchase course' })
+    // 1. Kiểm tra xem khóa học có tồn tại không
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
     }
 
-    // Tìm sinh viên theo mongoID
-    const student = await Student.findOne({ mongoID })
-
+    // 2. Kiểm tra xem học sinh có tồn tại không
+    const student = await Student.findById(studentId);
     if (!student) {
-      return res.status(404).json({ error: 'Student not found' })
+      return res.status(404).json({ error: 'Student not found' });
     }
 
-    // Kiểm tra xem sinh viên đã thanh toán khóa học này chưa
-    const isCoursePurchased = student.courses.some(
-      course => course.courseID === courseId && course.isPaid
-    )
-
-    if (isCoursePurchased) {
-      return res
-        .status(400)
-        .json({ error: 'Student already purchased this course' })
+    // 3. Kiểm tra xem học sinh đã có trong khóa học chưa
+    if (course.studentList.includes(studentId)) {
+      return res.status(400).json({ error: 'Student already enrolled in this course' });
     }
 
-    // Cập nhật payCheckIMG cho courseInfo của khóa học
-    const courseInfo = student.courses.find(
-      course => course.courseID === courseId
-    )
-    courseInfo.paycheckIMG = paycheckIMG
+    // 4. Thêm học sinh vào danh sách học sinh của khóa học
+    course.studentList.push(studentId);
+    await course.save();
 
-    // Lưu thông tin sinh viên
-    await student.save()
+    // 5. Tạo object courseInfo cho học sinh và thêm vào danh sách courses của học sinh
+    const courseInfo = {
+      courseId: courseId,
+      isPaid: true,  // Đặt isPaid là true vì học sinh đã thanh toán
+      enrollDate: moment().format('DD MM YYYY')  // Định dạng ngày hôm nay
+    };
 
-    // Trả về thông báo đã cập nhật
+    student.courses.push(courseInfo);
+    await student.save();
+
+    // 6. Trả về kết quả thành công
     res.status(200).json({
-      message:
-        'Pay check received successfully. Please wait for the confirmation from our staff'
-    })
+      message: 'Student successfully added to the course',
+      courseId: courseId,
+      studentId: studentId,
+      courseInfo: courseInfo
+    });
   } catch (err) {
-    res.status(500).json({
-      error: 'Error purchasing course',
-      message: err.message
-    })
+    console.error(err);
+    // Xử lý lỗi server
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
-})
+});
 
-// Học sinh có thể xem điểm của mình của khóa học nào đó
-router.get('/scores/:courseId', async (req, res) => {
-  try {
-    const { courseId } = req.params // Lấy courseId từ URL
-    const { mongoID, userRole } = req.body // Lấy mongoID, userRole từ request body
-
-    // Nếu không phải là sinh viên thì không thể xem điểm
-    if (userRole !== 'student') {
-      return res.status(403).json({ error: 'Only student can view scores' })
-    }
-
-    // Tìm sinh viên theo mongoID
-    const student = await Student.findOne({ mongoID })
-
-    if (!student) {
-      return res.status(404).json({ error: 'Student not found' })
-    }
-
-    // Tìm thông tin khóa học mà sinh viên đang học
-    const courseInfo = student.courses.find(
-      course => course.courseID === courseId
-    )
-
-    if (!courseInfo) {
-      return res.status(404).json({ error: 'Course not found' })
-    }
-
-    // Trả về điểm của sinh viên
-    res.status(200).json({ scores: courseInfo.scores })
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching scores', message: err.message })
-  }
-})
-
-// Học sinh và giáo viên có thể xem các lớp học mình học/dạy
-router.get('/classes', async (req, res) => {
-  const { mongoID, userRole } = req.query // Lấy mongoID và userRole từ query params
+//API Thêm giáo viên vào course
+router.post('/add-teacher-to-course/:courseId/:teacherId', async (req, res) => {
+  const { courseId, teacherId } = req.params;
+  const { classSchedules } = req.body;  // classSchedules là mảng chứa thông tin lớp và buổi học muốn gán giáo viên
 
   try {
-    if (userRole === 'student') {
-      // Tìm học sinh theo mongoID và lấy danh sách các khóa học của học sinh đó
-      const student = await Student.findOne({ mongoID })
-
-      if (!student) {
-        return res.status(404).json({ error: 'Student not found' })
-      }
-
-      // Tìm các khóa học mà học sinh tham gia (dựa trên `courses`)
-      const courseIds = student.courses.map(course => course.courseID) // Lấy tất cả `courseID` của học sinh
-      const courses = await Course.find({
-        courseID: { $in: courseIds } // Tìm khóa học có `courseID` nằm trong danh sách
-      })
-
-      // Tập hợp tất cả các lớp học từ các khóa học này
-      const allClasses = courses.reduce((acc, course) => {
-        return [...acc, ...course.classes] // Gộp tất cả lớp học từ các khóa học
-      }, [])
-
-      return res.status(200).json(allClasses) // Trả về danh sách lớp học mà học sinh tham gia
-    } else if (userRole === 'teacher') {
-      // Tìm giáo viên theo mongoID và lấy danh sách các khóa học của giáo viên đó
-      const teacher = await Teacher.findOne({ mongoID })
-
-      if (!teacher) {
-        return res.status(404).json({ error: 'Teacher not found' })
-      }
-
-      // Lấy danh sách các `courseId` của giáo viên (dựa trên `courses`)
-      const courseIds = teacher.courses // `courses` là mảng `courseID` chuỗi của giáo viên
-      const courses = await Course.find({
-        courseID: { $in: courseIds } // Tìm khóa học có `courseID` trong danh sách của giáo viên
-      })
-
-      // Tập hợp tất cả các lớp học từ các khóa học này
-      const allClasses = courses.reduce((acc, course) => {
-        return [...acc, ...course.classes] // Gộp tất cả lớp học từ các khóa học
-      }, [])
-
-      return res.status(200).json(allClasses) // Trả về danh sách lớp học mà giáo viên dạy
-    } else {
-      return res.status(400).json({ error: 'Invalid role' }) // Nếu role không hợp lệ
+    // 1. Kiểm tra xem khóa học có tồn tại không
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
     }
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Server error', message: err.message })
-  }
-})
 
-// API để xem lịch học của học sinh trong tuần
-router.get('/schedule', async (req, res) => {
-  const { mongoID, userRole } = req.query // Lấy mongoID và userRole từ query params
+    // 2. Kiểm tra xem giáo viên có tồn tại không
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) {
+      return res.status(404).json({ error: 'Teacher not found' });
+    }
 
-  try {
-    let classesInWeek = [] // Mảng chứa lịch học trong tuần
+    // 3. Kiểm tra và thêm giáo viên vào danh sách giáo viên của khóa học
+    if (!course.teachers) {
+      course.teachers = [];
+    }
 
-    // Lấy tuần hiện tại
-    const startOfWeek = moment().startOf('week').format('YYYY-MM-DD') // Chủ nhật tuần này
-    const endOfWeek = moment().endOf('week').format('YYYY-MM-DD') // Thứ bảy tuần này
+    // Kiểm tra giáo viên đã có trong khóa học chưa
+    if (course.teachers.includes(teacherId)) {
+      return res.status(400).json({ error: 'Teacher already added to this course' });
+    }
+    
+    // Thêm giáo viên vào khóa học
+    course.teachers.push(teacherId);
+    await course.save();
 
-    if (userRole === 'student') {
-      // Tìm sinh viên theo mongoID
-      const student = await Student.findOne({ mongoID })
+    // 4. Cập nhật thông tin lớp học, thêm giáo viên vào các buổi học cụ thể
+    if (classSchedules && Array.isArray(classSchedules)) {
+      for (const schedule of classSchedules) {
+        const { classId, session } = schedule;
 
-      if (!student) {
-        return res.status(404).json({ error: 'Student not found' })
-      }
-
-      // Duyệt qua các khóa học của học sinh
-      for (let courseInfo of student.courses) {
-        const course = await Course.findOne({ courseID: courseInfo.courseID })
-
-        if (course) {
-          // Duyệt qua các lớp học của khóa học
-          for (let classObj of course.classes) {
-            const classSchedule = classObj.schedule.filter(scheduleTime => {
-              const scheduleMoment = moment(scheduleTime, 'ddd HH:mm')
-              return scheduleMoment.isBetween(
-                startOfWeek,
-                endOfWeek,
-                null,
-                '[]'
-              )
-            })
-
-            if (classSchedule.length > 0) {
-              classesInWeek.push({
-                class: classObj.name,
-                schedule: classSchedule
-              })
-            }
-          }
+        // Tìm lớp học trong khóa học theo classId
+        const classIndex = course.classes.findIndex(classItem => classItem.classId === classId);
+        if (classIndex === -1) {
+          return res.status(400).json({ error: `Class with ID ${classId} not found in this course` });
         }
-      }
 
-      res.status(200).json({ schedules: classesInWeek })
-    } else if (userRole === 'teacher') {
-      // Tìm giáo viên theo mongoID
-      const teacher = await Teacher.findOne({ mongoID })
-
-      if (!teacher) {
-        return res.status(404).json({ error: 'Teacher not found' })
-      }
-
-      // Duyệt qua các khóa học của giáo viên
-      for (let courseId of teacher.courses) {
-        const course = await Course.findOne({ courseID: courseId })
-
-        if (course) {
-          // Duyệt qua các lớp học của khóa học
-          for (let classObj of course.classes) {
-            const classSchedule = classObj.schedule.filter(scheduleTime => {
-              const scheduleMoment = moment(scheduleTime, 'ddd HH:mm')
-              return scheduleMoment.isBetween(
-                startOfWeek,
-                endOfWeek,
-                null,
-                '[]'
-              )
-            })
-
-            if (classSchedule.length > 0) {
-              classesInWeek.push({
-                class: classObj.name,
-                schedule: classSchedule
-              })
-            }
-          }
+        // Kiểm tra số buổi học trong lớp đó
+        const classItem = course.classes[classIndex];
+        if (session < 1 || session > classItem.schedule.length) {
+          return res.status(400).json({ error: `Invalid session number for class ${classId}` });
         }
+
+        // Thêm giáo viên vào buổi học đúng theo session
+        classItem.schedule[session - 1].teachers.push(teacherId); // Lưu ý session là 1-based, nhưng mảng là 0-based
       }
 
-      res.status(200).json({ schedules: classesInWeek })
-    } else {
-      return res.status(400).json({ error: 'Invalid user role' })
+      // Lưu lại thông tin khóa học với các thay đổi
+      await course.save();
     }
+
+    // 5. Trả về kết quả thành công
+    res.status(200).json({
+      message: 'Teacher successfully added to the course and assigned to sessions',
+      courseId: courseId,
+      teacherId: teacherId,
+      classSchedules: classSchedules
+    });
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Server error', message: err.message })
+    console.error(err);
+    // Xử lý lỗi server
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
-})
+});
+
+//API xem thông tin course
+router.get('/course-information/:courseId', async (req, res) => {
+  const { courseId } = req.params;
+
+  try {
+    // Kiểm tra thông tin đầu vào
+    if (!courseId) {
+      return res.status(400).json({ message: "Thông tin khóa học không hợp lệ." });
+    }
+
+    // Tìm khóa học theo courseId
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Khóa học không tồn tại." });
+    }
+
+    // Trả về thông tin chi tiết của khóa học
+    return res.status(200).json({
+      message: "Thông tin khóa học.",
+      course: course
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Có lỗi xảy ra khi lấy thông tin khóa học." });
+  }
+});
