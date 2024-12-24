@@ -5,6 +5,8 @@ const cors = require('cors')
 const router = express.Router()
 const { clerkMiddleware, requireAuth, clerkClient } = require('@clerk/express')
 const { createProxyMiddleware } = require('http-proxy-middleware')
+const moment = require('moment') // Để xử lý thời gian cho API schedule
+
 dotenv.config() // Load các biến môi trường từ file .env
 
 const app = express()
@@ -27,6 +29,13 @@ mongoose
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('MongoDB connection error:', err))
 
+// Định nghĩa schema cho Assignment
+const assignmentSchema = new mongoose.Schema({
+  score: { type: Number, min: 0, max: 10 },
+  description: { type: String, singleline: true },
+  comment: { type: String, singleline: true }
+})
+
 // Định nghĩa schema cho CourseInfo
 const courseInfoSchema = new mongoose.Schema({
   courseID: {
@@ -40,18 +49,12 @@ const courseInfoSchema = new mongoose.Schema({
   isPaid: {
     type: Boolean
   },
+  scores: [assignmentSchema], // Thông tin điểm số của sinh viên
   paycheckIMG: {
     type: String,
     required: false,
     match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/ // Đảm bảo URL hợp lệ
   }
-})
-
-// Định nghĩa schema cho Assignment
-const assignmentSchema = new mongoose.Schema({
-  score: { type: Number, min: 0, max: 10 },
-  description: { type: String, singleline: true },
-  comment: { type: String, singleline: true }
 })
 
 // Định nghĩa schema cho Student
@@ -209,7 +212,7 @@ const courseSchema = new mongoose.Schema({
     {
       type: [String]
     }
-  ], // Danh sách tên các giáo viên giảng dạy khóa học
+  ], // Danh sách id các giáo viên giảng dạy khóa học
   price: {
     type: Number,
     min: 0
@@ -430,61 +433,40 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
-// API để tạo sinh viên mới
-router.post('/students', async (req, res) => {
+// **************************************************************** API TEST CLERK *****************************************************************************
+
+// API để cập nhật private metadata cho người dùng
+app.put('/api/update-metadata', async (req, res) => {
+  const { clerkUserId, metadata } = req.body // Lấy thông tin từ request body
+
   try {
-    const { clerkUserID, userRole, mongoID, courses } = req.body
-
-    const newStudent = new Student({ clerkUserID, userRole, mongoID, courses })
-    await newStudent.save()
-    res.status(201).json(newStudent) // Trả về thông tin sinh viên mới tạo
-  } catch (err) {
-    console.error(err) // In chi tiết lỗi ra console
-    res
-      .status(400)
-      .json({ error: 'Error creating student', message: err.message }) // Trả về lỗi chi tiết
-  }
-})
-
-// API để lấy danh sách sinh viên
-router.get('/students', async (req, res) => {
-  try {
-    const students = await Student.find()
-    res.status(200).json(students)
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching students' })
-  }
-})
-
-// API cập nhật thông tin sinh viên
-router.put('/students/:id', async (req, res) => {
-  try {
-    const { id } = req.params // Lấy ID từ URL
-    const updateData = req.body // Lấy dữ liệu từ request body
-
-    // Tìm và cập nhật sinh viên
-    const student = await Student.findByIdAndUpdate(id, updateData, {
-      new: true, // Trả về đối tượng đã cập nhật
-      runValidators: true // Chạy các validator khi cập nhật
+    // Cập nhật private metadata cho người dùng
+    await clerkClient.users.updateUserMetadata(clerkUserId, {
+      privateMetadata: metadata
     })
 
-    if (!student) {
-      return res.status(404).json({ error: 'Student not found' })
-    }
-
-    res.status(200).json(student) // Trả về sinh viên đã cập nhật
-  } catch (err) {
+    // Trả về phản hồi thành công
+    res.status(200).json({ message: 'Metadata updated successfully' })
+  } catch (error) {
+    // Xử lý lỗi
     res
       .status(500)
-      .json({ error: 'Error updating student', message: err.message })
+      .json({ error: 'Failed to update metadata', message: error.message })
   }
 })
 
-// API đăng ký khóa học cho sinh viên
+// **************************************************************** 5 API CHỨC NĂNG *****************************************************************************
+
+// Học sinh có thể đăng ký vào khóa học
 router.put('/enroll-course/:courseId', async (req, res) => {
   try {
     const { courseId } = req.params // Lấy courseId từ URL
-    const { mongoID } = req.body // Lấy mongoID từ request body
+    const { mongoID, userRole } = req.body // Lấy mongoID, userRole từ request body
+
+    // Nếu không phải là sinh viên thì không thể đăng ký khóa học
+    if (userRole !== 'student') {
+      return res.status(403).json({ error: 'Only student can enroll course' })
+    }
 
     // Tìm sinh viên theo mongoID
     const student = await Student.findOne({ mongoID })
@@ -517,8 +499,8 @@ router.put('/enroll-course/:courseId', async (req, res) => {
     // Lưu thông tin sinh viên
     await student.save()
 
-    // Trả về sinh viên đã cập nhật
-    res.status(200).json(student)
+    // Trả về thông báo đăng ký thành công
+    res.status(200).json({ message: 'Enroll course successfully' })
   } catch (err) {
     res.status(500).json({
       error: 'Error enrolling student in course',
@@ -527,231 +509,94 @@ router.put('/enroll-course/:courseId', async (req, res) => {
   }
 })
 
-// API để tạo bài tập mới
-router.post('/assignments', async (req, res) => {
+// Học sinh có quyền thanh toán học phí cho khóa học
+router.put('/purchase-course/:courseId', async (req, res) => {
   try {
-    const { score, description, comment } = req.body
-    const newAssignment = new Assignment({ score, description, comment })
-    await newAssignment.save()
-    res.status(201).json(newAssignment) // Trả về bài tập mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating assignment', message: err.message })
-  }
-})
+    const { courseId } = req.params // Lấy courseId từ URL
+    const { mongoID, userRole, paycheckIMG } = req.body // Lấy mongoID, userRole, payCheckIMG từ request body
 
-// API để lấy danh sách bài tập
-router.get('/assignments', async (req, res) => {
-  try {
-    const assignments = await Assignment.find()
-    res.status(200).json(assignments) // Trả về danh sách bài tập
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching assignments', message: err.message })
-  }
-})
-
-// API để tạo khóa học mới
-router.post('/courseinfo', async (req, res) => {
-  try {
-    const { courseID, enrollDate, isPaid, paycheckIMG } = req.body
-
-    // Kiểm tra nếu thông tin khóa học đã có trong MongoDB (hoặc có thể kiểm tra thêm)
-    const newCourseInfo = new CourseInfo({
-      courseID,
-      enrollDate,
-      isPaid,
-      paycheckIMG
-    })
-
-    await newCourseInfo.save() // Lưu dữ liệu vào MongoDB
-    res.status(201).json(newCourseInfo) // Trả về khóa học mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating course info', message: err.message })
-  }
-})
-
-// API để lấy danh sách tất cả khóa học
-router.get('/courseinfo', async (req, res) => {
-  try {
-    const courses = await CourseInfo.find() // Lấy tất cả dữ liệu từ collection CourseInfo
-    res.status(200).json(courses) // Trả về danh sách khóa học
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching course info', message: err.message })
-  }
-})
-
-// API để lấy thông tin một khóa học theo `courseID`
-router.get('/courseinfo/:id', async (req, res) => {
-  try {
-    const course = await CourseInfo.findById(req.params.id) // Tìm khóa học theo ID
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' })
+    // Nếu không phải là sinh viên thì không thể mua khóa học
+    if (userRole !== 'student') {
+      return res.status(403).json({ error: 'Only student can purchase course' })
     }
-    res.status(200).json(course) // Trả về khóa học tìm được
+
+    // Tìm sinh viên theo mongoID
+    const student = await Student.findOne({ mongoID })
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' })
+    }
+
+    // Kiểm tra xem sinh viên đã thanh toán khóa học này chưa
+    const isCoursePurchased = student.courses.some(
+      course => course.courseID === courseId && course.isPaid
+    )
+
+    if (isCoursePurchased) {
+      return res
+        .status(400)
+        .json({ error: 'Student already purchased this course' })
+    }
+
+    // Cập nhật payCheckIMG cho courseInfo của khóa học
+    const courseInfo = student.courses.find(
+      course => course.courseID === courseId
+    )
+    courseInfo.paycheckIMG = paycheckIMG
+
+    // Lưu thông tin sinh viên
+    await student.save()
+
+    // Trả về thông báo đã cập nhật
+    res.status(200).json({
+      message:
+        'Pay check received successfully. Please wait for the confirmation from our staff'
+    })
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching course info', message: err.message })
+    res.status(500).json({
+      error: 'Error purchasing course',
+      message: err.message
+    })
   }
 })
 
-// API để cập nhật thông tin khóa học
-router.put('/courseinfo/:id', async (req, res) => {
+// Học sinh có thể xem điểm của mình của khóa học nào đó
+router.get('/scores/:courseId', async (req, res) => {
   try {
-    const { id } = req.params
-    const updateData = req.body
+    const { courseId } = req.params // Lấy courseId từ URL
+    const { mongoID, userRole } = req.body // Lấy mongoID, userRole từ request body
 
-    // Tìm và cập nhật thông tin khóa học
-    const courseInfo = await CourseInfo.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true
-    })
+    // Nếu không phải là sinh viên thì không thể xem điểm
+    if (userRole !== 'student') {
+      return res.status(403).json({ error: 'Only student can view scores' })
+    }
+
+    // Tìm sinh viên theo mongoID
+    const student = await Student.findOne({ mongoID })
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student not found' })
+    }
+
+    // Tìm thông tin khóa học mà sinh viên đang học
+    const courseInfo = student.courses.find(
+      course => course.courseID === courseId
+    )
 
     if (!courseInfo) {
-      return res.status(404).json({ error: 'Course info not found' })
-    }
-
-    res.status(200).json(courseInfo) // Trả về thông tin khóa học đã cập nhật
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error updating course info', message: err.message })
-  }
-})
-
-// API để xóa khóa học
-router.delete('/courseinfo/:id', async (req, res) => {
-  try {
-    const deletedCourse = await CourseInfo.findByIdAndDelete(req.params.id) // Xóa khóa học theo ID
-    if (!deletedCourse) {
       return res.status(404).json({ error: 'Course not found' })
     }
-    res.status(200).json({ message: 'Course deleted successfully' }) // Trả về thông báo xóa thành công
+
+    // Trả về điểm của sinh viên
+    res.status(200).json({ scores: courseInfo.scores })
   } catch (err) {
     res
       .status(500)
-      .json({ error: 'Error deleting course info', message: err.message })
+      .json({ error: 'Error fetching scores', message: err.message })
   }
 })
 
-// API để tạo Teacher mới
-router.post('/teachers', async (req, res) => {
-  try {
-    const {
-      clerkUserID,
-      userRole,
-      mongoID,
-      courses,
-      monthlySalary,
-      courseSalary,
-      paycheckList
-    } = req.body
-    const newTeacher = new Teacher({
-      clerkUserID,
-      userRole,
-      mongoID,
-      courses,
-      monthlySalary,
-      courseSalary,
-      paycheckList
-    })
-    await newTeacher.save()
-    res.status(201).json(newTeacher) // Trả về teacher mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating teacher', message: err.message })
-  }
-})
-
-// API để lấy tất cả Teacher
-router.get('/teachers', async (req, res) => {
-  try {
-    const teachers = await Teacher.find()
-    res.status(200).json(teachers) // Trả về danh sách teachers
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching teachers', message: err.message })
-  }
-})
-
-// API để cập nhật thông tin giáo viên
-router.put('/teachers/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    const updateData = req.body
-
-    // Tìm và cập nhật giáo viên
-    const teacher = await Teacher.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true
-    })
-
-    if (!teacher) {
-      return res.status(404).json({ error: 'Teacher not found' })
-    }
-
-    res.status(200).json(teacher) // Trả về giáo viên đã cập nhật
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error updating teacher', message: err.message })
-  }
-})
-
-// API để tạo Class mới
-router.post('/classes', async (req, res) => {
-  try {
-    const {
-      classID,
-      type,
-      schedule,
-      name,
-      description,
-      teachers,
-      lessonList,
-      progress,
-      documents,
-      isActive,
-      meeting,
-      coverIMG,
-      startDate,
-      endDate
-    } = req.body
-    const newClass = new Class({
-      classID,
-      type,
-      schedule,
-      name,
-      description,
-      teachers,
-      lessonList,
-      progress,
-      documents,
-      isActive,
-      meeting,
-      coverIMG,
-      startDate,
-      endDate
-    })
-    await newClass.save()
-    res.status(201).json(newClass) // Trả về class mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating class', message: err.message })
-  }
-})
-
-// API để lấy class của giáo viên hoặc học sinh đó
+// Học sinh và giáo viên có thể xem các lớp học mình học/dạy
 router.get('/classes', async (req, res) => {
   const { mongoID, userRole } = req.query // Lấy mongoID và userRole từ query params
 
@@ -805,230 +650,94 @@ router.get('/classes', async (req, res) => {
   }
 })
 
-// API để tạo Course mới
-router.post('/courses', async (req, res) => {
+// API để xem lịch học của học sinh trong tuần
+router.get('/schedule', async (req, res) => {
+  const { mongoID, userRole } = req.query // Lấy mongoID và userRole từ query params
+
   try {
-    const {
-      courseID,
-      name,
-      description,
-      classes,
-      teachers,
-      price,
-      compareAtPrice,
-      rating,
-      totalVote,
-      target,
-      sumary,
-      studentList,
-      studentLimit,
-      appliedNumber,
-      coverIMG,
-      startDate,
-      endDate
-    } = req.body
-    const newCourse = new Course({
-      courseID,
-      name,
-      description,
-      classes,
-      teachers,
-      price,
-      compareAtPrice,
-      rating,
-      totalVote,
-      target,
-      sumary,
-      studentList,
-      studentLimit,
-      appliedNumber,
-      coverIMG,
-      startDate,
-      endDate
-    })
-    await newCourse.save()
-    res.status(201).json(newCourse) // Trả về course mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating course', message: err.message })
-  }
-})
+    let classesInWeek = [] // Mảng chứa lịch học trong tuần
 
-// API để lấy tất cả Course
-router.get('/courses', async (req, res) => {
-  try {
-    const courses = await Course.find()
-    res.status(200).json(courses) // Trả về danh sách courses
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching courses', message: err.message })
-  }
-})
+    // Lấy tuần hiện tại
+    const startOfWeek = moment().startOf('week').format('YYYY-MM-DD') // Chủ nhật tuần này
+    const endOfWeek = moment().endOf('week').format('YYYY-MM-DD') // Thứ bảy tuần này
 
-// API để cập nhật khóa học
-router.put('/courses/:id', async (req, res) => {
-  try {
-    const { id } = req.params
-    const updateData = req.body
+    if (userRole === 'student') {
+      // Tìm sinh viên theo mongoID
+      const student = await Student.findOne({ mongoID })
 
-    // Tìm và cập nhật khóa học
-    const course = await Course.findByIdAndUpdate(id, updateData, {
-      new: true,
-      runValidators: true
-    })
+      if (!student) {
+        return res.status(404).json({ error: 'Student not found' })
+      }
 
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' })
+      // Duyệt qua các khóa học của học sinh
+      for (let courseInfo of student.courses) {
+        const course = await Course.findOne({ courseID: courseInfo.courseID })
+
+        if (course) {
+          // Duyệt qua các lớp học của khóa học
+          for (let classObj of course.classes) {
+            const classSchedule = classObj.schedule.filter(scheduleTime => {
+              const scheduleMoment = moment(scheduleTime, 'ddd HH:mm')
+              return scheduleMoment.isBetween(
+                startOfWeek,
+                endOfWeek,
+                null,
+                '[]'
+              )
+            })
+
+            if (classSchedule.length > 0) {
+              classesInWeek.push({
+                class: classObj.name,
+                schedule: classSchedule
+              })
+            }
+          }
+        }
+      }
+
+      res.status(200).json({ schedules: classesInWeek })
+    } else if (userRole === 'teacher') {
+      // Tìm giáo viên theo mongoID
+      const teacher = await Teacher.findOne({ mongoID })
+
+      if (!teacher) {
+        return res.status(404).json({ error: 'Teacher not found' })
+      }
+
+      // Duyệt qua các khóa học của giáo viên
+      for (let courseId of teacher.courses) {
+        const course = await Course.findOne({ courseID: courseId })
+
+        if (course) {
+          // Duyệt qua các lớp học của khóa học
+          for (let classObj of course.classes) {
+            const classSchedule = classObj.schedule.filter(scheduleTime => {
+              const scheduleMoment = moment(scheduleTime, 'ddd HH:mm')
+              return scheduleMoment.isBetween(
+                startOfWeek,
+                endOfWeek,
+                null,
+                '[]'
+              )
+            })
+
+            if (classSchedule.length > 0) {
+              classesInWeek.push({
+                class: classObj.name,
+                schedule: classSchedule
+              })
+            }
+          }
+        }
+      }
+
+      res.status(200).json({ schedules: classesInWeek })
+    } else {
+      return res.status(400).json({ error: 'Invalid user role' })
     }
-
-    res.status(200).json(course) // Trả về khóa học đã cập nhật
   } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error updating course', message: err.message })
-  }
-})
-
-// API để tạo Salary mới
-router.post('/salaries', async (req, res) => {
-  try {
-    const { id, description, type, receiverID, value } = req.body
-    const newSalary = new Salary({ id, description, type, receiverID, value })
-    await newSalary.save()
-    res.status(201).json(newSalary) // Trả về salary mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating salary', message: err.message })
-  }
-})
-
-// API để lấy tất cả Salary
-router.get('/salaries', async (req, res) => {
-  try {
-    const salaries = await Salary.find()
-    res.status(200).json(salaries) // Trả về danh sách salaries
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching salaries', message: err.message })
-  }
-})
-
-// API để tạo Accountant mới
-router.post('/accountants', async (req, res) => {
-  try {
-    const { clerkUserID, role, mongoID, monthlySalary, paycheckList } = req.body
-    const newAccountant = new Accountant({
-      clerkUserID,
-      role,
-      mongoID,
-      monthlySalary,
-      paycheckList
-    })
-    await newAccountant.save()
-    res.status(201).json(newAccountant) // Trả về accountant mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating accountant', message: err.message })
-  }
-})
-
-// API để lấy tất cả Accountant
-router.get('/accountants', async (req, res) => {
-  try {
-    const accountants = await Accountant.find()
-    res.status(200).json(accountants) // Trả về danh sách accountants
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching accountants', message: err.message })
-  }
-})
-
-// API để tạo Manager mới
-router.post('/managers', async (req, res) => {
-  try {
-    const { clerkUserID, role, mongoID, monthlySalary, paycheckList } = req.body
-    const newManager = new Manager({
-      clerkUserID,
-      role,
-      mongoID,
-      monthlySalary,
-      paycheckList
-    })
-    await newManager.save()
-    res.status(201).json(newManager) // Trả về manager mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating manager', message: err.message })
-  }
-})
-
-// API để lấy tất cả Manager
-router.get('/managers', async (req, res) => {
-  try {
-    const managers = await Manager.find()
-    res.status(200).json(managers) // Trả về danh sách managers
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching managers', message: err.message })
-  }
-})
-
-// API để tạo Admin mới
-router.post('/admins', async (req, res) => {
-  try {
-    const { clerkUserID, role, mongoID, monthlySalary, paycheckList } = req.body
-    const newAdmin = new Admin({
-      clerkUserID,
-      role,
-      mongoID,
-      monthlySalary,
-      paycheckList
-    })
-    await newAdmin.save()
-    res.status(201).json(newAdmin) // Trả về admin mới tạo
-  } catch (err) {
-    res
-      .status(400)
-      .json({ error: 'Error creating admin', message: err.message })
-  }
-})
-
-// API để lấy tất cả Admin
-router.get('/admins', async (req, res) => {
-  try {
-    const admins = await Admin.find()
-    res.status(200).json(admins) // Trả về danh sách admins
-  } catch (err) {
-    res
-      .status(500)
-      .json({ error: 'Error fetching admins', message: err.message })
-  }
-})
-
-// API để cập nhật private metadata cho người dùng
-app.put('/api/update-metadata', async (req, res) => {
-  const { clerkUserId, metadata } = req.body // Lấy thông tin từ request body
-
-  try {
-    // Cập nhật private metadata cho người dùng
-    await clerkClient.users.updateUserMetadata(clerkUserId, {
-      privateMetadata: metadata
-    })
-
-    // Trả về phản hồi thành công
-    res.status(200).json({ message: 'Metadata updated successfully' })
-  } catch (error) {
-    // Xử lý lỗi
-    res
-      .status(500)
-      .json({ error: 'Failed to update metadata', message: error.message })
+    console.error(err)
+    res.status(500).json({ error: 'Server error', message: err.message })
   }
 })
