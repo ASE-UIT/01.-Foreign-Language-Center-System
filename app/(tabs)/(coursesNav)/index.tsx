@@ -14,7 +14,7 @@ export type Course = {
   imageUrl: any;
 };
 
-export type RootStackParamList={
+export type RootStackParamList = {
   Course: any,
   CourseDetails: any,
 }
@@ -34,11 +34,13 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
         </TouchableOpacity>
 
 
-        <TouchableOpacity style={styles.detailButton} onPress={()=> router.push({pathname: '/(tabs)/(coursesNav)/details/[id]',
-          params: { id: '1' },})}>
+        <TouchableOpacity style={styles.detailButton} onPress={() => router.push({
+          pathname: '/(tabs)/(coursesNav)/details/[id]',
+          params: { id: '1' },
+        })}>
           <Text style={styles.detailText}>Xem chi tiết</Text>
-        
-          
+
+
 
         </TouchableOpacity>
 
@@ -51,7 +53,7 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
 
 export default function Index() {
   const { user } = useUser()
-  
+
   const courses: Course[] = [
     {
       id: "1",
@@ -130,36 +132,39 @@ export default function Index() {
     // Add more courses as needed
   ];
   const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
-const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>(); 
+  const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
   return (
     <View >
       <SignedIn>
         <View >
-          <View style={{flexDirection: 'row', // Horizontal layout
-    alignItems: 'center', // Vertical alignment
-    justifyContent: 'space-between', // Space out items
-    height: 92, // Custom header height
-    backgroundColor: '#2A58BA', // Background color
-    
-     }}>
-            <Text style={{fontSize: 20, // Kích thước chữ tiêu đề header
-            color: 'white', // Màu chữ tiêu đề
-            marginTop: 30,
-            marginLeft: 15,
-            fontWeight:'bold'}}>Danh sách khóa học</Text>
-            
+          <View style={{
+            flexDirection: 'row', // Horizontal layout
+            alignItems: 'center', // Vertical alignment
+            justifyContent: 'space-between', // Space out items
+            height: 92, // Custom header height
+            backgroundColor: '#2A58BA', // Background color
+
+          }}>
+            <Text style={{
+              fontSize: 20, // Kích thước chữ tiêu đề header
+              color: 'white', // Màu chữ tiêu đề
+              marginTop: 30,
+              marginLeft: 15,
+              fontWeight: 'bold'
+            }}>Danh sách khóa học</Text>
+
             <TouchableOpacity onPress={() => navigation.openDrawer()}>
-      <Image
-        source={require('../../../assets/images/menu.png')}
-        style={{
-          width: 30,
-          height: 20,
-          marginRight: 20,
-          marginTop: 30,
-          resizeMode: 'contain',
-        }}
-      />
-    </TouchableOpacity>
+              <Image
+                source={require('../../../assets/images/menu.png')}
+                style={{
+                  width: 30,
+                  height: 20,
+                  marginRight: 20,
+                  marginTop: 30,
+                  resizeMode: 'contain',
+                }}
+              />
+            </TouchableOpacity>
           </View>
 
           <FlatList
@@ -170,22 +175,13 @@ const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
           />
         </View>
       </SignedIn>
-
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign in</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-   
+
     backgroundColor: "#f9f9f9",
   },
   header: {
