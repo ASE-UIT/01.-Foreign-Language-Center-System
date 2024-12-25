@@ -758,7 +758,7 @@ router.get('/courses', async (req, res) => {
       totalVote: course.totalVote,
       studentLimit: course.studentLimit,
       currentStudent: course.currentStudent,
-      id: course.courseID // Hoặc sử dụng course._id nếu bạn muốn
+      id: course.courseID 
     }));
 
     // Trả về danh sách khóa học
