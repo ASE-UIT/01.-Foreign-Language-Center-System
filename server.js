@@ -89,14 +89,6 @@ studentSchema.pre('save', function (next) {
   next() // Tiếp tục với quá trình lưu tài liệu
 })
 
-// Cấu hình để trả về `mongoID` thay vì `_id` trong JSON
-// studentSchema.set('toJSON', {
-//   transform: function (doc, ret) {
-//     delete ret._id // Xóa `_id` khỏi kết quả trả về
-//     ret.mongoID = ret.mongoID.toString() // Đảm bảo `mongoID` là kiểu chuỗi
-//   }
-// })
-
 // Định nghĩa schema cho Teacher
 const teacherSchema = new mongoose.Schema({
   clerkUserID: {
@@ -1829,5 +1821,536 @@ router.put('/confirm-payment', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Server error', message: err.message })
+  }
+})
+
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
+// **************************************************************** CRUD API *****************************************************************************
+// ------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+// **************************************************************** CRUD ASSIGNMENT *****************************************************************************
+
+// POST: Tạo mới assignment
+app.post('/api/assignments', async (req, res) => {
+  try {
+    const assignment = new Assignment(req.body)
+    const newAssignment = await assignment.save()
+    res.status(201).json(newAssignment)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả assignments
+app.get('/api/assignments', async (req, res) => {
+  try {
+    const assignments = await Assignment.find()
+    res.status(200).json(assignments)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật assignment theo ID
+app.put('/api/assignments/:id', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedAssignment = await Assignment.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      options
+    )
+    if (!updatedAssignment)
+      return res.status(404).json({ message: 'Assignment not found' })
+    res.status(200).json(updatedAssignment)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa assignment theo ID
+app.delete('/api/assignments/:id', async (req, res) => {
+  try {
+    const deletedAssignment = await Assignment.findByIdAndDelete(req.params.id)
+    if (!deletedAssignment)
+      return res.status(404).json({ message: 'Assignment not found' })
+    res.status(200).json({ message: 'Assignment deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CRUD COURSE INFO *****************************************************************************
+
+// POST: Tạo mới courseInfo
+app.post('/api/course-info', async (req, res) => {
+  try {
+    const courseInfo = new CourseInfo(req.body)
+    const newCourseInfo = await courseInfo.save()
+    res.status(201).json(newCourseInfo)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả courseInfo
+app.get('/api/course-info', async (req, res) => {
+  try {
+    const courseInfos = await CourseInfo.find()
+    res.status(200).json(courseInfos)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật courseInfo theo ID
+app.put('/api/course-info/:id', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedCourseInfo = await CourseInfo.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      options
+    )
+    if (!updatedCourseInfo)
+      return res.status(404).json({ message: 'CourseInfo not found' })
+    res.status(200).json(updatedCourseInfo)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa courseInfo theo ID
+app.delete('/api/course-info/:id', async (req, res) => {
+  try {
+    const deletedCourseInfo = await CourseInfo.findByIdAndDelete(req.params.id)
+    if (!deletedCourseInfo)
+      return res.status(404).json({ message: 'CourseInfo not found' })
+    res.status(200).json({ message: 'CourseInfo deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CUD STUDENT *****************************************************************************
+
+// POST: Tạo mới student
+app.post('/api/students', async (req, res) => {
+  try {
+    const student = new Student(req.body)
+    const newStudent = await student.save()
+    res.status(201).json(newStudent)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật student theo mongoID
+app.put('/api/students/:mongoID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedStudent = await Student.findOneAndUpdate(
+      { mongoID: req.params.mongoID },
+      updates,
+      options
+    )
+    if (!updatedStudent)
+      return res.status(404).json({ message: 'Student not found' })
+    res.status(200).json(updatedStudent)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa student theo mongoID
+app.delete('/api/students/:mongoID', async (req, res) => {
+  try {
+    const deletedStudent = await Student.findOneAndDelete({
+      mongoID: req.params.mongoID
+    })
+    if (!deletedStudent)
+      return res.status(404).json({ message: 'Student not found' })
+    res.status(200).json({ message: 'Student deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CUD TEACHER *****************************************************************************
+
+// POST: Tạo mới teacher
+app.post('/api/teachers', async (req, res) => {
+  try {
+    const teacher = new Teacher(req.body)
+    const newTeacher = await teacher.save()
+    res.status(201).json(newTeacher)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật teacher theo mongoID
+app.put('/api/teachers/:mongoID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedTeacher = await Teacher.findOneAndUpdate(
+      { mongoID: req.params.mongoID },
+      updates,
+      options
+    )
+    if (!updatedTeacher)
+      return res.status(404).json({ message: 'Teacher not found' })
+    res.status(200).json(updatedTeacher)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa teacher theo mongoID
+app.delete('/api/teachers/:mongoID', async (req, res) => {
+  try {
+    const deletedTeacher = await Teacher.findOneAndDelete({
+      mongoID: req.params.mongoID
+    })
+    if (!deletedTeacher)
+      return res.status(404).json({ message: 'Teacher not found' })
+    res.status(200).json({ message: 'Teacher deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CUD CLASS *****************************************************************************
+
+// POST: Tạo mới class
+app.post('/api/classes', async (req, res) => {
+  try {
+    const newClass = new Class(req.body)
+    const savedClass = await newClass.save()
+    res.status(201).json(savedClass)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật class theo classID
+app.put('/api/classes/:classID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedClass = await Class.findOneAndUpdate(
+      { classID: req.params.classID },
+      updates,
+      options
+    )
+    if (!updatedClass)
+      return res.status(404).json({ message: 'Class not found' })
+    res.status(200).json(updatedClass)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa class theo classID
+app.delete('/api/classes/:classID', async (req, res) => {
+  try {
+    const deletedClass = await Class.findOneAndDelete({
+      classID: req.params.classID
+    })
+    if (!deletedClass)
+      return res.status(404).json({ message: 'Class not found' })
+    res.status(200).json({ message: 'Class deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CUD COURSE *****************************************************************************
+
+// POST: Tạo mới course
+app.post('/api/courses', async (req, res) => {
+  try {
+    const course = new Course(req.body)
+    const newCourse = await course.save()
+    res.status(201).json(newCourse)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật course theo courseID
+app.put('/api/courses/:courseID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedCourse = await Course.findOneAndUpdate(
+      { courseID: req.params.courseID },
+      updates,
+      options
+    )
+    if (!updatedCourse)
+      return res.status(404).json({ message: 'Course not found' })
+    res.status(200).json(updatedCourse)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa course theo courseID
+app.delete('/api/courses/:courseID', async (req, res) => {
+  try {
+    const deletedCourse = await Course.findOneAndDelete({
+      courseID: req.params.courseID
+    })
+    if (!deletedCourse)
+      return res.status(404).json({ message: 'Course not found' })
+    res.status(200).json({ message: 'Course deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CRUD SALARY *****************************************************************************
+// POST: Tạo mới salary
+app.post('/api/salaries', async (req, res) => {
+  try {
+    const salary = new Salary(req.body)
+    const newSalary = await salary.save()
+    res.status(201).json(newSalary)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả salaries
+app.get('/api/salaries', async (req, res) => {
+  try {
+    const salaries = await Salary.find()
+    res.status(200).json(salaries)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật salary theo ID
+app.put('/api/salaries/:id', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedSalary = await Salary.findOneAndUpdate(
+      { id: req.params.id },
+      updates,
+      options
+    )
+    if (!updatedSalary)
+      return res.status(404).json({ message: 'Salary not found' })
+    res.status(200).json(updatedSalary)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa salary theo ID
+app.delete('/api/salaries/:id', async (req, res) => {
+  try {
+    const deletedSalary = await Salary.findOneAndDelete({ id: req.params.id })
+    if (!deletedSalary)
+      return res.status(404).json({ message: 'Salary not found' })
+    res.status(200).json({ message: 'Salary deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+// **************************************************************** CRUD ACCOUNTANT *****************************************************************************
+
+// POST: Tạo mới accountant
+app.post('/api/accountants', async (req, res) => {
+  try {
+    const accountant = new Accountant(req.body)
+    const newAccountant = await accountant.save()
+    res.status(201).json(newAccountant)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả accountants
+app.get('/api/accountants', async (req, res) => {
+  try {
+    const accountants = await Accountant.find()
+    res.status(200).json(accountants)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật accountant theo mongoID
+app.put('/api/accountants/:mongoID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedAccountant = await Accountant.findOneAndUpdate(
+      { mongoID: req.params.mongoID },
+      updates,
+      options
+    )
+    if (!updatedAccountant)
+      return res.status(404).json({ message: 'Accountant not found' })
+    res.status(200).json(updatedAccountant)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa accountant theo mongoID
+app.delete('/api/accountants/:mongoID', async (req, res) => {
+  try {
+    const deletedAccountant = await Accountant.findOneAndDelete({
+      mongoID: req.params.mongoID
+    })
+    if (!deletedAccountant)
+      return res.status(404).json({ message: 'Accountant not found' })
+    res.status(200).json({ message: 'Accountant deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CRUD MANAGER *****************************************************************************
+
+// POST: Tạo mới manager
+app.post('/api/managers', async (req, res) => {
+  try {
+    const manager = new Manager(req.body)
+    const newManager = await manager.save()
+    res.status(201).json(newManager)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả managers
+app.get('/api/managers', async (req, res) => {
+  try {
+    const managers = await Manager.find()
+    res.status(200).json(managers)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật manager theo mongoID
+app.put('/api/managers/:mongoID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedManager = await Manager.findOneAndUpdate(
+      { mongoID: req.params.mongoID },
+      updates,
+      options
+    )
+    if (!updatedManager)
+      return res.status(404).json({ message: 'Manager not found' })
+    res.status(200).json(updatedManager)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa manager theo mongoID
+app.delete('/api/managers/:mongoID', async (req, res) => {
+  try {
+    const deletedManager = await Manager.findOneAndDelete({
+      mongoID: req.params.mongoID
+    })
+    if (!deletedManager)
+      return res.status(404).json({ message: 'Manager not found' })
+    res.status(200).json({ message: 'Manager deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CRUD ADMIN *****************************************************************************
+
+// POST: Tạo mới admin
+app.post('/api/admins', async (req, res) => {
+  try {
+    const admin = new Admin(req.body)
+    const newAdmin = await admin.save()
+    res.status(201).json(newAdmin)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// GET: Lấy danh sách tất cả admins
+app.get('/api/admins', async (req, res) => {
+  try {
+    const admins = await Admin.find()
+    res.status(200).json(admins)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// PUT: Cập nhật admin theo mongoID
+app.put('/api/admins/:mongoID', async (req, res) => {
+  try {
+    const updates = req.body
+    const options = { new: true }
+    const updatedAdmin = await Admin.findOneAndUpdate(
+      { mongoID: req.params.mongoID },
+      updates,
+      options
+    )
+    if (!updatedAdmin)
+      return res.status(404).json({ message: 'Admin not found' })
+    res.status(200).json(updatedAdmin)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa admin theo mongoID
+app.delete('/api/admins/:mongoID', async (req, res) => {
+  try {
+    const deletedAdmin = await Admin.findOneAndDelete({
+      mongoID: req.params.mongoID
+    })
+    if (!deletedAdmin)
+      return res.status(404).json({ message: 'Admin not found' })
+    res.status(200).json({ message: 'Admin deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// **************************************************************** CD REQUEST *****************************************************************************
+
+// POST: Tạo mới request
+app.post('/api/requests', async (req, res) => {
+  try {
+    const request = new Request(req.body)
+    const newRequest = await request.save()
+    res.status(201).json(newRequest)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+// DELETE: Xóa request theo ID
+app.delete('/api/requests/:id', async (req, res) => {
+  try {
+    const deletedRequest = await Request.findOneAndDelete({ id: req.params.id })
+    if (!deletedRequest)
+      return res.status(404).json({ message: 'Request not found' })
+    res.status(200).json({ message: 'Request deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: error.message })
   }
 })
