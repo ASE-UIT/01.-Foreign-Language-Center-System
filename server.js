@@ -398,7 +398,7 @@ adminSchema.pre('save', function (next) {
   next() // Tiếp tục với quá trình lưu tài liệu
 })
 
-// **************************************************************** ADD REQUEST SCHEMA *****************************************************************************
+// **************************************************************** ADD REQUEST SCHEMA - Giang *****************************************************************************
 const requestSchema = new mongoose.Schema({
   id: {
     type: String,
@@ -472,7 +472,7 @@ app.put('/api/update-metadata', async (req, res) => {
   }
 })
 
-// **************************************************************** 5 API CHỨC NĂNG *****************************************************************************
+// **************************************************************** 5 API CHỨC NĂNG - Nguyên *****************************************************************************
 
 // Học sinh có thể đăng ký vào khóa học
 router.put('/enroll-course/:courseId', async (req, res) => {
@@ -1728,11 +1728,9 @@ router.get('/salary', async (req, res) => {
 
     // Kiểm tra quyền của user với `clerkUserId`
     if (employee.clerkUserId !== clerkUserId) {
-      return res
-        .status(403)
-        .json({
-          error: 'Access denied: You do not have permission to view this salary'
-        })
+      return res.status(403).json({
+        error: 'Access denied: You do not have permission to view this salary'
+      })
     }
 
     // Lấy danh sách paycheck từ employee
