@@ -2069,18 +2069,7 @@ app.delete('/api/classes/:classID', async (req, res) => {
   }
 })
 
-// **************************************************************** CUD COURSE *****************************************************************************
-
-// POST: Tạo mới course
-app.post('/api/courses', async (req, res) => {
-  try {
-    const course = new Course(req.body)
-    const newCourse = await course.save()
-    res.status(201).json(newCourse)
-  } catch (error) {
-    res.status(400).json({ message: error.message })
-  }
-})
+// **************************************************************** UD COURSE *****************************************************************************
 
 // PUT: Cập nhật course theo courseID
 app.put('/api/courses/:courseID', async (req, res) => {
