@@ -802,6 +802,12 @@ router.get('/salary', async (req, res) => {
   const { clerkUserId, mongoID, userRole } = req.query; // Lấy thông tin từ query params
 
   try {
+    // Kiểm tra quyền truy cập
+    const allowedRoles = ['teacher', 'accountant', 'manager', 'admin'];
+    if (!allowedRoles.includes(userRole)) {
+      return res.status(403).json({ error: 'Access denied: Invalid user role' });
+    }
+
     // Tìm nhân viên theo mongoID
     let employee;
     if (userRole === 'teacher') {
@@ -813,11 +819,16 @@ router.get('/salary', async (req, res) => {
     } else if (userRole === 'admin') {
       employee = await Admin.findOne({ mongoID });
     } else {
-      return res.status(403).json({ error: 'Invalid user role' });
+      return res.status(403).json({ error: 'Access denied: Invalid user role' });
     }
 
     if (!employee) {
       return res.status(404).json({ error: 'Employee not found' });
+    }
+
+    // Kiểm tra quyền của user với `clerkUserId`
+    if (employee.clerkUserId !== clerkUserId) {
+      return res.status(403).json({ error: 'Access denied: You do not have permission to view this salary' });
     }
 
     // Lấy danh sách paycheck từ employee
