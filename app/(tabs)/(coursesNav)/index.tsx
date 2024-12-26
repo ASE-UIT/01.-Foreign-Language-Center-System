@@ -135,14 +135,6 @@ export default function Index() {
           />
         </SafeAreaView>
       </SignedIn>
-      <SignedOut>
-        <Link href="/(auth)/sign-in">
-          <Text>Sign in</Text>
-        </Link>
-        <Link href="/(auth)/sign-up">
-          <Text>Sign up</Text>
-        </Link>
-      </SignedOut>
     </View>
   )
 }
