@@ -1,11 +1,21 @@
 const express = require('express')
+const upload = require('./multer');
 const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 const cors = require('cors')
+const path = require('path');
 const router = express.Router()
-const { clerkMiddleware, requireAuth, clerkClient } = require('@clerk/express')
-const { createProxyMiddleware } = require('http-proxy-middleware')
-const moment = require('moment') // Để xử lý thời gian cho API schedule
+const { clerkMiddleware, clerkClient } = require('@clerk/express')
+const moment = require('moment')
+
+const fs = require('fs');
+
+const uploadDir = path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
 
 dotenv.config() // Load các biến môi trường từ file .env
 
@@ -22,10 +32,7 @@ app.use(clerkMiddleware({ apiKey: process.env.CLERK_SECRET_KEY }))
 
 // Kết nối MongoDB
 mongoose
-    .connect(process.env.MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    })
+    .connect(process.env.MONGO_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.log('MongoDB connection error:', err))
 
@@ -56,7 +63,7 @@ const courseInfoSchema = new mongoose.Schema({
     paycheckIMG: {
         type: String,
         required: false,
-        match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/ // Đảm bảo URL hợp lệ
+        // match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/ // Đảm bảo URL hợp lệ
     }
 })
 
@@ -69,7 +76,7 @@ courseInfoSchema.pre('save', function (next) {
 })
 
 const studentSchema = new mongoose.Schema({
-    clerkUserId: {
+    clerkUserID: {
         type: String,
         unique: true
     },
@@ -209,12 +216,12 @@ const courseSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    classes: [classSchema], // Danh sách lớp học trong khóa học (mảng ObjectId tham chiếu đến Class)
+    classes: [classSchema],
     teachers: [
         {
             type: [String]
         }
-    ], // Danh sách id các giáo viên giảng dạy khóa học
+    ],
     price: {
         type: Number,
         min: 0
@@ -239,9 +246,8 @@ const courseSchema = new mongoose.Schema({
         type: [String]
     },
     studentList: {
-        type: [String],
-        unique: true
-    }, // Danh sách các học sinh tham gia khóa học (lưu = id)
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }]
+    },
     studentLimit: {
         type: Number,
         min: 1
@@ -257,15 +263,15 @@ const courseSchema = new mongoose.Schema({
     },
     coverIMG: {
         type: String,
-        match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
+        // match: /^(http|https):\/\/[^\s$.?#].[^\s]*$/
     },
     startDate: {
         type: String,
-        match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
+        match: /^\d{2} \d{2} \d{4}$/
     },
     endDate: {
         type: String,
-        match: /^\d{2} \d{2} \d{4}$/ // Kiểm tra định dạng ngày "dd mm yyyy"
+        match: /^\d{2} \d{2} \d{4}$/
     }
 })
 
@@ -456,11 +462,11 @@ app.listen(PORT, () => {
 
 // API để cập nhật private metadata cho người dùng
 app.put('/api/update-metadata', async (req, res) => {
-    const { clerkUserId, metadata } = req.body // Lấy thông tin từ request body
+    const { clerkUserID, metadata } = req.body // Lấy thông tin từ request body
 
     try {
         // Cập nhật private metadata cho người dùng
-        await clerkClient.users.updateUserMetadata(clerkUserId, {
+        await clerkClient.users.updateUserMetadata(clerkUserID, {
             privateMetadata: metadata
         })
 
@@ -476,16 +482,16 @@ app.put('/api/update-metadata', async (req, res) => {
 
 
 app.get('/api/get-role', async (req, res) => {
-    const { clerkUserId } = req.query;
+    const { clerkUserID } = req.query;
 
     try {
-        if (!clerkUserId) {
+        if (!clerkUserID) {
             return res.status(400).json({
-                error: 'Missing clerkUserId parameter'
+                error: 'Missing clerkUserID parameter'
             });
         }
 
-        const user = await clerkClient.users.getUser(clerkUserId);
+        const user = await clerkClient.users.getUser(clerkUserID);
         const userRole = user.privateMetadata.userRole;
         const mongoID = user.privateMetadata.mongoID;
         const isActivated = user.privateMetadata.isActivated;
@@ -506,39 +512,33 @@ app.get('/api/get-role', async (req, res) => {
 });
 
 
-const getMetadata = async (clerkUserId) => {
+const getMetadata = async (clerkUserID) => {
     try {
-        if (!clerkUserId) {
-            return res.status(400).json({
-                error: 'Missing clerkUserId parameter'
-            });
+        if (!clerkUserID) {
+            throw new Error('Missing clerkUserID parameter');
         }
 
-        const user = await clerkClient.users.getUser(clerkUserId);
+        const user = await clerkClient.users.getUser(clerkUserID);
         const userRole = user.privateMetadata.userRole;
         const mongoID = user.privateMetadata.mongoID;
         const isActivated = user.privateMetadata.isActivated;
 
-        return res.status(200).json({
+        return {
             userRole: userRole,
             mongoID: mongoID,
             isActivated: isActivated
-        });
-
+        };
     } catch (error) {
         console.error('Error getting user role:', error);
-        return res.status(500).json({
-            error: 'Failed to get user role',
-            message: error.message
-        });
+        throw error;
     }
 };
 
 router.get('/my-classes', async (req, res) => {
     try {
-        const { clerkUserId } = req.query;
+        const { clerkUserID } = req.query;
 
-        const student = await Student.findOne({ clerkUserId });
+        const student = await Student.findOne({ clerkUserID });
 
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
@@ -570,9 +570,9 @@ router.get('/my-classes', async (req, res) => {
 router.put('/enroll-course/:courseId', async (req, res) => {
     try {
         const { courseId } = req.params // Lấy courseId từ URL
-        const { userClerkId } = req.body;
+        const { clerkUserID } = req.body;
 
-        const userOnClerk = await getMetadata(userClerkId);
+        const userOnClerk = await getMetadata(clerkUserID);
 
         const mongoID = userOnClerk.mongoID;
         const userRole = userOnClerk.userRole;
@@ -625,69 +625,81 @@ router.put('/enroll-course/:courseId', async (req, res) => {
     }
 })
 
-// Học sinh có quyền thanh toán học phí cho khóa học
-router.put('/purchase-course/:courseId', async (req, res) => {
+router.put('/purchase-course/:courseId', upload.single('payProof'), async (req, res) => {
     try {
-        const { courseId } = req.params // Lấy courseId từ URL
-        const { userClerkId, paycheckIMG } = req.body // Lấy mongoID, userRole, payCheckIMG từ request body
+        const { courseId } = req.params;
+        const { clerkUserID } = req.body;
+        const payProof = req.file;
 
-        const userOnClerk = await getMetadata(userClerkId);
+        const userOnClerk = await getMetadata(clerkUserID);
 
         const mongoID = userOnClerk.mongoID;
         const userRole = userOnClerk.userRole;
 
-        // Nếu không phải là sinh viên thì không thể mua khóa học
         if (userRole !== 'student') {
-            return res.status(403).json({ error: 'Only student can purchase course' })
+            return res.status(403).json({ error: 'Only student can purchase course' });
         }
 
-        // Tìm sinh viên theo mongoID
-        const student = await Student.findOne({ mongoID })
+        const student = await Student.findOne({ mongoID });
 
         if (!student) {
-            return res.status(404).json({ error: 'Student not found' })
+            return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Kiểm tra xem sinh viên đã thanh toán khóa học này chưa
         const isCoursePurchased = student.courses.some(
-            course => course.courseID === courseId && course.isPaid
-        )
+            (course) => course.courseID === courseId && course.isPaid
+        );
 
         if (isCoursePurchased) {
             return res
                 .status(400)
-                .json({ error: 'Student already purchased this course' })
+                .json({ error: 'Student already purchased this course' });
         }
 
-        // Cập nhật payCheckIMG cho courseInfo của khóa học
+        const course = await Course.findOne({ courseID: courseId });
+
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+
         const courseInfo = student.courses.find(
-            course => course.courseID === courseId
-        )
-        courseInfo.paycheckIMG = paycheckIMG
+            (courseInfo) => courseInfo.courseID === courseId
+        );
 
-        // Lưu thông tin sinh viên
-        await student.save()
+        if (!courseInfo) {
+            courseInfo = {
+                courseID: courseId,
+                isPaid: true,
+                paycheckIMG: payProof.filename,
+            };
+            student.courses.push(courseInfo);
+        } else {
+            courseInfo.isPaid = true;
+            courseInfo.paycheckIMG = payProof.filename;
+        }
 
-        // Trả về thông báo đã cập nhật
+        await student.save();
+
         res.status(200).json({
-            message:
-                'Pay check received successfully. Please wait for the confirmation from our staff'
-        })
-    } catch (err) {
+            message: 'Purchase course successfully',
+        });
+    } catch (error) {
+        console.error('Error purchasing course:', error);
         res.status(500).json({
-            error: 'Error purchasing course',
-            message: err.message
-        })
+            error: 'Failed to purchase course',
+            message: error.message,
+        });
     }
-})
+});
+
 
 // Học sinh có thể xem điểm của mình của khóa học nào đó
 router.get('/scores/:courseId', async (req, res) => {
     try {
         const { courseId } = req.params // Lấy courseId từ URL
-        const { userClerkId } = req.body // Lấy mongoID, userRole từ request body
+        const { clerkUserID } = req.body // Lấy mongoID, userRole từ request body
 
-        const userOnClerk = await getMetadata(userClerkId);
+        const userOnClerk = await getMetadata(clerkUserID);
 
         const mongoID = userOnClerk.mongoID;
         const userRole = userOnClerk.userRole;
@@ -724,17 +736,19 @@ router.get('/scores/:courseId', async (req, res) => {
 
 // Học sinh và giáo viên có thể xem các lớp học mình học/dạy
 router.get('/classes', async (req, res) => {
-    const { userClerkId } = req.query // Lấy mongoID và userRole từ query params
+    const { clerkUserID } = req.query // Lấy mongoID và userRole từ query params
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
 
     const mongoID = userOnClerk.mongoID;
     const userRole = userOnClerk.userRole;
 
+    console.log(mongoID, userRole);
+
     try {
         if (userRole === 'student') {
             // Tìm học sinh theo mongoID và lấy danh sách các khóa học của học sinh đó
-            const student = await Student.findOne({ mongoID })
+            const student = await Student.findOne({ mongoID: mongoID })
 
             if (!student) {
                 return res.status(404).json({ error: 'Student not found' })
@@ -783,9 +797,9 @@ router.get('/classes', async (req, res) => {
 
 // API để xem lịch học của học sinh trong tuần
 router.get('/schedule', async (req, res) => {
-    const { userClerkId } = req.query // Lấy mongoID và userRole từ query params
+    const { clerkUserID } = req.query // Lấy mongoID và userRole từ query params
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
 
     const mongoID = userOnClerk.mongoID;
     const userRole = userOnClerk.userRole;
@@ -881,9 +895,9 @@ router.get('/schedule', async (req, res) => {
 // **************************************************************** 6 API GIANG *****************************************************************************
 // API get all student
 router.get('/all-students', async (req, res) => {
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
 
     const userRole = userOnClerk.userRole;
 
@@ -898,13 +912,13 @@ router.get('/all-students', async (req, res) => {
         let user
         switch (userRole) {
             case 'accountant':
-                user = await Accountant.findOne({ clerkUserID: clerkUserId })
+                user = await Accountant.findOne({ clerkUserID: clerkUserID })
                 break
             case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
+                user = await Manager.findOne({ clerkUserID: clerkUserID })
                 break
             case 'admin':
-                user = await Admin.findOne({ clerkUserID: clerkUserId })
+                user = await Admin.findOne({ clerkUserID: clerkUserID })
                 break
         }
 
@@ -926,10 +940,10 @@ router.get('/all-students', async (req, res) => {
 
 // API xem học sinh của 1 khóa học
 router.get('/students/:courseId', async (req, res) => {
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
     const { courseId } = req.params
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     // Kiểm tra vai trò (role)
@@ -943,16 +957,16 @@ router.get('/students/:courseId', async (req, res) => {
         let user
         switch (userRole) {
             case 'admin':
-                user = await Admin.findOne({ clerkUserID: clerkUserId })
+                user = await Admin.findOne({ clerkUserID: clerkUserID })
                 break
             case 'accountant':
-                user = await Accountant.findOne({ clerkUserID: clerkUserId })
+                user = await Accountant.findOne({ clerkUserID: clerkUserID })
                 break
             case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
+                user = await Manager.findOne({ clerkUserID: clerkUserID })
                 break
             case 'teacher':
-                user = await Teacher.findOne({ clerkUserID: clerkUserId })
+                user = await Teacher.findOne({ clerkUserID: clerkUserID })
                 break
         }
 
@@ -1000,9 +1014,9 @@ router.get('/students/:courseId', async (req, res) => {
 
 // API finance
 router.get('/finance', async (req, res) => {
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     // Kiểm tra vai trò (role)
@@ -1012,7 +1026,7 @@ router.get('/finance', async (req, res) => {
 
     try {
         // Tìm người dùng dựa trên vai trò
-        const admin = await Admin.findOne({ clerkUserID: clerkUserId })
+        const admin = await Admin.findOne({ clerkUserID: clerkUserID })
 
         // Kiểm tra người dùng tồn tại không
         if (!admin) {
@@ -1051,9 +1065,9 @@ router.get('/finance', async (req, res) => {
 
 // API xem các giáo viên
 router.get('/teachers', async (req, res) => {
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     // Kiểm tra vai trò (role)
@@ -1067,13 +1081,13 @@ router.get('/teachers', async (req, res) => {
         let user
         switch (userRole) {
             case 'admin':
-                user = await Admin.findOne({ clerkUserID: clerkUserId })
+                user = await Admin.findOne({ clerkUserID: clerkUserID })
                 break
             case 'accountant':
-                user = await Accountant.findOne({ clerkUserID: clerkUserId })
+                user = await Accountant.findOne({ clerkUserID: clerkUserID })
                 break
             case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
+                user = await Manager.findOne({ clerkUserID: clerkUserID })
                 break
         }
 
@@ -1095,9 +1109,9 @@ router.get('/teachers', async (req, res) => {
 
 // API lấy tất cả các request
 router.get('/all-requests', async (req, res) => {
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     // Kiểm tra vai trò
@@ -1107,7 +1121,7 @@ router.get('/all-requests', async (req, res) => {
 
     try {
         // Tìm người dùng dựa trên vai trò
-        const user = await Manager.findOne({ clerkUserID: clerkUserId })
+        const user = await Manager.findOne({ clerkUserID: clerkUserID })
 
         if (!user) {
             return res.status(404).json({ error: 'User not found' })
@@ -1128,9 +1142,9 @@ router.get('/all-requests', async (req, res) => {
 // API để kích hoạt tài khoản
 router.post('/activate', async (req, res) => {
     const { targetClerkUserID, roleValue } = req.body
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     if (!targetClerkUserID || !roleValue) {
@@ -1146,7 +1160,7 @@ router.post('/activate', async (req, res) => {
 
     try {
         // Find the manager
-        const user = await Manager.findOne({ clerkUserID: clerkUserId })
+        const user = await Manager.findOne({ clerkUserID: clerkUserID })
         if (!user) {
             return res.status(404).json({ error: 'User not found' })
         }
@@ -1486,88 +1500,43 @@ router.get('/course-information/:courseId', async (req, res) => {
     }
 })
 
-router.put('/purchase-course/:courseId', async (req, res) => {
+//API xem thông tin course
+router.get('/course-detail/:courseId', async (req, res) => {
+    const { courseId } = req.params
+
     try {
-        const { courseId } = req.params;
-        const { userClerkId, payProof } = req.body;
-
-        const userOnClerk = await getMetadata(userClerkId);
-
-        const mongoID = userOnClerk.mongoID;
-        const userRole = userOnClerk.userRole;
-
-        // Nếu không phải là sinh viên thì không thể mua khóa học
-        if (userRole !== 'student') {
-            return res.status(403).json({ error: 'Only student can purchase course' });
-        }
-
-        // Tìm sinh viên theo mongoID
-        const student = await Student.findOne({ mongoID });
-
-        if (!student) {
-            return res.status(404).json({ error: 'Student not found' });
-        }
-
-        // Kiểm tra xem sinh viên đã mua khóa học này chưa
-        const isCoursePurchased = student.courses.some(
-            (course) => course.courseID === courseId && course.isPaid
-        );
-
-        if (isCoursePurchased) {
+        if (!courseId) {
             return res
                 .status(400)
-                .json({ error: 'Student already purchased this course' });
+                .json({ message: 'Thông tin khóa học không hợp lệ.' })
         }
 
-        // Tìm khóa học
-        const course = await Course.findOne({ courseID: courseId });
-
+        // Tìm khóa học theo courseId
+        const course = await Course.findOne({ courseID: courseId })
         if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
+            return res.status(404).json({ message: 'Khóa học không tồn tại.' })
         }
 
-        // Cập nhật tình trạng thanh toán cho khóa học
-        const courseInfo = student.courses.find(
-            (courseInfo) => courseInfo.courseID === courseId
-        );
-
-        if (!courseInfo) {
-            // Tạo mới courseInfo nếu chưa có
-            courseInfo = {
-                courseID: courseId,
-                isPaid: true,
-                paycheckIMG: payProof, // Lưu hình ảnh chứng từ thanh toán
-            };
-            student.courses.push(courseInfo);
-        } else {
-            // Cập nhật courseInfo nếu đã có
-            courseInfo.isPaid = true;
-            courseInfo.paycheckIMG = payProof; // Lưu hình ảnh chứng từ thanh toán
-        }
-
-        // Lưu thông tin sinh viên
-        await student.save();
-
-        // Trả về thông báo mua khóa học thành công
-        res.status(200).json({
-            message: 'Purchase course successfully',
-        });
-    } catch (err) {
-        res.status(500).json({
-            error: 'Error purchasing course',
-            message: err.message,
-        });
+        // Trả về thông tin chi tiết của khóa học
+        return res.status(200).json({
+            course
+        })
+    } catch (error) {
+        console.error(error)
+        return res
+            .status(500)
+            .json({ message: 'Có lỗi xảy ra khi lấy thông tin khóa học.' })
     }
-});
+})
 
 // **************************************************************** 4 API CHỨC NĂNG - CHÂU *****************************************************************************
 
 //API xóa student khỏi course
 router.delete('/delete/:courseId/:studentId', async (req, res) => {
     const { courseId, studentId } = req.params
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     try {
@@ -1581,10 +1550,10 @@ router.delete('/delete/:courseId/:studentId', async (req, res) => {
         let user
         switch (userRole) {
             case 'accountant':
-                user = await Accountant.findOne({ clerkUserID: clerkUserId })
+                user = await Accountant.findOne({ clerkUserID: clerkUserID })
                 break
             case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
+                user = await Manager.findOne({ clerkUserID: clerkUserID })
                 break
         }
 
@@ -1632,59 +1601,55 @@ router.delete('/delete/:courseId/:studentId', async (req, res) => {
 })
 
 //API xem thông tin của học sinh
-router.get('/information/:studentId', async (req, res) => {
-    const { studentId } = req.params
-    const { clerkUserId } = req.query
+router.get('/student-information', async (req, res) => {
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
+    const studentId = userOnClerk.mongoID;
 
     try {
-        // Kiểm tra quyền hạn: Chỉ kế toán và nhân viên hỗ trợ học vụ được phép truy cập
-        if (!['accountant', 'manager'].includes(userRole)) {
-            return res
-                .status(403)
-                .json({ error: 'Access denied. Invalid permissions.' })
-        }
-
-        let user
-        switch (userRole) {
-            case 'accountant':
-                user = await Accountant.findOne({ clerkUserID: clerkUserId })
-                break
-            case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
-                break
-        }
-
-        if (!user) {
-            return res.status(404).json({ error: 'Requesting user not found.' })
-        }
-
-        // Tìm thông tin học sinh trong database
-        const student = await Student.findById(studentId)
+        const student = await Student.findOne({ _id: studentId })
 
         if (!student) {
-            return res.status(404).json({ error: 'Student not found.' })
+            return res.status(404).json({ error: 'Requesting user not found.', userRole: userRole, studentID: studentId })
         }
 
-        // Lấy thêm thông tin từ Clerk
-        const clerkInfo = await clerkClient.users.getUser(student.clerkUserID)
+        const courseIds = student.courses.map((course) => course.courseID)
 
-        if (!clerkInfo) {
-            return res
-                .status(404)
-                .json({ error: 'Student Clerk information not found.' })
-        }
+        const courses = await Course.find({
+            courseID: { $in: courseIds }
+        })
 
-        // Gộp thông tin từ MongoDB và Clerk
-        const studentInfo = {
-            ...student.toObject(),
-            clerkInfo: clerkInfo
-        }
+        const courseInfo = await Promise.all(courses.map(async (course) => {
+            const classes = course.classes
 
-        // Trả về thông tin học sinh
-        res.status(200).json({ student: studentInfo })
+            const classInfo = await Promise.all(classes.map(async (classItem) => {
+                return {
+                    classID: classItem.classID,
+                    className: classItem.name,
+                    schedule: classItem.schedule,
+                    meeting: classItem.meeting,
+                    teacher: course.teachers,
+                }
+            }))
+
+            return {
+                courseID: course.courseID,
+                courseName: course.name,
+                startDate: course.startDate,
+                endDate: course.endDate,
+                coverIMG: course.coverIMG,
+                enrollDate: course.enrollDate,
+                price: course.price,
+                rating: course.rating,
+                isPaid: true,
+                totalVote: course.totalVote,
+                classes: classInfo,
+            }
+        }))
+
+        res.status(200).json({ courses: courseInfo })
     } catch (err) {
         console.error(err)
         // Xử lý lỗi server
@@ -1695,9 +1660,9 @@ router.get('/information/:studentId', async (req, res) => {
 //API xem điểm của học sinh
 router.get('/result/:courseId/:studentId', async (req, res) => {
     const { courseId, studentId } = req.params
-    const { clerkUserId } = req.query
+    const { clerkUserID } = req.query
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     try {
@@ -1711,7 +1676,7 @@ router.get('/result/:courseId/:studentId', async (req, res) => {
         let user
         switch (userRole) {
             case 'teacher':
-                user = await Teacher.findOne({ clerkUserID: clerkUserId })
+                user = await Teacher.findOne({ clerkUserID: clerkUserID })
                 // Kiểm tra giáo viên chỉ có thể xem điểm của khóa học mình dạy
                 if (!user.courses.includes(courseId)) {
                     return res
@@ -1720,7 +1685,7 @@ router.get('/result/:courseId/:studentId', async (req, res) => {
                 }
                 break
             case 'manager':
-                user = await Manager.findOne({ clerkUserID: clerkUserId })
+                user = await Manager.findOne({ clerkUserID: clerkUserID })
                 break
         }
 
@@ -1760,11 +1725,11 @@ router.put(
     '/teacher-schedule/:courseId/:classId/:teacherId',
     async (req, res) => {
         const { courseId, classId, teacherId } = req.params
-        const { clerkUserId, schedules } = req.body
+        const { clerkUserID, schedules } = req.body
 
         try {
             // Kiểm tra quyền hạn: Chỉ nhân viên hỗ trợ học vụ hoặc quản lý mới có thể thay đổi lịch dạy
-            const manager = await Manager.findOne({ clerkUserID: clerkUserId })
+            const manager = await Manager.findOne({ clerkUserID: clerkUserID })
             if (!manager) {
                 return res
                     .status(403)
@@ -1895,9 +1860,9 @@ router.get('/courses', async (req, res) => {
 
 // API để kế toán xem toàn bộ lương của các nhân viên
 router.get('/salaries', async (req, res) => {
-    const { clerkUserId } = req.query // Lấy clerkUserId và userRole từ query params
+    const { clerkUserID } = req.query // Lấy clerkUserID và userRole từ query params
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     try {
@@ -1908,8 +1873,8 @@ router.get('/salaries', async (req, res) => {
                 .json({ error: 'Only accountants can view salaries' })
         }
 
-        // Tìm người dùng theo clerkUserId
-        const accountant = await Accountant.findOne({ clerkUserId: clerkUserId })
+        // Tìm người dùng theo clerkUserID
+        const accountant = await Accountant.findOne({ clerkUserID: clerkUserID })
 
         if (!accountant) {
             return res.status(404).json({ error: 'Accountant not found' })
@@ -1928,9 +1893,9 @@ router.get('/salaries', async (req, res) => {
 
 // API để nhân viên xem lương của mình
 router.get('/salary', async (req, res) => {
-    const { clerkUserId } = req.query // Lấy thông tin từ query params
+    const { clerkUserID } = req.query // Lấy thông tin từ query params
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const mongoID = userOnClerk.mongoID;
     const userRole = userOnClerk.userRole;
 
@@ -1959,8 +1924,8 @@ router.get('/salary', async (req, res) => {
             return res.status(404).json({ error: 'Employee not found' })
         }
 
-        // Kiểm tra quyền của user với `clerkUserId`
-        if (employee.clerkUserId !== clerkUserId) {
+        // Kiểm tra quyền của user với `clerkUserID`
+        if (employee.clerkUserID !== clerkUserID) {
             return res.status(403).json({
                 error: 'Access denied: You do not have permission to view this salary'
             })
@@ -1982,9 +1947,9 @@ router.get('/salary', async (req, res) => {
 
 // API để giáo viên upload tài liệu cho học sinh
 router.post('/upload-document', async (req, res) => {
-    const { clerkUserId, classId, documentLink } = req.body // Lấy thông tin từ request body
+    const { clerkUserID, classId, documentLink } = req.body // Lấy thông tin từ request body
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     // Xác thực người dùng
@@ -2013,9 +1978,9 @@ router.post('/upload-document', async (req, res) => {
 
 // API để kế toán xác nhận thanh toán học phí của học sinh cho khóa học
 router.put('/confirm-payment', async (req, res) => {
-    const { clerkUserId, courseId, studentId } = req.body // Lấy thông tin từ request body
+    const { clerkUserID, courseId, studentId } = req.body // Lấy thông tin từ request body
 
-    const userOnClerk = await getMetadata(userClerkId);
+    const userOnClerk = await getMetadata(clerkUserID);
     const userRole = userOnClerk.userRole;
 
     try {
