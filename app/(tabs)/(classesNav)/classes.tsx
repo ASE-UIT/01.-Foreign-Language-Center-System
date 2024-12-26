@@ -1,10 +1,31 @@
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { router, useNavigation } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions, Button } from 'react-native';
-import { RootDrawerParamList } from '../_layout';
+// types.ts
+interface Teacher {
+    name: string;
+}
 
-// Định nghĩa kiểu cho Course
+interface Class {
+    classID: string;
+    className: string;
+    schedule: string[];
+    meeting: string;
+    teacher: string[][];
+}
+
+interface CourseResponse {
+    courses: {
+        courseID: string;
+        courseName: string;
+        startDate: string;
+        endDate: string;
+        coverIMG: string;
+        price: number;
+        rating: number;
+        isPaid: boolean;
+        totalVote: number;
+        classes: Class[];
+    }[];
+}
+
 interface Course {
     courseID: string;
     title: string;
@@ -13,89 +34,79 @@ interface Course {
     image: string;
 }
 
+
+export const fetchStudentCourses = async (clerkUserID: string) => {
+    const instance = http();
+
+    try {
+        const response = await instance.get<CourseResponse>(
+            `/student-information?clerkUserID=${clerkUserID}`
+        );
+        console.log(response);
+
+        return response.data.courses.map(course => ({
+            courseID: course.courseID,
+            title: course.courseName,
+            instructor: course.classes[0]?.teacher[0]?.join(", ") || "No instructor",
+            progress: "0/0 buổi",
+            image: course.coverIMG
+        }));
+
+    } catch (error) {
+        console.error("Error fetching courses:", error);
+        throw error;
+    }
+};
+
+// CourseList.tsx
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { router, useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { RootDrawerParamList } from '../_layout';
+import { useUser } from '@clerk/clerk-expo';
+import { http } from '@/http/http';
+
 const CourseList: React.FC = () => {
-    const [courses, setCourses] = useState<Course[]>([]); // Khai báo kiểu cho state courses
-
-    // Đối tượng mẫu
-    const sampleCourses: Course[] = [
-        {
-            courseID: "1",
-            title: "Tiếng Anh giao tiếp cơ bản",
-            instructor: "Mỹ Quế Lan",
-            progress: "7/15 buổi",
-            image: "https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png",
-        },
-        {
-            courseID: "2",
-            title: "Tiếng Anh nâng cao",
-            instructor: "Nguyễn Văn A",
-            progress: "5/10 buổi",
-            image: "https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png",
-        },
-        {
-            courseID: "3",
-            title: "Tiếng Anh cho người đi làm",
-            instructor: "Trần Thị B",
-            progress: "10/20 buổi",
-            image: "https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png",
-        },
-        {
-            courseID: "4",
-            title: "Tiếng Anh cho người đi làm",
-            instructor: "Trần Thị B",
-            progress: "10/20 buổi",
-            image: "https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png",
-        },
-        {
-            courseID: "5",
-            title: "Tiếng Anh cho người đi làm",
-            instructor: "Trần Thị B",
-            progress: "10/20 buổi",
-            image: "https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png",
-        },
-    ];
-
-    const fetchCourses = async () => {
-        try {
-            // const response = await fetch('https://api.example.com/courses'); // Thay đổi URL cho API thực tế
-            // const data: Course[] = await response.json(); // Khai báo kiểu cho dữ liệu trả về
-            setCourses(sampleCourses);
-        } catch (error) {
-            console.error("Error fetching courses:", error);
-        }
-    };
-
-    useEffect(() => {
-        fetchCourses();
-    }, []);
-
+    const [courses, setCourses] = useState<Course[]>([]);
+    const { user } = useUser();
     const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
+    useEffect(() => {
+        const loadCourses = async () => {
+            if (user?.id) {
+                try {
+                    const courses = await fetchStudentCourses(user.id);
+                    setCourses(courses);
+                } catch (error) {
+                    console.error("Error loading courses:", error);
+                }
+            }
+        };
+
+        loadCourses();
+    }, [user]);
 
     const handleNavToClassDetail = (course: Course) => {
         router.push({
-            pathname: '/(tabs)/(classesNav)/classDetail', // Đảm bảo đường dẫn này đúng
+            pathname: '/(tabs)/(classesNav)/classDetail',
             params: {
-                courseID: JSON.stringify(course.courseID), // Convert course to a string
+                courseID: JSON.stringify(course.courseID),
             },
-
         });
     };
 
-    // Hàm render cho từng item trong FlatList
     const renderCourseItem = ({ item }: { item: Course }) => (
         <View style={styles.courseCard}>
             <View style={styles.courseContent}>
                 <Image source={{ uri: item.image }} style={styles.image} />
-                <View>
+                <View style={{ flex: 1 }}>
                     <Text style={styles.courseTitle}>{item.title}</Text>
                     <View style={styles.timeContainer}>
                         <Text style={styles.courseText}>Giảng viên: </Text>
-                        <Text style={styles.teacherImageText}>{item.instructor}</Text>
-                    </View>
-                    <View style={styles.timeLayout}>
-                        <Text style={styles.courseText}>Tiến độ: </Text>
-                        <Text style={styles.timeText}>{item.progress}</Text>
+                        <Text style={styles.teacherImageText} numberOfLines={2}>
+                            {item.instructor.length > 20 ? `${item.instructor.slice(0, 20)}...` : item.instructor}
+                        </Text>
                     </View>
                     <TouchableOpacity style={styles.detailButton} onPress={() => handleNavToClassDetail(item)}>
                         <Text style={styles.detailButtonText}>Xem chi tiết</Text>
@@ -108,17 +119,16 @@ const CourseList: React.FC = () => {
     return (
         <View style={{ flex: 1 }}>
             <View style={{
-                flexDirection: 'row', // Horizontal layout
-                alignItems: 'center', // Vertical alignment
-                justifyContent: 'space-between', // Space out items
-                height: 92, // Custom header height
-                backgroundColor: '#2A58BA', // Background color
-
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: 92,
+                backgroundColor: '#2A58BA',
             }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                     <Text style={{
-                        fontSize: 20, // Kích thước chữ tiêu đề header
-                        color: 'white', // Màu chữ tiêu đề
+                        fontSize: 20,
+                        color: 'white',
                         marginTop: 30,
                         marginLeft: 15,
                         fontWeight: 'bold'
@@ -152,7 +162,7 @@ const CourseList: React.FC = () => {
     );
 };
 
-const { height } = Dimensions.get('window'); // Lấy chiều dài thiết bị
+const { height } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         paddingTop: 30,
@@ -181,29 +191,19 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginRight: 15,
     },
-    instructor: {
-        fontSize: 16,
-        color: 'gray',
-    },
-    progress: {
-        fontSize: 15,
-    },
     flatListContent: {
         alignItems: 'center',
         justifyContent: 'center',
     },
     flatList: {
         flexGrow: 1,
-    }, 
+    },
     courseTitle: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#2A58BA',
         fontFamily: 'Inter-Bold',
         marginVertical: 5,
-    },
-    detailLayout: {
-        marginTop: 5,
     },
     courseText: {
         fontSize: 13,
@@ -213,14 +213,6 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     timeText: {
-        fontSize: 13,
-        fontWeight: 'bold'
-    },
-    classLayout: {
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-    classText: {
         fontSize: 13,
         fontWeight: 'bold'
     },
@@ -235,19 +227,19 @@ const styles = StyleSheet.create({
     },
     detailButton: {
         marginTop: 5,
-        width: 82, // Fixed width
-        height: 20, // Fixed height
-        borderRadius: 5, // Border radius
-        borderWidth: 1, // Border width
-        borderColor: '#BABABA', // Border color
-        backgroundColor: '#E6E6E6', // Background color
-        opacity: 1, // Opacity (set to 1 for visibility)
+        width: 82,
+        height: 20,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#BABABA',
+        backgroundColor: '#E6E6E6',
+        opacity: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10, // Gap (not directly applicable in React Native)
+        gap: 10,
     },
     detailButtonText: {
-        color: 'black', // Màu chữ (có thể thay đổi nếu cần)
+        color: 'black',
     },
 });
 
