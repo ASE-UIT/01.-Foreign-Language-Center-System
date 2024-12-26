@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, useUser } from '@clerk/clerk-expo'
+import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/clerk-expo'
 import { Link, router } from 'expo-router'
 import { Text, View, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
 import teacher from '../../../assets/images/teacher.png'
@@ -6,13 +6,14 @@ import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { http } from '@/http/http';
 
 
 export type Course = {
-  id: string;
-  title: string;
-  instructor: string;
+  courseID: string;
+  name: string;
+  teachers: string[];
   imageUrl: any;
 };
 
@@ -21,110 +22,126 @@ export type RootStackParamList = {
   CourseDetails: any,
 }
 
-const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
-  <View style={styles.courseCard}>
-    <Image source={course.imageUrl} style={styles.image} />
-    <View style={styles.infoContainer}>
-      <Text style={styles.courseTitle}>{course.title}</Text>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={styles.instructor}>Giảng viên: </Text>
-        <Text style={[styles.instructor, { fontWeight: 'bold' }]}>{course.instructor}</Text>
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.registerButton}>
-          <Text style={styles.buttonText}>Đăng ký</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.detailButton} onPress={() => router.push({
-          pathname: '/(tabs)/(coursesNav)/(courseDetails)/[id]',
-          params: { id: '1' },
-        })}>
-          <Text style={styles.detailText}>Xem chi tiết</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-);
+
 
 export default function Index() {
-  const { user } = useUser()
-  const getRole = async () => {
+  const {user} = useClerk()
+  const enroll = async(id:any) => {
+    const response = await http().put(`/enroll-course/${id}`, {clerkUserID: user?.id})
+    console.log(response)
+  }
+  const [courses, setCourses] = useState<Course[]>([]); // Biến để lưu dữ liệu
+  const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
+    <View style={styles.courseCard}>
+      <Image source={course.imageUrl} style={styles.image} />
+      <View style={styles.infoContainer}>
+        <Text style={styles.courseTitle}>{course.name}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={styles.instructor}>Giảng viên: </Text>
+          <Text style={[styles.instructor, { fontWeight: 'bold' }]}>{course.teachers[0][0]}</Text>
+        </View>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.registerButton} onPress={() => enroll(course.courseID)}>
+            <Text style={styles.buttonText}>Đăng ký</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.detailButton} onPress={() => router.push({
+            pathname: '/(tabs)/(coursesNav)/(courseDetails)/[id]',
+            params: { id: `${course.courseID}` },
+          })}>
+            <Text style={styles.detailText}>Xem chi tiết</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+  const getCourses = async () => {
     try {
-      const response = await axios.get<{ role: string; success: boolean }>(
-        `http://10.0.2.2:5000/api/get-role?clerkUserId=user_2ixUzA4ftkBgZekEaVHvlN88BjU`
+      const response = await axios.get<any>(
+        `http://10.0.2.2:5000/api/courses`, 
       );
-      console.log("Response:", response.data);
+     
+      const courseData = response.data.map((course: any) => ({
+        courseID: course.courseID,
+        name: course.name,
+        teachers: course.teachers,
+        imageUrl: teacher
+       
+      }));
+
+      setCourses(courseData);  // Lưu mảng khóa học vào state
+     
     } catch (error) {
       console.error("Error fetching role:", error);
     }
   };
 
   useEffect(() => {
-    getRole();
+    getCourses();
   }, []); // Dependency array ensures the effect runs only once
-  const courses: Course[] = [
-    {
-      id: "1",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
+  // const courses: Course[] = [
+  //   {
+  //     id: "1",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
 
-    },
-    {
-      id: "2",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "3",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "4",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "5",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "6",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "7",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "8",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "9",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
-    {
-      id: "10",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher // Replace with actual image URL
-    },
+  //   },
+  //   {
+  //     id: "2",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "4",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "5",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "6",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "7",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "8",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "9",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
+  //   {
+  //     id: "10",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher // Replace with actual image URL
+  //   },
    
-  ];
+  // ];
 
   const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
@@ -144,7 +161,7 @@ export default function Index() {
         <SafeAreaView style={{flex:1}}>
           <FlatList
             data={courses}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.courseID}
             renderItem={renderCourse}
             contentContainerStyle={styles.listContainer}
           />

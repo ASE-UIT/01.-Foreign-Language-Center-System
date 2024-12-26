@@ -697,7 +697,7 @@ router.put('/purchase-course/:courseId', upload.single('payProof'), async (req, 
 router.get('/scores/:courseId', async (req, res) => {
     try {
         const { courseId } = req.params // Lấy courseId từ URL
-        const { clerkUserID } = req.body // Lấy mongoID, userRole từ request body
+        const { clerkUserID } = req.query // Lấy mongoID, userRole từ request body
 
         const userOnClerk = await getMetadata(clerkUserID);
 
@@ -710,7 +710,7 @@ router.get('/scores/:courseId', async (req, res) => {
         }
 
         // Tìm sinh viên theo mongoID
-        const student = await Student.findOne({ mongoID })
+        const student = await Student.findOne({ mongoID:mongoID })
 
         if (!student) {
             return res.status(404).json({ error: 'Student not found' })

@@ -174,7 +174,7 @@ export default function TabLayout() {
         <Drawer.Screen
           name="(salaryNav)"
           options={{
-
+            drawerLabelStyle:{display:'none'},
             headerShown: false,
             title: 'Lương',
             headerLeft: () => <></>,

@@ -1,7 +1,9 @@
 import { RootDrawerParamList } from "@/app/(tabs)/_layout";
+import { http } from "@/http/http";
+import { useClerk } from "@clerk/clerk-expo";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
-import { router, useNavigation } from "expo-router";
-import React from "react";
+import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,14 +14,34 @@ import {
 } from "react-native";
 
 export default function ScoreBoard() {
-  const tableData = [
-    { session: "1", testName: "", score: "" },
-    { session: "2", testName: "", score: "" },
-    { session: "3", testName: "", score: "" },
-    { session: "4", testName: "", score: "" },
-    { session: "5", testName: "", score: "" },
-    { session: "6", testName: "", score: "" },
-  ];
+   const { id } = useLocalSearchParams();
+   const {user} = useClerk()
+   const [tableData,setTableData] = useState<any>()
+   const getScores = async() =>{
+    
+    const response = await http().get(`/scores/${id}`,  {params:{clerkUserID: user?.id}} )
+    const score = response.data.scores?.map((score: any,index:any) => ({
+           session:index,
+           testName: score.description,
+           score: score.score,
+           
+          }));
+    
+    console.log(score)
+    setTableData(score)
+   }
+
+   useEffect(()=>{
+    getScores()
+   },[])
+  // const tableData = [
+  //   { session: "1", testName: "", score: "" },
+  //   { session: "2", testName: "", score: "" },
+  //   { session: "3", testName: "", score: "" },
+  //   { session: "4", testName: "", score: "" },
+  //   { session: "5", testName: "", score: "" },
+  //   { session: "6", testName: "", score: "" },
+  // ];
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>(); 
 
   return (
@@ -72,15 +94,7 @@ export default function ScoreBoard() {
      
                           
 
-      {/* Course Info */}
-      <View style={styles.courseInfo}>
-        <Text style={styles.courseTitle}>
-          Khóa học: <Text style={styles.boldText}>Tiếng Anh giao tiếp cơ bản</Text>
-        </Text>
-        <Text style={styles.instructor}>
-          Giảng viên: <Text style={styles.boldText}>Mỹ Quế Lan</Text>
-        </Text>
-      </View>
+     
 
       {/* Score Table */}
       <ScrollView>
@@ -90,7 +104,7 @@ export default function ScoreBoard() {
             <Text style={styles.tableHeaderText}>Tên bài kiểm tra</Text>
             <Text style={styles.tableHeaderText}>Điểm</Text>
           </View>
-          {tableData.map((row, index) => (
+          {tableData && tableData.map((row:any, index:any) => (
             <View key={index} style={styles.tableRow}>
               <Text style={styles.tableCell}>{row.session}</Text>
               <Text style={styles.tableCell}>{row.testName}</Text>

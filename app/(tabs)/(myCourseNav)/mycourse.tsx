@@ -1,26 +1,35 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet, FlatList } from 'react-native'
-import React from 'react'
-import { Course } from '../(coursesNav)';
+import React, { useEffect, useState } from 'react'
+
 import { router, useNavigation } from 'expo-router';
 import teacher from '../../../assets/images/teacher.png'
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import axios from 'axios';
+import { useClerk } from '@clerk/clerk-expo';
 
-const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
+export type Course = {
+  id: string;
+  title: string;
+  instructor: string;
+  imageUrl: any;
+};
+
+const CourseCard: React.FC<{ course: any }> = ({ course }) => (
   <View style={styles.courseCard}>
     <Image source={course.imageUrl} style={styles.image} />
     <View style={styles.infoContainer}>
-      <Text style={styles.courseTitle}>{course.title}</Text>
+      <Text style={styles.courseTitle}>{course.name}</Text>
       <View style={{ flexDirection: 'row' }}>
         <Text style={styles.instructor}>Giảng viên:  </Text>
-        <Text style={[styles.instructor, { fontWeight: 'bold' }]}>{course.instructor}</Text>
+        <Text style={[styles.instructor, { fontWeight: 'bold' }]}>{course.teachers[0][0]}</Text>
       </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.detailButton} onPress={() => router.push({
           pathname: '../(myCourseDetails)/[id]',
-          params: { id: '1' }
+          params: { id: `${course.courseID}` }
         })}>
           <Text style={styles.detailText}>Xem chi tiết</Text>
 
@@ -35,82 +44,110 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
   </View>
 );
 export default function Mycourse() {
-  const courses: Course[] = [
-    {
-      id: "1",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "2",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "3",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "4",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "5",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "6",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "7",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher
-    },
-    {
-      id: "8",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "9",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "10",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "11",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-    {
-      id: "12",
-      title: "Tiếng Anh giao tiếp cơ bản",
-      instructor: "Mỹ Quế Lan",
-      imageUrl: teacher 
-    },
-  ];
+const [courses, setCourses] = useState<any[]>([]); // Biến để lưu dữ liệu
+const {user} = useClerk()
+  const getCourses = async () => {
+    try {
+      const response = await axios.get<any>(
+        `http://10.0.2.2:5000/api/student-information?clerkUserID=${user?.id}`, 
+      );
+     
+      const courseData = response.data.courses.map((course: any) => ({
+        courseID: course.courseID,
+        name: course.courseName,
+        teachers: course.classes[0].teacher,
+        imageUrl: teacher
+       
+      }));
 
-  const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
+      setCourses(courseData);  // Lưu mảng khóa học vào state
+
+      console.log(response.data.courses[0].courseID)
+     
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+
+  useEffect(() => {
+    getCourses();
+  }, []); // Dependency array ensures the effect runs only once
+  // const courses: Course[] = [
+  //   {
+  //     id: "1",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "2",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "4",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "5",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "6",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "7",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher
+  //   },
+  //   {
+  //     id: "8",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "9",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "10",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "11",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  //   {
+  //     id: "12",
+  //     title: "Tiếng Anh giao tiếp cơ bản",
+  //     instructor: "Mỹ Quế Lan",
+  //     imageUrl: teacher 
+  //   },
+  // ];
+
+  const renderCourse = ({ item }: { item: any }) => <CourseCard course={item} />;
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
   return (
     <View style={{flex:1}}>
@@ -127,7 +164,7 @@ export default function Mycourse() {
         <SafeAreaView style={{flex:2}}>
           <FlatList
             data={courses}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.courseID}
             renderItem={renderCourse}
             contentContainerStyle={{flexGrow: 1, paddingBottom:20}}
 

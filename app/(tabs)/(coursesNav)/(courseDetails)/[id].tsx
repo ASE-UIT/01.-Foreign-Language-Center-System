@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router/build/hooks";
 import teacher from '../../../../assets/images/teacher.png'
@@ -6,23 +6,7 @@ import { router, useNavigation } from "expo-router";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../_layout";
 import { FontAwesome6 } from "@expo/vector-icons";
-
-type Schedule = {
-  name: string;
-  details: string[];
-};
-
-type CourseDetails = {
-  id: string;
-  title: string;
-  instructor: string;
-  imageUrl: string; 
-  studentCount: string; 
-  overview: string;
-  objectives: string;
-  schedule: Schedule[];
-  additionalInfo: string; 
-};
+import { http } from "@/http/http";
 
 export default function CourseDetail() {
   const { id } = useLocalSearchParams();
@@ -34,77 +18,41 @@ export default function CourseDetail() {
     additional: false,
   });
 
+const [course, setCourse] = useState<any>()
+
+
+  const getCourseDetails = async() => {
+    try{
+      const response = await http().get(`/course-detail/${id}`)
+    const courseData = {
+      
+      title: response.data.course.name,
+      instructor: response.data.course.teachers[0][0],
+      studentCount: response.data.course.currentStudent,
+      studentLimit: response.data.course.studentLimit,
+      overview: response.data.course.sumary,
+      objectives: response.data.course.target,
+      schedule: response.data.course.classes[0].schedule,
+      rating:response.data.course.rating,
+      vote:response.data.course.totalVote,
+
+    }
+    setCourse(courseData)
+    console.log(response.data.course.name)
+    }catch(error){ 
+
+      console.error("Error fetching role:", error);
+    }
+    }
+    
+          
+      
+
+  useEffect(()=>{getCourseDetails()},[])
+
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
   const [expandedSections, setExpandedSections] = useState<number[]>([]); 
-  
-  const courses:CourseDetails[] = [{
-    id: "1",
-    title: "Từ vựng IELTS cho band 7.5+",
-    instructor: "Mỹ Quế Lan",
-    imageUrl: teacher,
-    studentCount: "25/30 học sinh",
-    overview: `- Khóa học gồm 51 bài học với thời lượng tương đương 32 giờ học xoay quanh chủ đề từ vựng cho các bạn thi IELTS với band mong muốn là 7.5+.
-- 18 chủ đề từ vựng bao gồm: School, Traveling, Economic, và các chủ đề khác ...`,
-    objectives: `- Các bạn học sinh tham gia khóa học nắm được các từ vựng cần thiết để thi IELTS và đạt được mục tiêu.
-- Có kiến thức rõ ràng về việc sử dụng từ vựng theo ngữ cảnh phù hợp.`,
-    schedule: [
-      {
-        name: "Lớp học từ vựng về chủ đề school và business",
-        details: [
-          "Thời khóa biểu: 7h30 tối thứ 2, thứ 4, thứ 6",
-          "Thời gian bắt đầu: 15 - 12 - 2024",
-          "Thời gian kết thúc: 22 - 01 - 2025",
-          "Giảng viên: anh Khánh và chị Hạo",
-        ],
-      },
-      {
-        name: "Lớp học từ vựng về chủ đề traveling và daily",
-        details: [
-          "Thời khóa biểu: 7h30 tối thứ 3, thứ 4, thứ 4",
-          "Thời gian bắt đầu: 15 - 02 - 2025",
-          "Thời gian kết thúc: 22 - 03 - 2025",
-          "Giảng viên: anh Khánh và chị Hạo",
-        ],
-      },
-    ],
-    additionalInfo:
-      "Khóa học được đánh giá 4.3/5 với số lượng phiếu đánh giá là 50 phiếu",
-  },
-  {
-    id: "2",
-    title: "Từ vựng IELTS cho band 7.5+",
-    instructor: "Mỹ Quế Lan",
-    imageUrl: teacher, // Replace with actual image URL
-    studentCount: "25/30 học sinh",
-    overview: `- Khóa học gồm 51 bài học với thời lượng tương đương 32 giờ học xoay quanh chủ đề từ vựng cho các bạn thi IELTS với band mong muốn là 7.5+.
-- 18 chủ đề từ vựng bao gồm: School, Traveling, Economic, và các chủ đề khác ...`,
-    objectives: `- Các bạn học sinh tham gia khóa học nắm được các từ vựng cần thiết để thi IELTS và đạt được mục tiêu.
-- Có kiến thức rõ ràng về việc sử dụng từ vựng theo ngữ cảnh phù hợp.`,
-    schedule: [
-      {
-        name: "Lớp học từ vựng về chủ đề school và business",
-        details: [
-          "Thời khóa biểu: 7h30 tối thứ 2, thứ 4, thứ 6",
-          "Thời gian bắt đầu: 15 - 12 - 2024",
-          "Thời gian kết thúc: 22 - 01 - 2025",
-          "Giảng viên: anh Khánh và chị Hạo",
-        ],
-      },
-      {
-        name: "Lớp học từ vựng về chủ đề traveling và daily",
-        details: [
-          "Thời khóa biểu: 7h30 tối thứ 3, thứ 4, thứ 4",
-          "Thời gian bắt đầu: 15 - 02 - 2025",
-          "Thời gian kết thúc: 22 - 03 - 2025",
-          "Giảng viên: anh Khánh và chị Hạo",
-        ],
-      },
-    ],
-    additionalInfo:
-      "Khóa học được đánh giá 4.3/5 với số lượng phiếu đánh giá là 50 phiếu",
-  },
-  ];
 
   let index = 0
 
@@ -126,17 +74,12 @@ export default function CourseDetail() {
     if (expandedSections.includes(index)) {
       setExpandedSections(expandedSections.filter(i => i !== index)); // Đóng
     } else {
-      setExpandedSections([...expandedSections, index]); // Mở
+      setExpandedSections([...expandedSections, index]); // Mở 
     }
   };
 
-  const course = courses.find((c) => c.id === id);
-  if (!course) {
-    return <Text> Khóa học không tìm thấy </Text>;
-  }
-
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1 , marginBottom:20}}>
       {/*Header*/}
       <View style={styles.headerNav}>
         <View style={styles.headerContent}>
@@ -160,18 +103,18 @@ export default function CourseDetail() {
         <View style={{ flex: 1, paddingHorizontal: 20 }}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <View style={styles.header}>
-              <Text style={styles.subtitle}>{course.title}</Text>
-              <Text style={styles.teacher}>Giảng viên: {course.instructor}</Text>
+              <Text style={styles.subtitle}>{course && course.title}</Text>
+              <Text style={styles.teacher}>Giảng viên: {course && course.instructor}</Text>
             </View>
             <View style={{ flex: 1, marginRight: 20, marginTop: 20 }}>
               <Image source={teacher} style={styles.image} />
             </View>
           </View>
           <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-            <TouchableOpacity style={[styles.registerButton, {  }]} onPress={() => router.push('/(scores)/[id]')}>
+            <TouchableOpacity style={[styles.registerButton, {  }]} onPress={() => alert("Đăng ký khóa học thành công")}>
               <Text style={styles.registerText}>Đăng ký</Text>
             </TouchableOpacity>
-            <Text style={styles.studentCount}>Sĩ số: {course.studentCount}</Text>
+            <Text style={styles.studentCount}>Sĩ số: {course && course.studentCount}/{course && course.studentLimit}</Text>
           </View>
         </View>
         <View>
@@ -185,51 +128,51 @@ export default function CourseDetail() {
               color="black" />
           </TouchableOpacity>
           {sections.overview && (
-            <Text style={styles.sectionContent}>{course.overview}</Text>
+            course.overview.map((item : any, index:any) => (
+              <View key={index} style={styles.scheduleContainer}>
+                <Text style={styles.sectionContent}>- {item}</Text>
+             </View>))
           )}
 
           {/* Section 2: Objectives */}
           <TouchableOpacity onPress={() => toggleSection("objectives")} style={styles.section}>
             <Text style={styles.sectionTitle}>2. Mục tiêu khóa học:</Text>
             <FontAwesome6 style={{ marginRight: 30 }}
-              name={expandedSections.includes(0) ? "chevron-up" : "chevron-down"}
+              name={expandedSections.includes(1) ? "chevron-up" : "chevron-down"}
               size={25}
               color="black" />
           </TouchableOpacity>
           {sections.objectives && (
-            <Text style={styles.sectionContent}>{course.objectives}</Text>
+             course.objectives.map((item : any, index:any) => (
+              <View key={index} style={styles.scheduleContainer}>
+                <Text style={styles.sectionContent}>- {item}</Text>
+             </View>))
           )}
 
           {/* Section 3: Schedule */}
           <TouchableOpacity onPress={() => toggleSection("schedule")} style={styles.section}>
             <Text style={styles.sectionTitle}>3. Các lớp học và lịch học:</Text>
             <FontAwesome6 style={{ marginRight: 30 }}
-              name={expandedSections.includes(0) ? "chevron-up" : "chevron-down"}
+              name={expandedSections.includes(2) ? "chevron-up" : "chevron-down"}
               size={25}
               color="black" />
           </TouchableOpacity>
-          {sections.schedule &&
-            course.schedule.map((item, index) => (
-              <View key={index} style={styles.scheduleContainer}>
-                <Text style={styles.scheduleTitle}>- {item.name}:</Text>
-                {item.details.map((detail, idx) => (
-                  <Text key={idx} style={styles.scheduleDetail}>
-                    • {detail}
-                  </Text>
-                ))}
-              </View>
-            ))}
+             {sections.schedule &&
+                      course.schedule.map((item : any, index:any) => (
+                        <View key={index} style={styles.scheduleContainer}>
+                          <Text style={styles.sectionContent}>- {item}</Text>
+                       </View>))}
 
           {/* Section 4: Additional Info */}
           <TouchableOpacity onPress={() => toggleSection("additional")} style={styles.section}>
             <Text style={styles.sectionTitle}>4. Thông tin thêm:</Text>
             <FontAwesome6 style={{ marginRight: 30 }}
-              name={expandedSections.includes(0) ? "chevron-up" : "chevron-down"}
+              name={expandedSections.includes(3) ? "chevron-up" : "chevron-down"}
               size={25}
               color="black" />
           </TouchableOpacity>
           {sections.additional && (
-            <Text style={styles.sectionContent}>{course.additionalInfo}</Text>
+            <Text style={styles.sectionContent}>Khóa học được đánh giá {course.rating}/5 với {course.vote} lượt đánh giá</Text>
           )}
         </View>
       </ScrollView>
@@ -356,20 +299,25 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 10,
     marginBottom: 8,
+    flexWrap:'wrap',
+    width:'98%',
   },
   scheduleContainer: {
-    marginLeft: 20,
+    width:'98%',
     marginBottom: 8,
   },
   scheduleTitle: {
     fontSize: 16,
+   
     fontWeight: "bold",
     color: "#333",
     marginBottom: 4,
+    flexWrap:'wrap',
+    width:'98%',
   },
   scheduleDetail: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 14,
+    color: "black",
     marginLeft: 8,
   },
 });
