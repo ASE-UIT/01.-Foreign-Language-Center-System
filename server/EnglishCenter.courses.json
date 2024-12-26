@@ -1,17 +1,17 @@
 [{
-  "_id": "60d93f24c79b567b74951e30",
-  "courseID": "60d93f24c79b567b74951e30",
-  "name": "Web Development with JavaScript",
-  "description": "Learn web development using JavaScript programming language",
+  "_id": "61d4741d1e6a5c47a4a36c50",
+  "courseID": "61d4741d1e6a5c47a4a36c50",
+  "name": "Introduction to Programming",
+  "description": "Learn the basics of programming",
   "classes": [
     {
-      "_id": "60d93f24c79b567b74951e31",
-      "classID": "60d93f24c79b567b74951e31",
+      "_id": "61d4741d1e6a5c47a4a36c51",
+      "classID": "61d4741d1e6a5c47a4a36c51",
       "schedule": [
-        "Monday",
-        "Wednesday"
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
       ],
-      "name": "Introduction to JavaScript",
+      "name": "Introduction to Programming",
       "description": [
         [
           "Variables",
@@ -21,436 +21,1016 @@
       ],
       "teachers": [
         [
-          "Bob Johnson",
-          "Alice Williams"
+          "teacher1",
+          "teacher2"
         ]
       ],
       "lessonList": [
-        "Introduction to JavaScript",
-        "Variables and Data Types",
+        "Variables",
+        "Data Types",
         "Operators"
       ],
       "progress": 1,
       "documents": [
-        "https://example.com/javascript-docs"
+        "https://example.com/document1.pdf"
       ],
       "isActive": true,
-      "meeting": "https://example.com/meeting-javascript",
-      "coverIMG": "https://example.com/javascript-image",
-      "startDate": "01 07 2024",
-      "endDate": "31 07 2024"
-    },
+      "meeting": "https://example.com/meeting1",
+      "coverIMG": "https://example.com/cover1.jpg",
+      "startDate": "01 01 2024",
+      "endDate": "31 01 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Trần Nhật Khánh",
+      "Trình Quang Hạo"
+    ]
+  ],
+  "price": 1000,
+  "compareAtPrice": 1500,
+  "rating": 4.5,
+  "totalVote": 100,
+  "target": [
+    "Understand the basics of programming",
+    "Learn how to write clean and efficient code",
+    "Apply programming concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to programming concepts",
+    "Understanding data types and variables",
+    "Learning control structures and functions",
+    "Applying programming concepts to real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36bfb"
+  ],
+  "studentLimit": 10,
+  "appliedNumber": 5,
+  "currentStudent": 3,
+  "coverIMG": "https://permutable.ai/wp-content/uploads/2024/03/19301.jpg",
+  "startDate": "01 01 2024",
+  "endDate": "31 01 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c52",
+  "courseID": "61d4741d1e6a5c47a4a36c52",
+  "name": "Data Structures and Algorithms",
+  "description": "Learn data structures and algorithms",
+  "classes": [
     {
-      "_id": "60d93f24c79b567b74951e32",
-      "classID": "60d93f24c79b567b74951e32",
+      "_id": "61d4741d1e6a5c47a4a36c53",
+      "classID": "61d4741d1e6a5c47a4a36c53",
       "schedule": [
-        "Tuesday",
-        "Thursday"
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
       ],
-      "name": "Front-end Development",
+      "name": "Data Structures",
+      "description": [
+        [
+          "Arrays",
+          "Linked Lists",
+          "Stacks"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher3",
+          "teacher4"
+        ]
+      ],
+      "lessonList": [
+        "Arrays",
+        "Linked Lists",
+        "Stacks"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document2.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting2",
+      "coverIMG": "https://example.com/cover2.jpg",
+      "startDate": "01 02 2024",
+      "endDate": "28 02 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher3",
+      "teacher4"
+    ]
+  ],
+  "price": 1200,
+  "compareAtPrice": 1800,
+  "rating": 4.8,
+  "totalVote": 150,
+  "target": [
+    "Understand data structures and algorithms",
+    "Learn how to implement data structures in code",
+    "Apply algorithms to solve real-world problems"
+  ],
+  "sumary": [
+    "Introduction to data structures and algorithms",
+    "Learning how to implement data structures in code",
+    "Understanding the trade-offs between different data structures",
+    "Applying algorithms to solve real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36bff"
+  ],
+  "studentLimit": 15,
+  "appliedNumber": 10,
+  "currentStudent": 5,
+  "coverIMG": "https://codeop.tech/wp-content/uploads/2022/09/women-in-coding-e1664430458975.jpg",
+  "startDate": "01 02 2024",
+  "endDate": "28 02 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c54",
+  "courseID": "61d4741d1e6a5c47a4a36c54",
+  "name": "Web Development",
+  "description": "Learn web development",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c55",
+      "classID": "61d4741d1e6a5c47a4a36c55",
+      "schedule": [
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
+      ],
+      "name": "Introduction to Web Development",
       "description": [
         [
           "HTML",
           "CSS",
-          "React"
+          "JavaScript"
         ]
       ],
       "teachers": [
         [
-          "Bob Johnson",
-          "Alice Williams"
+          "teacher5",
+          "teacher6"
         ]
       ],
       "lessonList": [
-        "Front-end Development",
-        "HTML"
-      ],
-      "progress": 2,
-      "documents": [
-        "https://example.com/front-end-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-front-end",
-      "coverIMG": "https://example.com/front-end-image",
-      "startDate": "15 07 2024",
-      "endDate": "30 08 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e33",
-      "classID": "60d93f24c79b567b74951e33",
-      "schedule": [
-        "Monday"
-      ],
-      "name": "Back-end Development",
-      "description": [
-        [
-          "Node.js",
-          "Express.js"
-        ]
-      ],
-      "teachers": [
-        [
-          "Bob Johnson",
-          "Alice Williams"
-        ]
-      ],
-      "lessonList": [
-        "Back-end Development",
-        "Node.js"
+        "HTML",
+        "CSS",
+        "JavaScript"
       ],
       "progress": 1,
       "documents": [
-        "https://example.com/back-end-docs"
+        "https://example.com/document3.pdf"
       ],
       "isActive": true,
-      "meeting": "https://example.com/meeting-back-end",
-      "coverIMG": "https://example.com/back-end-image",
+      "meeting": "https://example.com/meeting3",
+      "coverIMG": "https://example.com/cover3.jpg",
+      "startDate": "01 03 2024",
+      "endDate": "31 03 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Trần Quốc Tuấn",
+      "Huỳnh Thiên Lý"
+    ]
+  ],
+  "price": 1500,
+  "compareAtPrice": 2500,
+  "rating": 4.9,
+  "totalVote": 200,
+  "target": [
+    "Understand the basics of web development",
+    "Learn how to create responsive web applications",
+    "Apply web development concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to web development concepts",
+    "Learning how to create responsive web applications",
+    "Understanding how to apply web development concepts to real-world problems",
+    "Learning how to use HTML, CSS, and JavaScript to create web applications"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c00"
+  ],
+  "studentLimit": 20,
+  "appliedNumber": 15,
+  "currentStudent": 10,
+  "coverIMG": "https://www.techopedia.com/wp-content/uploads/2023/02/istock-1173805290-1.jpeg",
+  "startDate": "01 03 2024",
+  "endDate": "31 03 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c56",
+  "courseID": "61d4741d1e6a5c47a4a36c56",
+  "name": "Machine Learning",
+  "description": "Learn machine learning",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c57",
+      "classID": "61d4741d1e6a5c47a4a36c57",
+      "schedule": [
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
+      ],
+      "name": "Introduction to Machine Learning",
+      "description": [
+        [
+          "Supervised Learning",
+          "Unsupervised Learning",
+          "Reinforcement Learning"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher7",
+          "teacher8"
+        ]
+      ],
+      "lessonList": [
+        "Supervised Learning",
+        "Unsupervised Learning",
+        "Reinforcement Learning"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document4.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting4",
+      "coverIMG": "https://example.com/cover4.jpg",
+      "startDate": "01 04 2024",
+      "endDate": "30 04 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Thầy Tụng Kinh",
+      "Thầy Dòng"
+    ]
+  ],
+  "price": 1800,
+  "compareAtPrice": 3000,
+  "rating": 4.7,
+  "totalVote": 250,
+  "target": [
+    "Understand the basics of machine learning",
+    "Learn how to implement machine learning algorithms",
+    "Apply machine learning concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to machine learning concepts",
+    "Learning how to implement machine learning algorithms",
+    "Understanding how to apply machine learning concepts to real-world problems",
+    "Learning how to evaluate and refine machine learning models"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c01"
+  ],
+  "studentLimit": 25,
+  "appliedNumber": 20,
+  "currentStudent": 15,
+  "coverIMG": "https://i.ytimg.com/vi/aPQt7BGohgg/maxresdefault.jpg",
+  "startDate": "01 04 2024",
+  "endDate": "30 04 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c58",
+  "courseID": "61d4741d1e6a5c47a4a36c58",
+  "name": "Data Science",
+  "description": "Learn data science",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c59",
+      "classID": "61d4741d1e6a5c47a4a36c59",
+      "schedule": [
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
+      ],
+      "name": "Introduction to Data Science",
+      "description": [
+        [
+          "Data Visualization",
+          "Machine Learning",
+          "Deep Learning"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher9",
+          "teacher10"
+        ]
+      ],
+      "lessonList": [
+        "Data Visualization",
+        "Machine Learning",
+        "Deep Learning"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document5.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting5",
+      "coverIMG": "https://example.com/cover5.jpg",
+      "startDate": "01 05 2024",
+      "endDate": "31 05 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher9",
+      "teacher10"
+    ]
+  ],
+  "price": 2000,
+  "compareAtPrice": 3500,
+  "rating": 4.6,
+  "totalVote": 300,
+  "target": [
+    "Understand the basics of data science",
+    "Learn how to apply data science concepts to real-world problems",
+    "Apply data science concepts to solve real-world problems"
+  ],
+  "sumary": [
+    "Introduction to data science concepts",
+    "Learning how to apply data science concepts to real-world problems",
+    "Understanding how to use data visualization and machine learning",
+    "Learning how to work with large datasets"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c02"
+  ],
+  "studentLimit": 30,
+  "appliedNumber": 25,
+  "currentStudent": 20,
+  "coverIMG": "https://miro.medium.com/v2/resize:fit:1400/1*XlkgEt13aSt0dz-eNMctYA.png",
+  "startDate": "01 05 2024",
+  "endDate": "31 05 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c60",
+  "courseID": "61d4741d1e6a5c47a4a36c60",
+  "name": "Artificial Intelligence",
+  "description": "Learn artificial intelligence",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c61",
+      "classID": "61d4741d1e6a5c47a4a36c61",
+      "schedule": [
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
+      ],
+      "name": "Introduction to Artificial Intelligence",
+      "description": [
+        [
+          "Machine Learning",
+          "Deep Learning",
+          "Natural Language Processing"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher1",
+          "teacher2"
+        ]
+      ],
+      "lessonList": [
+        "Machine Learning",
+        "Deep Learning",
+        "Natural Language Processing"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document6.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting6",
+      "coverIMG": "https://example.com/cover6.jpg",
+      "startDate": "01 06 2024",
+      "endDate": "30 06 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Nhật Huy",
+      "Quốc Toản"
+    ]
+  ],
+  "price": 2200,
+  "compareAtPrice": 4000,
+  "rating": 4.4,
+  "totalVote": 350,
+  "target": [
+    "Understand the basics of artificial intelligence",
+    "Learn how to apply artificial intelligence concepts to real-world problems",
+    "Apply artificial intelligence concepts to automate tasks"
+  ],
+  "sumary": [
+    "Introduction to artificial intelligence concepts",
+    "Learning how to apply artificial intelligence concepts to real-world problems",
+    "Understanding how to use artificial intelligence to automate tasks",
+    "Learning how to evaluate and refine artificial intelligence models"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c03"
+  ],
+  "studentLimit": 35,
+  "appliedNumber": 30,
+  "currentStudent": 25,
+  "coverIMG": "https://chriskirby.net/content/images/2024/02/AICodingAssistant.png",
+  "startDate": "01 06 2024",
+  "endDate": "30 06 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c62",
+  "courseID": "61d4741d1e6a5c47a4a36c62",
+  "name": "Cybersecurity",
+  "description": "Learn cybersecurity",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c63",
+      "classID": "61d4741d1e6a5c47a4a36c63",
+      "schedule": [
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
+      ],
+      "name": "Introduction to Cybersecurity",
+      "description": [
+        [
+          "Network Security",
+          "Cryptography",
+          "Risk Management"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher3",
+          "teacher4"
+        ]
+      ],
+      "lessonList": [
+        "Network Security",
+        "Cryptography",
+        "Risk Management"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document7.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting7",
+      "coverIMG": "https://example.com/cover7.jpg",
+      "startDate": "01 07 2024",
+      "endDate": "31 07 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher3",
+      "teacher4"
+    ]
+  ],
+  "price": 2400,
+  "compareAtPrice": 4500,
+  "rating": 4.3,
+  "totalVote": 400,
+  "target": [
+    "Understand the basics of cybersecurity",
+    "Learn how to protect against cyber threats",
+    "Apply cybersecurity concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to cybersecurity concepts",
+    "Learning how to protect against cyber threats",
+    "Understanding how to use cybersecurity to protect against attacks",
+    "Learning how to apply cybersecurity concepts to real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c04"
+  ],
+  "studentLimit": 40,
+  "appliedNumber": 35,
+  "currentStudent": 30,
+  "coverIMG": "https://codeop.tech/wp-content/uploads/2024/05/What-is-Coding.jpg",
+  "startDate": "01 07 2024",
+  "endDate": "31 07 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c64",
+  "courseID": "61d4741d1e6a5c47a4a36c64",
+  "name": "Data Analytics",
+  "description": "Learn data analytics",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c65",
+      "classID": "61d4741d1e6a5c47a4a36c65",
+      "schedule": [
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
+      ],
+      "name": "Introduction to Data Analytics",
+      "description": [
+        [
+          "Data Visualization",
+          "Machine Learning",
+          "Statistical Analysis"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher5",
+          "teacher6"
+        ]
+      ],
+      "lessonList": [
+        "Data Visualization",
+        "Machine Learning",
+        "Statistical Analysis"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document8.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting8",
+      "coverIMG": "https://example.com/cover8.jpg",
       "startDate": "01 08 2024",
       "endDate": "31 08 2024"
     }
   ],
   "teachers": [
     [
-      "Bob Johnson",
-      "Alice Williams"
+      "teacher5",
+      "teacher6"
     ]
   ],
-  "price": 150,
-  "compareAtPrice": 300,
+  "price": 2600,
+  "compareAtPrice": 5000,
   "rating": 4.2,
-  "totalVote": 20,
+  "totalVote": 450,
   "target": [
-    "Beginners"
+    "Understand the basics of data analytics",
+    "Learn how to apply data analytics concepts to real-world problems",
+    "Apply data analytics concepts to solve real-world problems"
   ],
   "sumary": [
-    "Introduction to JavaScript",
-    "Front-end Development",
-    "Back-end Development"
+    "Introduction to data analytics concepts",
+    "Learning how to apply data analytics concepts to real-world problems",
+    "Understanding how to use data visualization and machine learning",
+    "Learning how to work with large datasets"
   ],
   "studentList": [
-    "student7",
-    "student8",
-    "student9"
+    "61d4741d1e6a5c47a4a36c05"
   ],
-  "studentLimit": 12,
-  "appliedNumber": 8,
-  "currentStudent": 4,
-  "coverIMG": "https://example.com/javascript-course-image",
-  "startDate": "01 07 2024",
+  "studentLimit": 45,
+  "appliedNumber": 40,
+  "currentStudent": 35,
+  "coverIMG": "https://news.mit.edu/sites/default/files/images/202012/MIT-Coding-Brain-01-press.jpg",
+  "startDate": "01 08 2024",
   "endDate": "31 08 2024"
 },
 {
-  "_id": "60d93f24c79b567b74951e20",
-  "courseID": "60d93f24c79b567b74951e20",
-  "name": "Data Science with R",
-  "description": "Learn data science concepts using R programming language",
+  "_id": "61d4741d1e6a5c47a4a36c66",
+  "courseID": "61d4741d1e6a5c47a4a36c66",
+  "name": "Cloud Computing",
+  "description": "Learn cloud computing",
   "classes": [
     {
-      "_id": "60d93f24c79b567b74951e21",
-      "classID": "60d93f24c79b567b74951e21",
+      "_id": "61d4741d1e6a5c47a4a36c67",
+      "classID": "61d4741d1e6a5c47a4a36c67",
       "schedule": [
-        "Monday",
-        "Wednesday"
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
       ],
-      "name": "Introduction to R",
+      "name": "Introduction to Cloud Computing",
       "description": [
         [
-          "Variables",
-          "Data Types",
-          "Operators"
+          "Cloud Architecture",
+          "Cloud Security",
+          "Cloud Storage"
         ]
       ],
       "teachers": [
         [
-          "Jane Doe",
-          "Bob Smith"
+          "teacher7",
+          "teacher8"
         ]
       ],
       "lessonList": [
-        "Introduction to R",
-        "Variables and Data Types",
-        "Operators"
+        "Cloud Architecture",
+        "Cloud Security",
+        "Cloud Storage"
       ],
       "progress": 1,
       "documents": [
-        "https://example.com/r-docs"
+        "https://example.com/document9.pdf"
       ],
       "isActive": true,
-      "meeting": "https://example.com/meeting-r",
-      "coverIMG": "https://example.com/r-image",
-      "startDate": "01 03 2024",
-      "endDate": "31 03 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e22",
-      "classID": "60d93f24c79b567b74951e22",
-      "schedule": [
-        "Tuesday",
-        "Thursday"
-      ],
-      "name": "Data Visualization",
-      "description": [
-        [
-          "Plots",
-          "Charts"
-        ]
-      ],
-      "teachers": [
-        [
-          "Jane Doe",
-          "Bob Smith"
-        ]
-      ],
-      "lessonList": [
-        "Data Visualization",
-        "Plots"
-      ],
-      "progress": 2,
-      "documents": [
-        "https://example.com/data-visualization-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-data-visualization",
-      "coverIMG": "https://example.com/data-visualization-image",
-      "startDate": "15 03 2024",
-      "endDate": "30 04 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e23",
-      "classID": "60d93f24c79b567b74951e23",
-      "schedule": [
-        "Monday"
-      ],
-      "name": "Machine Learning",
-      "description": [
-        [
-          "Linear Regression",
-          "Decision Trees"
-        ]
-      ],
-      "teachers": [
-        [
-          "Jane Doe",
-          "Bob Smith"
-        ]
-      ],
-      "lessonList": [
-        "Machine Learning",
-        "Linear Regression"
-      ],
-      "progress": 1,
-      "documents": [
-        "https://example.com/machine-learning-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-machine-learning",
-      "coverIMG": "https://example.com/machine-learning-image",
-      "startDate": "01 05 2024",
-      "endDate": "31 05 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e24",
-      "classID": "60d93f24c79b567b74951e24",
-      "schedule": [
-        "Wednesday"
-      ],
-      "name": "Deep Learning",
-      "description": [
-        [
-          "Neural Networks",
-          "Convolutional Neural Networks"
-        ]
-      ],
-      "teachers": [
-        [
-          "Jane Doe",
-          "Bob Smith"
-        ]
-      ],
-      "lessonList": [
-        "Deep Learning",
-        "Neural Networks"
-      ],
-      "progress": 1,
-      "documents": [
-        "https://example.com/deep-learning-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-deep-learning",
-      "coverIMG": "https://example.com/deep-learning-image",
-      "startDate": "15 05 2024",
-      "endDate": "30 06 2024"
+      "meeting": "https://example.com/meeting9",
+      "coverIMG": "https://example.com/cover9.jpg",
+      "startDate": "01 09 2024",
+      "endDate": "30 09 2024"
     }
   ],
   "teachers": [
     [
-      "Jane Doe",
-      "Bob Smith"
+      "teacher7",
+      "teacher8"
     ]
   ],
-  "price": 200,
-  "compareAtPrice": 400,
-  "rating": 4.8,
-  "totalVote": 50,
+  "price": 2800,
+  "compareAtPrice": 5500,
+  "rating": 4.1,
+  "totalVote": 500,
   "target": [
-    "Intermediate"
+    "Understand the basics of cloud computing",
+    "Learn how to deploy applications to the cloud",
+    "Apply cloud computing concepts to real-world problems"
   ],
   "sumary": [
-    "Introduction to R",
-    "Data Visualization",
-    "Machine Learning",
-    "Deep Learning"
+    "Introduction to cloud computing concepts",
+    "Learning how to deploy applications to the cloud",
+    "Understanding how to use cloud computing to automate tasks",
+    "Learning how to apply cloud computing concepts to real-world problems"
   ],
   "studentList": [
-    "student4",
-    "student5",
-    "student6"
+    "61d4741d1e6a5c47a4a36c06"
   ],
-  "studentLimit": 15,
-  "appliedNumber": 10,
-  "currentStudent": 5,
-  "coverIMG": "https://example.com/r-course-image",
-  "startDate": "01 03 2024",
-  "endDate": "30 06 2024"
+  "studentLimit": 50,
+  "appliedNumber": 45,
+  "currentStudent": 40,
+  "coverIMG": "https://www.codingal.com/resources/wp-content/uploads/2023/12/Coding-in-Everyday-Life.png",
+  "startDate": "01 09 2024",
+  "endDate": "30 09 2024"
 },
 {
-  "_id": "60d93f24c79b567b74951e11",
-  "courseID": "60d93f24c79b567b74951e11",
-  "name": "Introduction to Python",
-  "description": "Learn the basics of Python programming",
+  "_id": "61d4741d1e6a5c47a4a36c70",
+  "courseID": "61d4741d1e6a5c47a4a36c70",
+  "name": "Networking Fundamentals",
+  "description": "Learn networking fundamentals",
   "classes": [
     {
-      "_id": "60d93f24c79b567b74951e12",
-      "classID": "60d93f24c79b567b74951e12",
+      "_id": "61d4741d1e6a5c47a4a36c71",
+      "classID": "61d4741d1e6a5c47a4a36c71",
       "schedule": [
-        "Monday",
-        "Wednesday",
-        "Friday"
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
       ],
-      "name": "Introduction to Python Basics",
+      "name": "Introduction to Networking",
       "description": [
         [
-          "Variables",
-          "Data Types",
-          "Operators"
+          "TCP/IP",
+          "Routing",
+          "Switching"
         ]
       ],
       "teachers": [
         [
-          "John Doe",
-          "Jane Smith"
+          "teacher9",
+          "teacher10"
         ]
       ],
       "lessonList": [
-        "Introduction to Python",
-        "Variables and Data Types",
-        "Operators"
+        "TCP/IP",
+        "Routing",
+        "Switching"
       ],
       "progress": 1,
       "documents": [
-        "https://example.com/python-docs"
+        "https://example.com/document10.pdf"
       ],
       "isActive": true,
-      "meeting": "https://example.com/meeting-python",
-      "coverIMG": "https://example.com/python-image",
-      "startDate": "01 01 2024",
-      "endDate": "31 01 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e13",
-      "classID": "60d93f24c79b567b74951e13",
-      "schedule": [
-        "Tuesday",
-        "Thursday"
-      ],
-      "name": "Control Structures",
-      "description": [
-        [
-          "If-Else Statements",
-          "Loops"
-        ]
-      ],
-      "teachers": [
-        [
-          "John Doe",
-          "Jane Smith"
-        ]
-      ],
-      "lessonList": [
-        "Control Structures",
-        "Loops"
-      ],
-      "progress": 2,
-      "documents": [
-        "https://example.com/control-structures-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-control-structures",
-      "coverIMG": "https://example.com/control-structures-image",
-      "startDate": "15 01 2024",
-      "endDate": "28 02 2024"
-    },
-    {
-      "_id": "60d93f24c79b567b74951e14",
-      "classID": "60d93f24c79b567b74951e14",
-      "schedule": [
-        "Monday"
-      ],
-      "name": "Functions",
-      "description": [
-        [
-          "Functions",
-          "Modules"
-        ]
-      ],
-      "teachers": [
-        [
-          "John Doe",
-          "Jane Smith"
-        ]
-      ],
-      "lessonList": [
-        "Functions",
-        "Modules"
-      ],
-      "progress": 1,
-      "documents": [
-        "https://example.com/functions-docs"
-      ],
-      "isActive": true,
-      "meeting": "https://example.com/meeting-functions",
-      "coverIMG": "https://example.com/functions-image",
-      "startDate": "01 02 2024",
-      "endDate": "29 02 2024"
+      "meeting": "https://example.com/meeting10",
+      "coverIMG": "https://example.com/cover10.jpg",
+      "startDate": "01 10 2024",
+      "endDate": "31 10 2024"
     }
   ],
   "teachers": [
     [
-      "John Doe",
-      "Jane Smith"
+      "teacher9",
+      "teacher10"
     ]
   ],
-  "price": 100,
-  "compareAtPrice": 200,
-  "rating": 4.5,
-  "totalVote": 100,
+  "price": 2900,
+  "compareAtPrice": 5900,
+  "rating": 4,
+  "totalVote": 550,
   "target": [
-    "Beginners"
+    "Understand the basics of networking",
+    "Learn how to configure network devices",
+    "Apply networking concepts to real-world problems"
   ],
   "sumary": [
-    "Introduction to Python",
-    "Control Structures",
-    "Functions"
+    "Introduction to networking concepts",
+    "Learning how to configure network devices",
+    "Understanding how to apply networking concepts to real-world problems",
+    "Learning how to troubleshoot network issues"
   ],
   "studentList": [
-    "student1",
-    "student2",
-    "student3"
+    "61d4741d1e6a5c47a4a36c07"
   ],
-  "studentLimit": 10,
-  "appliedNumber": 5,
-  "currentStudent": 3,
-  "coverIMG": "https://example.com/python-course-image",
-  "startDate": "01 01 2024",
-  "endDate": "29 02 2024"
+  "studentLimit": 55,
+  "appliedNumber": 50,
+  "currentStudent": 45,
+  "coverIMG": "https://permutable.ai/wp-content/uploads/2024/03/19301.jpg",
+  "startDate": "01 10 2024",
+  "endDate": "31 10 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c75",
+  "courseID": "61d4741d1e6a5c47a4a36c75",
+  "name": "Database Management",
+  "description": "Learn database management",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c76",
+      "classID": "61d4741d1e6a5c47a4a36c76",
+      "schedule": [
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
+      ],
+      "name": "Introduction to Database Management",
+      "description": [
+        [
+          "Data Modeling",
+          "Data Normalization",
+          "Database Design"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher11",
+          "teacher12"
+        ]
+      ],
+      "lessonList": [
+        "Data Modeling",
+        "Data Normalization",
+        "Database Design"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document11.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting11",
+      "coverIMG": "https://example.com/cover11.jpg",
+      "startDate": "01 11 2024",
+      "endDate": "30 11 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher11",
+      "teacher12"
+    ]
+  ],
+  "price": 3000,
+  "compareAtPrice": 6000,
+  "rating": 3.9,
+  "totalVote": 600,
+  "target": [
+    "Understand the basics of database management",
+    "Learn how to design and implement databases",
+    "Apply database management concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to database management concepts",
+    "Learning how to design and implement databases",
+    "Understanding how to apply database management concepts to real-world problems",
+    "Learning how to optimize database performance"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c08"
+  ],
+  "studentLimit": 60,
+  "appliedNumber": 55,
+  "currentStudent": 50,
+  "coverIMG": "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/wp1lcwdav1p1/6GqubkOtzZEmkZHLHf7gs4/eda534603f58482634b02dd53d1ff8bc/GettyImages-1209452765.jpg?w=1500&h=680&q=60&fit=fill&f=faces&fm=jpg&fl=progressive&auto=format%2Ccompress&dpr=1&w=1000",
+  "startDate": "01 11 2024",
+  "endDate": "30 11 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c80",
+  "courseID": "61d4741d1e6a5c47a4a36c80",
+  "name": "Digital Marketing",
+  "description": "Learn digital marketing",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c81",
+      "classID": "61d4741d1e6a5c47a4a36c81",
+      "schedule": [
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
+      ],
+      "name": "Introduction to Digital Marketing",
+      "description": [
+        [
+          "Social Media Marketing",
+          "Content Marketing",
+          "Search Engine Optimization"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher13",
+          "teacher14"
+        ]
+      ],
+      "lessonList": [
+        "Social Media Marketing",
+        "Content Marketing",
+        "Search Engine Optimization"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document12.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting12",
+      "coverIMG": "https://example.com/cover12.jpg",
+      "startDate": "01 12 2024",
+      "endDate": "31 12 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher13",
+      "teacher14"
+    ]
+  ],
+  "price": 3200,
+  "compareAtPrice": 6400,
+  "rating": 3.8,
+  "totalVote": 650,
+  "target": [
+    "Understand the basics of digital marketing",
+    "Learn how to create effective digital marketing campaigns",
+    "Apply digital marketing concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to digital marketing concepts",
+    "Learning how to create effective digital marketing campaigns",
+    "Understanding how to measure and optimize digital marketing campaigns",
+    "Learning how to apply digital marketing concepts to real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c09"
+  ],
+  "studentLimit": 65,
+  "appliedNumber": 60,
+  "currentStudent": 55,
+  "coverIMG": "https://bizweb.dktcdn.net/100/430/778/files/car-coding-la-gi-2-jpeg.jpg?v=1725935570632",
+  "startDate": "01 12 2024",
+  "endDate": "31 12 2024"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c85",
+  "courseID": "61d4741d1e6a5c47a4a36c85",
+  "name": "E-commerce",
+  "description": "Learn e-commerce",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c86",
+      "classID": "61d4741d1e6a5c47a4a36c86",
+      "schedule": [
+        "Tue 14:00 16:00",
+        "Thu 10:00 12:00"
+      ],
+      "name": "Introduction to E-commerce",
+      "description": [
+        [
+          "Payment Processing",
+          "Order Management",
+          "Inventory Management"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher15",
+          "teacher16"
+        ]
+      ],
+      "lessonList": [
+        "Payment Processing",
+        "Order Management",
+        "Inventory Management"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document13.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting13",
+      "coverIMG": "https://example.com/cover13.jpg",
+      "startDate": "01 01 2025",
+      "endDate": "31 01 2025"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher15",
+      "teacher16"
+    ]
+  ],
+  "price": 3500,
+  "compareAtPrice": 7000,
+  "rating": 3.7,
+  "totalVote": 700,
+  "target": [
+    "Understand the basics of e-commerce",
+    "Learn how to manage e-commerce operations",
+    "Apply e-commerce concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to e-commerce concepts",
+    "Learning how to manage e-commerce operations",
+    "Understanding how to optimize e-commerce performance",
+    "Learning how to apply e-commerce concepts to real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c10"
+  ],
+  "studentLimit": 70,
+  "appliedNumber": 65,
+  "currentStudent": 60,
+  "coverIMG": "https://i.pcmag.com/imagery/articles/00l8p1iqqfNP3HRG3TtTgXl-1..v1587974089.jpg",
+  "startDate": "01 01 2025",
+  "endDate": "31 01 2025"
+},
+{
+  "_id": "61d4741d1e6a5c47a4a36c90",
+  "courseID": "61d4741d1e6a5c47a4a36c90",
+  "name": "Entrepreneurship",
+  "description": "Learn entrepreneurship",
+  "classes": [
+    {
+      "_id": "61d4741d1e6a5c47a4a36c91",
+      "classID": "61d4741d1e6a5c47a4a36c91",
+      "schedule": [
+        "Mon 14:00 16:00",
+        "Wed 10:00 12:00"
+      ],
+      "name": "Introduction to Entrepreneurship",
+      "description": [
+        [
+          "Business Planning",
+          "Marketing",
+          "Financial Management"
+        ]
+      ],
+      "teachers": [
+        [
+          "teacher17",
+          "teacher18"
+        ]
+      ],
+      "lessonList": [
+        "Business Planning",
+        "Marketing",
+        "Financial Management"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/document14.pdf"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting14",
+      "coverIMG": "https://example.com/cover14.jpg",
+      "startDate": "01 02 2025",
+      "endDate": "31 02 2025"
+    }
+  ],
+  "teachers": [
+    [
+      "teacher17",
+      "teacher18"
+    ]
+  ],
+  "price": 3800,
+  "compareAtPrice": 7800,
+  "rating": 3.6,
+  "totalVote": 750,
+  "target": [
+    "Understand the basics of entrepreneurship",
+    "Learn how to create a business plan",
+    "Apply entrepreneurship concepts to real-world problems"
+  ],
+  "sumary": [
+    "Introduction to entrepreneurship concepts",
+    "Learning how to create a business plan",
+    "Understanding how to secure funding and manage finances",
+    "Learning how to apply entrepreneurship concepts to real-world problems"
+  ],
+  "studentList": [
+    "61d4741d1e6a5c47a4a36c11"
+  ],
+  "studentLimit": 75,
+  "appliedNumber": 70,
+  "currentStudent": 65,
+  "coverIMG": "https://assets.gocoderz.com/site/wp-content/uploads/2021/05/My-Post-42-1024x683.png",
+  "startDate": "01 02 2025",
+  "endDate": "31 02 2025"
 }]
