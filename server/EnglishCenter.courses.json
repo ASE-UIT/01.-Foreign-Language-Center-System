@@ -1,0 +1,456 @@
+[{
+  "_id": "60d93f24c79b567b74951e30",
+  "courseID": "60d93f24c79b567b74951e30",
+  "name": "Web Development with JavaScript",
+  "description": "Learn web development using JavaScript programming language",
+  "classes": [
+    {
+      "_id": "60d93f24c79b567b74951e31",
+      "classID": "60d93f24c79b567b74951e31",
+      "schedule": [
+        "Monday",
+        "Wednesday"
+      ],
+      "name": "Introduction to JavaScript",
+      "description": [
+        [
+          "Variables",
+          "Data Types",
+          "Operators"
+        ]
+      ],
+      "teachers": [
+        [
+          "Bob Johnson",
+          "Alice Williams"
+        ]
+      ],
+      "lessonList": [
+        "Introduction to JavaScript",
+        "Variables and Data Types",
+        "Operators"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/javascript-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-javascript",
+      "coverIMG": "https://example.com/javascript-image",
+      "startDate": "01 07 2024",
+      "endDate": "31 07 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e32",
+      "classID": "60d93f24c79b567b74951e32",
+      "schedule": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "name": "Front-end Development",
+      "description": [
+        [
+          "HTML",
+          "CSS",
+          "React"
+        ]
+      ],
+      "teachers": [
+        [
+          "Bob Johnson",
+          "Alice Williams"
+        ]
+      ],
+      "lessonList": [
+        "Front-end Development",
+        "HTML"
+      ],
+      "progress": 2,
+      "documents": [
+        "https://example.com/front-end-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-front-end",
+      "coverIMG": "https://example.com/front-end-image",
+      "startDate": "15 07 2024",
+      "endDate": "30 08 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e33",
+      "classID": "60d93f24c79b567b74951e33",
+      "schedule": [
+        "Monday"
+      ],
+      "name": "Back-end Development",
+      "description": [
+        [
+          "Node.js",
+          "Express.js"
+        ]
+      ],
+      "teachers": [
+        [
+          "Bob Johnson",
+          "Alice Williams"
+        ]
+      ],
+      "lessonList": [
+        "Back-end Development",
+        "Node.js"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/back-end-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-back-end",
+      "coverIMG": "https://example.com/back-end-image",
+      "startDate": "01 08 2024",
+      "endDate": "31 08 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Bob Johnson",
+      "Alice Williams"
+    ]
+  ],
+  "price": 150,
+  "compareAtPrice": 300,
+  "rating": 4.2,
+  "totalVote": 20,
+  "target": [
+    "Beginners"
+  ],
+  "sumary": [
+    "Introduction to JavaScript",
+    "Front-end Development",
+    "Back-end Development"
+  ],
+  "studentList": [
+    "student7",
+    "student8",
+    "student9"
+  ],
+  "studentLimit": 12,
+  "appliedNumber": 8,
+  "currentStudent": 4,
+  "coverIMG": "https://example.com/javascript-course-image",
+  "startDate": "01 07 2024",
+  "endDate": "31 08 2024"
+},
+{
+  "_id": "60d93f24c79b567b74951e20",
+  "courseID": "60d93f24c79b567b74951e20",
+  "name": "Data Science with R",
+  "description": "Learn data science concepts using R programming language",
+  "classes": [
+    {
+      "_id": "60d93f24c79b567b74951e21",
+      "classID": "60d93f24c79b567b74951e21",
+      "schedule": [
+        "Monday",
+        "Wednesday"
+      ],
+      "name": "Introduction to R",
+      "description": [
+        [
+          "Variables",
+          "Data Types",
+          "Operators"
+        ]
+      ],
+      "teachers": [
+        [
+          "Jane Doe",
+          "Bob Smith"
+        ]
+      ],
+      "lessonList": [
+        "Introduction to R",
+        "Variables and Data Types",
+        "Operators"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/r-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-r",
+      "coverIMG": "https://example.com/r-image",
+      "startDate": "01 03 2024",
+      "endDate": "31 03 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e22",
+      "classID": "60d93f24c79b567b74951e22",
+      "schedule": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "name": "Data Visualization",
+      "description": [
+        [
+          "Plots",
+          "Charts"
+        ]
+      ],
+      "teachers": [
+        [
+          "Jane Doe",
+          "Bob Smith"
+        ]
+      ],
+      "lessonList": [
+        "Data Visualization",
+        "Plots"
+      ],
+      "progress": 2,
+      "documents": [
+        "https://example.com/data-visualization-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-data-visualization",
+      "coverIMG": "https://example.com/data-visualization-image",
+      "startDate": "15 03 2024",
+      "endDate": "30 04 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e23",
+      "classID": "60d93f24c79b567b74951e23",
+      "schedule": [
+        "Monday"
+      ],
+      "name": "Machine Learning",
+      "description": [
+        [
+          "Linear Regression",
+          "Decision Trees"
+        ]
+      ],
+      "teachers": [
+        [
+          "Jane Doe",
+          "Bob Smith"
+        ]
+      ],
+      "lessonList": [
+        "Machine Learning",
+        "Linear Regression"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/machine-learning-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-machine-learning",
+      "coverIMG": "https://example.com/machine-learning-image",
+      "startDate": "01 05 2024",
+      "endDate": "31 05 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e24",
+      "classID": "60d93f24c79b567b74951e24",
+      "schedule": [
+        "Wednesday"
+      ],
+      "name": "Deep Learning",
+      "description": [
+        [
+          "Neural Networks",
+          "Convolutional Neural Networks"
+        ]
+      ],
+      "teachers": [
+        [
+          "Jane Doe",
+          "Bob Smith"
+        ]
+      ],
+      "lessonList": [
+        "Deep Learning",
+        "Neural Networks"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/deep-learning-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-deep-learning",
+      "coverIMG": "https://example.com/deep-learning-image",
+      "startDate": "15 05 2024",
+      "endDate": "30 06 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "Jane Doe",
+      "Bob Smith"
+    ]
+  ],
+  "price": 200,
+  "compareAtPrice": 400,
+  "rating": 4.8,
+  "totalVote": 50,
+  "target": [
+    "Intermediate"
+  ],
+  "sumary": [
+    "Introduction to R",
+    "Data Visualization",
+    "Machine Learning",
+    "Deep Learning"
+  ],
+  "studentList": [
+    "student4",
+    "student5",
+    "student6"
+  ],
+  "studentLimit": 15,
+  "appliedNumber": 10,
+  "currentStudent": 5,
+  "coverIMG": "https://example.com/r-course-image",
+  "startDate": "01 03 2024",
+  "endDate": "30 06 2024"
+},
+{
+  "_id": "60d93f24c79b567b74951e11",
+  "courseID": "60d93f24c79b567b74951e11",
+  "name": "Introduction to Python",
+  "description": "Learn the basics of Python programming",
+  "classes": [
+    {
+      "_id": "60d93f24c79b567b74951e12",
+      "classID": "60d93f24c79b567b74951e12",
+      "schedule": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+      ],
+      "name": "Introduction to Python Basics",
+      "description": [
+        [
+          "Variables",
+          "Data Types",
+          "Operators"
+        ]
+      ],
+      "teachers": [
+        [
+          "John Doe",
+          "Jane Smith"
+        ]
+      ],
+      "lessonList": [
+        "Introduction to Python",
+        "Variables and Data Types",
+        "Operators"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/python-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-python",
+      "coverIMG": "https://example.com/python-image",
+      "startDate": "01 01 2024",
+      "endDate": "31 01 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e13",
+      "classID": "60d93f24c79b567b74951e13",
+      "schedule": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "name": "Control Structures",
+      "description": [
+        [
+          "If-Else Statements",
+          "Loops"
+        ]
+      ],
+      "teachers": [
+        [
+          "John Doe",
+          "Jane Smith"
+        ]
+      ],
+      "lessonList": [
+        "Control Structures",
+        "Loops"
+      ],
+      "progress": 2,
+      "documents": [
+        "https://example.com/control-structures-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-control-structures",
+      "coverIMG": "https://example.com/control-structures-image",
+      "startDate": "15 01 2024",
+      "endDate": "28 02 2024"
+    },
+    {
+      "_id": "60d93f24c79b567b74951e14",
+      "classID": "60d93f24c79b567b74951e14",
+      "schedule": [
+        "Monday"
+      ],
+      "name": "Functions",
+      "description": [
+        [
+          "Functions",
+          "Modules"
+        ]
+      ],
+      "teachers": [
+        [
+          "John Doe",
+          "Jane Smith"
+        ]
+      ],
+      "lessonList": [
+        "Functions",
+        "Modules"
+      ],
+      "progress": 1,
+      "documents": [
+        "https://example.com/functions-docs"
+      ],
+      "isActive": true,
+      "meeting": "https://example.com/meeting-functions",
+      "coverIMG": "https://example.com/functions-image",
+      "startDate": "01 02 2024",
+      "endDate": "29 02 2024"
+    }
+  ],
+  "teachers": [
+    [
+      "John Doe",
+      "Jane Smith"
+    ]
+  ],
+  "price": 100,
+  "compareAtPrice": 200,
+  "rating": 4.5,
+  "totalVote": 100,
+  "target": [
+    "Beginners"
+  ],
+  "sumary": [
+    "Introduction to Python",
+    "Control Structures",
+    "Functions"
+  ],
+  "studentList": [
+    "student1",
+    "student2",
+    "student3"
+  ],
+  "studentLimit": 10,
+  "appliedNumber": 5,
+  "currentStudent": 3,
+  "coverIMG": "https://example.com/python-course-image",
+  "startDate": "01 01 2024",
+  "endDate": "29 02 2024"
+}]
