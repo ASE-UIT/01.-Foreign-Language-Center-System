@@ -1,7 +1,11 @@
-// types.ts
-interface Teacher {
-    name: string;
-}
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { useNavigation } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
+import { RootDrawerParamList } from '../_layout';
+import { useUser } from '@clerk/clerk-expo';
+import { http } from '@/http/http';
+import ClassDetail from './classDetail';
 
 interface Class {
     classID: string;
@@ -11,64 +15,26 @@ interface Class {
     teacher: string[][];
 }
 
-interface CourseResponse {
-    courses: {
-        courseID: string;
-        courseName: string;
-        startDate: string;
-        endDate: string;
-        coverIMG: string;
-        price: number;
-        rating: number;
-        isPaid: boolean;
-        totalVote: number;
-        classes: Class[];
-    }[];
-}
-
-interface Course {
+export interface Course {
     courseID: string;
-    title: string;
-    instructor: string;
-    progress: string;
-    image: string;
+    courseName: string;
+    startDate: string;
+    endDate: string;
+    coverIMG: string;
+    price: number;
+    rating: number;
+    isPaid: boolean;
+    totalVote: number;
+    classes: Class[];
 }
 
-
-export const fetchStudentCourses = async (clerkUserID: string) => {
-    const instance = http();
-
-    try {
-        const response = await instance.get<CourseResponse>(
-            `/student-information?clerkUserID=${clerkUserID}`
-        );
-        console.log(response);
-
-        return response.data.courses.map(course => ({
-            courseID: course.courseID,
-            title: course.courseName,
-            instructor: course.classes[0]?.teacher[0]?.join(", ") || "No instructor",
-            progress: "0/0 buổi",
-            image: course.coverIMG
-        }));
-
-    } catch (error) {
-        console.error("Error fetching courses:", error);
-        throw error;
-    }
-};
-
-// CourseList.tsx
-import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { router, useNavigation } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, Dimensions } from 'react-native';
-import { RootDrawerParamList } from '../_layout';
-import { useUser } from '@clerk/clerk-expo';
-import { http } from '@/http/http';
+interface CourseResponse {
+    courses: Course[];
+}
 
 const CourseList: React.FC = () => {
     const [courses, setCourses] = useState<Course[]>([]);
+    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const { user } = useUser();
     const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
@@ -76,45 +42,46 @@ const CourseList: React.FC = () => {
         const loadCourses = async () => {
             if (user?.id) {
                 try {
-                    const courses = await fetchStudentCourses(user.id);
-                    setCourses(courses);
+                    const response = await http().get<CourseResponse>(
+                        `/student-information?clerkUserID=${user.id}`
+                    );
+                    setCourses(response.data.courses);
                 } catch (error) {
                     console.error("Error loading courses:", error);
                 }
             }
         };
-
         loadCourses();
     }, [user]);
-
-    const handleNavToClassDetail = (course: Course) => {
-        router.push({
-            pathname: '/(tabs)/(classesNav)/classDetail',
-            params: {
-                courseID: JSON.stringify(course.courseID),
-            },
-        });
-    };
 
     const renderCourseItem = ({ item }: { item: Course }) => (
         <View style={styles.courseCard}>
             <View style={styles.courseContent}>
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <Image source={{ uri: item.coverIMG }} style={styles.image} />
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.courseTitle}>{item.title}</Text>
+                    <Text style={styles.courseTitle}>{item.courseName}</Text>
                     <View style={styles.timeContainer}>
                         <Text style={styles.courseText}>Giảng viên: </Text>
                         <Text style={styles.teacherImageText} numberOfLines={2}>
-                            {item.instructor.length > 20 ? `${item.instructor.slice(0, 20)}...` : item.instructor}
+                            {item.classes[0]?.teacher[0]?.join(", ").length > 20
+                                ? `${item.classes[0]?.teacher[0]?.join(", ").slice(0, 20)}...`
+                                : item.classes[0]?.teacher[0]?.join(", ") || "No instructor"}
                         </Text>
                     </View>
-                    <TouchableOpacity style={styles.detailButton} onPress={() => handleNavToClassDetail(item)}>
+                    <TouchableOpacity
+                        style={styles.detailButton}
+                        onPress={() => setSelectedCourse(item)}
+                    >
                         <Text style={styles.detailButtonText}>Xem chi tiết</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         </View>
     );
+
+    if (selectedCourse) {
+        return <ClassDetail course={selectedCourse} onBack={() => setSelectedCourse(null)} />;
+    }
 
     return (
         <View style={{ flex: 1 }}>
