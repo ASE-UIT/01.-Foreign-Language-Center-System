@@ -4,67 +4,36 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { router, useNavigation } from 'expo-router';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
+import { Course } from './classes';
 
-const ClassDetail = () => {
-    const classData = {
-        title: "Từ vựng IELTS cho band 7.5+",
-        teacher: "Mỹ Quế Lan",
-        image: 'https://png.pngtree.com/png-vector/20240314/ourmid/pngtree-cartoon-of-thai-male-teacher-holding-a-stick-in-front-of-png-image_11960364.png',
-        overview: {
-            progress: "7/15 buổi",
-            startDate: "15 - 12 - 2024",
-            endDate: "22 - 01 - 2025",
-        },
-        details: [
-            {
-                session: "Buổi 1: Nói chuyện như người sư phạm",
-                instructor: "Chị Huy",
-                link: "Lớp thứ 2 khóa từ vựng",
-                description: [
-                    "Giới thiệu giảng viên",
-                    "Kho tài liệu học tập",
-                ],
-            },
-            {
-                session: "Buổi 2: Học IPA cùng chị Huy",
-                instructor: "Chị Huy",
-                link: "Lớp thứ 2 khóa từ vựng",
-                description: [
-                    "Khái niệm về IPA",
-                    "Unit 1 và bài tập về nhà",
-                ],
-            },
-        ],
-        resources: [
-            "Tài liệu buổi 1",
-            "Tài liệu buổi 2",
-        ],
-    };
+interface ClassDetailProps {
+    course: Course;
+    onBack: () => void;
+}
 
-    const [expandedSections, setExpandedSections] = useState<number[]>([]); // Quản lý trạng thái mở/đóng
-
-    const toggleSection = (index: number) => {
-        if (expandedSections.includes(index)) {
-            setExpandedSections(expandedSections.filter(i => i !== index)); // Đóng
-        } else {
-            setExpandedSections([...expandedSections, index]); // Mở
-        }
-    };
+const ClassDetail: React.FC<ClassDetailProps> = ({ course, onBack }) => {
+    const [expandedSections, setExpandedSections] = useState<number[]>([]);
     const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
+    const toggleSection = (index: number) => {
+        setExpandedSections(prev =>
+            prev.includes(index)
+                ? prev.filter(i => i !== index)
+                : [...prev, index]
+        );
+    };
 
     return (
         <ScrollView style={styles.container}>
             <View style={{
-                flexDirection: 'row', // Horizontal layout
-                alignItems: 'center', // Vertical alignment
-                justifyContent: 'space-between', // Space out items
-                height: 92, // Custom header height
-                backgroundColor: '#2A58BA', // Background color
-
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height: 92,
+                backgroundColor: '#2A58BA',
             }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                    <TouchableOpacity onPress={() => router.back()}>
+                    <TouchableOpacity onPress={onBack}>
                         <Image
                             source={require('../../../assets/images/back.png')}
                             style={{
@@ -77,8 +46,8 @@ const ClassDetail = () => {
                         />
                     </TouchableOpacity>
                     <Text style={{
-                        fontSize: 20, // Kích thước chữ tiêu đề header
-                        color: 'white', // Màu chữ tiêu đề
+                        fontSize: 20,
+                        color: 'white',
                         marginTop: 30,
                         marginLeft: 15,
                         fontWeight: 'bold'
@@ -102,45 +71,43 @@ const ClassDetail = () => {
             <View style={{ flex: 1, padding: 20 }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                     <View style={styles.header}>
-                        <Text style={styles.subtitle}>{classData.title}</Text>
-                        <Text style={styles.teacher}>Giảng viên: {classData.teacher}</Text>
+                        <Text style={styles.subtitle}>{course.courseName}</Text>
+                        <Text style={styles.teacher}>
+                            Giảng viên: {course.classes[0]?.teacher[0]?.join(", ") || "No instructor"}
+                        </Text>
                     </View>
                     <View style={{ flex: 1 }}>
-                        <Image source={{ uri: classData.image }} style={styles.image} />
+                        <Image source={{ uri: course.coverIMG }} style={styles.image} />
                     </View>
                 </View>
 
                 <View style={styles.section}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={styles.sectionTitle}>1. Tổng quan lớp học</Text>
-                        <TouchableOpacity style={{ flex: 1 }}
-                            onPress={() => toggleSection(0)}>
-                            <FontAwesome6 style={{ flex: 1 }}
+                        <TouchableOpacity onPress={() => toggleSection(0)}>
+                            <FontAwesome6
                                 name={expandedSections.includes(0) ? "chevron-up" : "chevron-down"}
                                 size={20}
-                                color="black" />
+                                color="black"
+                            />
                         </TouchableOpacity>
                     </View>
                     {expandedSections.includes(0) && (
                         <>
                             <Text style={styles.text}>
-                                - Tiến độ: <Text style={styles.boldText}>{classData.overview.progress}</Text>
+                                - Ngày mở lớp: <Text style={styles.boldText}>{course.startDate}</Text>
                             </Text>
                             <Text style={styles.text}>
-                                - Ngày mở lớp: <Text style={styles.boldText}>{classData.overview.startDate}</Text>
-                            </Text>
-                            <Text style={styles.text}>
-                                - Ngày kết thúc lớp: <Text style={styles.boldText}>{classData.overview.endDate}</Text>
+                                - Ngày kết thúc: <Text style={styles.boldText}>{course.endDate}</Text>
                             </Text>
                         </>
                     )}
                 </View>
 
-                {/* Dropdown cho Thông tin chi tiết */}
                 <View style={styles.section}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={styles.sectionTitle}>2. Thông tin chi tiết</Text>
-                        <TouchableOpacity style={{ flex: 1 }} onPress={() => toggleSection(1)}>
+                        <TouchableOpacity onPress={() => toggleSection(1)}>
                             <FontAwesome6
                                 name={expandedSections.includes(1) ? "chevron-up" : "chevron-down"}
                                 size={20}
@@ -148,49 +115,22 @@ const ClassDetail = () => {
                             />
                         </TouchableOpacity>
                     </View>
-                    {expandedSections.includes(1) && (
-                        <View>
-                            {classData.details.map((detail, index) => (
-                                <View key={index}>
-                                    <Text style={styles.subSectionTitle}>- {detail.session}</Text>
-                                    <Text style={styles.text}>• Giảng viên: {detail.instructor}</Text>
-                                    <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                        <Text style={styles.text}>• Link meeting:
-                                        </Text>
-                                        <TouchableOpacity>
-                                            <Text style={styles.link}>{detail.link}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Text style={styles.text}>• Mô tả buổi học:</Text>
-                                    {detail.description.map((desc, idx) => (
-                                        <Text key={idx} style={styles.textMargin_40}>• {desc}</Text> // Dấu chấm đầu dòng
-                                    ))}
-                                </View>
+                    {expandedSections.includes(1) && course.classes.map((classItem, index) => (
+                        <View key={index}>
+                            <Text style={styles.subSectionTitle}>- {classItem.className}</Text>
+                            <Text style={styles.text}>• Giảng viên: {classItem.teacher[0]?.join(", ")}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={styles.text}>• Link meeting: </Text>
+                                <TouchableOpacity>
+                                    <Text style={styles.link}>{classItem.meeting}</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <Text style={styles.text}>• Lịch học:</Text>
+                            {classItem.schedule.map((scheduleItem, idx) => (
+                                <Text key={idx} style={styles.textMargin_40}>• {scheduleItem}</Text>
                             ))}
                         </View>
-                    )}
-                </View>
-
-                {/* Dropdown cho Kho tài liệu */}
-                <View style={styles.section}>
-                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.sectionTitle}>3. Kho tài liệu</Text>
-                        <TouchableOpacity style={{ flex: 1 }} onPress={() => toggleSection(2)}>
-                            <FontAwesome6
-                                name={expandedSections.includes(2) ? "chevron-up" : "chevron-down"}
-                                size={20}
-                                color="black"
-                            />
-                        </TouchableOpacity>
-                    </View>
-
-                    {expandedSections.includes(2) && (
-                        classData.resources.map((resource, index) => (
-                            <TouchableOpacity key={index}>
-                                <Text style={[styles.link, styles.text]}>• {resource}</Text>
-                            </TouchableOpacity>
-                        ))
-                    )}
+                    ))}
                 </View>
             </View>
         </ScrollView>
