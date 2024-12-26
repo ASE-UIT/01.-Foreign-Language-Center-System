@@ -5,6 +5,8 @@ import teacher from '../../../assets/images/teacher.png'
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 
 export type Course = {
@@ -45,7 +47,20 @@ const CourseCard: React.FC<{ course: Course }> = ({ course }) => (
 
 export default function Index() {
   const { user } = useUser()
+  const getRole = async () => {
+    try {
+      const response = await axios.get<{ role: string; success: boolean }>(
+        `http://10.0.2.2:5000/api/get-role?clerkUserId=user_2ixUzA4ftkBgZekEaVHvlN88BjU`
+      );
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
 
+  useEffect(() => {
+    getRole();
+  }, []); // Dependency array ensures the effect runs only once
   const courses: Course[] = [
     {
       id: "1",

@@ -1,11 +1,12 @@
 // app/(tabs)/_layout.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Image, TouchableOpacity, View } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList, DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
 import { useClerk } from '@clerk/clerk-expo';
 import { Drawer } from 'expo-router/drawer'
+import axios from 'axios';
 
 
 // Định nghĩa kiểu cho các màn hình trong Drawer
@@ -19,6 +20,23 @@ export type RootDrawerParamList = {
 };
 
 export const Menu = () => {
+
+  const getRole = async () => {
+    try {
+      const response = await axios.get<{ role: string; success: boolean }>(
+        "/api/get-role?clerkUserId=user_2ixUzA4ftkBgZekEaVHvlN88BjU"
+      );
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error fetching role:", error);
+    }
+  };
+
+  useEffect(() => {
+    getRole();
+  }, []); // Dependency array ensures the effect runs only once
+
+  
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();  // Khai báo kiểu navigation cho Drawer
   return (
     <TouchableOpacity onPress={() => navigation.openDrawer()}>
