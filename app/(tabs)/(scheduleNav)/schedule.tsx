@@ -1,91 +1,163 @@
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native'
-import React, { useState } from 'react'
-import teacher_image from '../../../assets/images/image-teacher.jpg'
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import teacher_image from '../../../assets/images/image-teacher.jpg';
 import { router, useNavigation } from 'expo-router';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RootDrawerParamList } from '../_layout';
+import { http } from '@/http/http';
+import { useUser } from '@clerk/clerk-expo';
+import moment from 'moment';
 
 
+// Define interfaces
+interface Class {
+    classID: string;
+    className: string;
+    schedule: string[];
+    meeting: string;
+    teacher: string[][];
+}
 
+export interface Course {
+    courseID: string;
+    courseName: string;
+    startDate: string;
+    endDate: string;
+    coverIMG: string;
+    price: number;
+    rating: number;
+    isPaid: boolean;
+    totalVote: number;
+    classes: Class[];
+}
 
-const Schedule: React.FC = () => {
+interface CourseResponse {
+    courses: Course[];
+}
+
+const Schedule = () => {
     const [today, setToday] = useState(new Date());
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const [selectedDay, setSelectedDay] = useState(today.getDay()); // Thêm state để theo dõi ngày được chọn
-
-    // Đối tượng mô tả thông tin khóa học
-    const course = {
-        title: "Tiếng Anh giao tiếp cơ bản",
-        startDate: "20/08/2024",
-        endDate: "20/12/2024",
-        time: "15 giờ - 16 giờ 30",
-        room: "P.A123",
-        instructor: "Mỹ Quế Lan",
-        image: teacher_image
-    };
-
-    // Mảng chứa các ví dụ khóa học
-    const coursesArray = [
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course }
-    ];
-
-    const coursesArray2 = [
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-        { ...course },
-    ];
-    const [courseList, setCourseList] = useState(coursesArray);
-
-
-    const handleChangeDate = (index: number) => {
-        setSelectedDay(index);
-        setCourseList(coursesArray2);
-    }
-
-    const handleNavToClassDetail = (course: any) => {
-        // router.push({
-        //     pathname: '/(tabs)/(scheduleNav)/classDetail',
-        //     params: {
-        //         course: JSON.stringify(course), // Convert course to a string
-        //     }
-        // });
-    }
-
-    // Hàm render cho từng item trong FlatList
-    const renderCourseItem = ({ item }: any) => (
-        <TouchableOpacity style={scheduleStyles.courseCard}
-            onPress={() => handleNavToClassDetail(item)}>
-            <View style={scheduleStyles.courseContent}>
-                <Image source={item.image} style={scheduleStyles.image} />
-                <View>
-                    <Text style={scheduleStyles.courseTitle}>{item.title}</Text>
-                    <View style={scheduleStyles.timeContainer}>
-                        <Text style={scheduleStyles.courseText}>Giảng viên: </Text>
-                        <Text style={scheduleStyles.teacherImageText}>{item.instructor}</Text>
-                    </View>
-                    <View style={scheduleStyles.timeLayout}>
-                        <Text style={scheduleStyles.courseText}>Thời gian: </Text>
-                        <Text style={scheduleStyles.timeText}>{item.time}</Text>
-                    </View>
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
+    const [schedule, setSchedule] = useState<CourseResponse | null>(null);
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const [selectedDay, setSelectedDay] = useState(today.toLocaleDateString('en-US', { weekday: 'short' }));
+    const { user } = useUser();
 
     const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
+    const fetchSchedule = async () => {
+        if (user?.id) {
+            try {
+                const response = await http().get<CourseResponse>(
+                    `/student-information?clerkUserID=${user.id}`
+                );
+                const data: CourseResponse = response.data;
+                return data;
+            } catch (error) {
+                console.error("Error fetching schedule:", error);
+            }
+        }
+    };
+
+    const processSchedule = (data: CourseResponse) => {
+        const schedule: any[] = [];
+        data.courses.forEach((course) => {
+            course.classes.forEach((classInfo) => {
+                schedule.push({
+                    courseID: course.courseID,
+                    courseName: course.courseName,
+                    className: classInfo.className,
+                    schedule: classInfo.schedule,
+                    meeting: classInfo.meeting,
+                    teacher: classInfo.teacher[0][0],
+                });
+            });
+        });
+        return schedule;
+    };
+
+    useEffect(() => {
+        const fetchAndProcessSchedule = async () => {
+            const data = await fetchSchedule();
+            if (data) {
+                const processedSchedule = processSchedule(data);
+                setSchedule(data);
+            }
+        };
+        fetchAndProcessSchedule();
+    }, []);
+
+    const renderScheduleItem = ({ item }: any) => (
+        <View style={scheduleStyles.courseCard}>
+            <View style={scheduleStyles.courseContent}>
+                <View style={{ marginLeft: 5 }}>
+                    <Text style={scheduleStyles.courseTitle}>{item.courseName}</Text>
+                    <Text style={scheduleStyles.courseText}>Lớp: <Text style={{ fontWeight: 'bold' }}>{item.className}</Text></Text>
+                    {item.scheduleInfo.map((scheduleInfo: any, index: number) => (
+                        <Text key={index} style={scheduleStyles.courseText}>
+                            Thời gian: <Text style={{ fontWeight: 'bold' }}>{scheduleInfo.startTime}</Text> - <Text style={{ fontWeight: 'bold' }}>{scheduleInfo.endTime}</Text>
+                        </Text>
+                    ))}
+                    <Text style={scheduleStyles.courseText}>Link meeting: <Text style={{ fontWeight: 'bold' }}>{item.meeting}</Text></Text>
+                    <Text style={scheduleStyles.courseText}>Giảng viên: <Text style={{ fontWeight: 'bold' }}>{item.teacher}</Text></Text>
+                </View>
+            </View>
+        </View>
+    );
+
+
+    const handleChangeDate = (day: string) => {
+        setSelectedDay(day);
+    };
+
+
+
+    const getDayNumber = (day: string) => {
+        const today = moment();
+        const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const index = daysOfWeek.indexOf(day);
+        const firstDayOfWeek = today.startOf('week');
+        let diff = index - today.day();
+        if (diff < 0) {
+            diff += 7;
+        }
+        const date = moment(firstDayOfWeek).add(diff, 'days');
+        if (date.isAfter(today.endOf('week'))) {
+            date.subtract(7, 'days');
+        }
+        return date.date();
+    };
+
+
+
+    const filteredSchedule = schedule && schedule.courses.flatMap((course) =>
+        course.classes.filter((classInfo) => {
+            const scheduleDays = classInfo.schedule.map((scheduleText) => scheduleText.split(' ')[0]);
+            return scheduleDays.includes(selectedDay);
+        }).map((classInfo) => {
+            const scheduleTexts = classInfo.schedule.filter((scheduleText) => scheduleText.split(' ')[0] === selectedDay);
+            const scheduleInfo = scheduleTexts.map((scheduleText) => {
+                const parts = scheduleText.split(' ');
+                const day = parts[0];
+                const startTime = parts[1];
+                const endTime = parts[2];
+
+                return {
+                    day: day,
+                    startTime: startTime,
+                    endTime: endTime,
+                };
+            });
+
+            return {
+                courseID: course.courseID,
+                courseName: course.courseName,
+                className: classInfo.className,
+                scheduleInfo: scheduleInfo,
+                meeting: classInfo.meeting,
+                teacher: classInfo.teacher[0][0],
+            };
+        })
+    );
 
     return (
         <View style={{ flex: 1 }}>
@@ -125,41 +197,34 @@ const Schedule: React.FC = () => {
             <View style={scheduleStyles.container}>
                 <View style={scheduleStyles.margin10}>
                     <View style={scheduleStyles.weekLayout}>
-                        {daysOfWeek.map((day, index) => {
-                            const dayOffset = index - today.getDay(); // Tính toán độ lệch ngày
-                            const displayDate = new Date(today);
-                            displayDate.setDate(today.getDate() + dayOffset); // Cập nhật ngày hiển thị
-
-                            return (
-                                <TouchableOpacity key={index} onPress={() => handleChangeDate(index)} style={[scheduleStyles.dayContainer,
-                                selectedDay === index && scheduleStyles.selectedDay]}>
-                                    <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectedDayText]
-                                    }>
-                                        {day}
-                                    </Text>
-                                    <Text style={[scheduleStyles.dayText, selectedDay === index && scheduleStyles.selectDateText]}>
-                                        {displayDate.getDate()} {/* Hiển thị ngày tương ứng */}
-                                    </Text>
-                                </TouchableOpacity>
-                            );
-                        })}
+                        {daysOfWeek.map((day) => (
+                            <TouchableOpacity key={day} onPress={() => handleChangeDate(day)} style={[scheduleStyles.dayContainer,
+                            selectedDay === day && scheduleStyles.selectedDay]}>
+                                <View>
+                                    <Text style={[scheduleStyles.dayText, selectedDay === day && scheduleStyles.selectedDayText]}>{getDayNumber(day)}</Text>
+                                    <Text style={[scheduleStyles.dayText, selectedDay === day && scheduleStyles.selectedDayText]}>{day}</Text>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
                     </View>
                 </View>
 
                 <View style={scheduleStyles.flatListContainer}>
-                    <FlatList
-                        contentContainerStyle={scheduleStyles.flatListContent}
-                        data={courseList}
-                        renderItem={renderCourseItem}
-                        keyExtractor={(item, index) => index.toString()}
-                        style={scheduleStyles.flatList}
-                    />
+                    {filteredSchedule && (
+                        <FlatList
+                            contentContainerStyle={scheduleStyles.flatListContent}
+                            data={filteredSchedule}
+                            renderItem={renderScheduleItem}
+                            keyExtractor={(item, index) => index.toString()}
+                            style={scheduleStyles.flatList}
+                        />
+                    )}
                 </View>
             </View>
         </View>
+    );
+};
 
-    )
-}
 const { height } = Dimensions.get('window'); // Lấy chiều dài thiết bị
 const scheduleStyles = StyleSheet.create({
     container: {
@@ -222,12 +287,6 @@ const scheduleStyles = StyleSheet.create({
         fontWeight: '700',
         color: 'white'
     },
-    selectDateText: {
-        fontSize: 14,
-        fontFamily: 'Inter-Bold',
-        textAlign: 'center',
-        color: 'white'
-    },
     courseCard: {
         width: 350,
         height: 120,
@@ -238,9 +297,9 @@ const scheduleStyles = StyleSheet.create({
         borderColor: '#BABABA',
     },
     courseContent: {
-        margin: 15,
+        margin: 10,
         flex: 1,
-        flexDirection: 'row',
+        flexDirection: 'column',
     },
     image: {
         width: 86,
@@ -316,6 +375,6 @@ const scheduleStyles = StyleSheet.create({
     flatList: {
         flexGrow: 1,
     },
-})
+});
 
-export default Schedule
+export default Schedule;
