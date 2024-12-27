@@ -26,8 +26,9 @@ export type RootStackParamList = {
 
 export default function Index() {
   const {user} = useClerk()
+  const req = {clerkUserID: user?.id}
   const enroll = async(id:any) => {
-    const response = await http().put(`/enroll-course/${id}`, {clerkUserID: user?.id})
+    const response = await http().put(`/enroll-course/${id}`, req)
     console.log(response)
   }
   const [courses, setCourses] = useState<Course[]>([]); // Biến để lưu dữ liệu
