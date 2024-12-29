@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/clerk-expo'
 import { Link, router } from 'expo-router'
-import { Text, View, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView } from 'react-native'
+import { Text, View, StyleSheet, Image, TouchableOpacity, FlatList, SafeAreaView, Alert } from 'react-native'
 import teacher from '../../../assets/images/teacher.png'
 import { useNavigation } from '@react-navigation/native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
@@ -25,9 +25,9 @@ export type RootStackParamList = {
 
 
 export default function Index() {
-  const {user} = useClerk()
-  const req = {clerkUserID: user?.id}
-  const enroll = async(id:any) => {
+  const { user } = useClerk()
+  const req = { clerkUserID: user?.id }
+  const enroll = async (id: any) => {
     const response = await http().put(`/enroll-course/${id}`, req)
     console.log(response)
   }
@@ -58,19 +58,19 @@ export default function Index() {
   const getCourses = async () => {
     try {
       const response = await axios.get<any>(
-        `http://10.0.2.2:5000/api/courses`, 
+        `http://10.0.2.2:5000/api/courses`,
       );
-     
+
       const courseData = response.data.map((course: any) => ({
         courseID: course.courseID,
         name: course.name,
         teachers: course.teachers,
         imageUrl: teacher
-       
+
       }));
 
       setCourses(courseData);  // Lưu mảng khóa học vào state
-     
+
     } catch (error) {
       console.error("Error fetching role:", error);
     }
@@ -141,14 +141,14 @@ export default function Index() {
   //     instructor: "Mỹ Quế Lan",
   //     imageUrl: teacher // Replace with actual image URL
   //   },
-   
+
   // ];
 
   const renderCourse = ({ item }: { item: Course }) => <CourseCard course={item} />;
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
   return (
-    <View style={{flex:1}}>
+    <View style={{ flex: 1 }}>
       <SignedIn>
         <View style={styles.headerNav}>
           <Text style={styles.headerTitle}>Danh sách khóa học</Text>
@@ -159,7 +159,7 @@ export default function Index() {
             />
           </TouchableOpacity>
         </View>
-        <SafeAreaView style={{flex:1}}>
+        <SafeAreaView style={{ flex: 1 }}>
           <FlatList
             data={courses}
             keyExtractor={(item) => item.courseID}

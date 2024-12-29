@@ -7,6 +7,7 @@ import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { RootDrawerParamList } from "../../_layout";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { http } from "@/http/http";
+import { useClerk } from "@clerk/clerk-expo";
 
 export default function CourseDetail() {
   const { id } = useLocalSearchParams();
@@ -18,41 +19,46 @@ export default function CourseDetail() {
     additional: false,
   });
 
-const [course, setCourse] = useState<any>()
+  const [course, setCourse] = useState<any>()
+  const { user } = useClerk()
+  const req = { clerkUserID: user?.id }
+  const enroll = async (id: any) => {
+    const response = await http().put(`/enroll-course/${id}`, req)
+    console.log(response)
+  }
 
-
-  const getCourseDetails = async() => {
-    try{
+  const getCourseDetails = async () => {
+    try {
       const response = await http().get(`/course-detail/${id}`)
-    const courseData = {
-      
-      title: response.data.course.name,
-      instructor: response.data.course.teachers[0][0],
-      studentCount: response.data.course.currentStudent,
-      studentLimit: response.data.course.studentLimit,
-      overview: response.data.course.sumary,
-      objectives: response.data.course.target,
-      schedule: response.data.course.classes[0].schedule,
-      rating:response.data.course.rating,
-      vote:response.data.course.totalVote,
+      const courseData = {
 
-    }
-    setCourse(courseData)
-    console.log(response.data.course.name)
-    }catch(error){ 
+        title: response.data.course.name,
+        instructor: response.data.course.teachers[0][0],
+        studentCount: response.data.course.currentStudent,
+        studentLimit: response.data.course.studentLimit,
+        overview: response.data.course.sumary,
+        objectives: response.data.course.target,
+        schedule: response.data.course.classes[0].schedule,
+        rating: response.data.course.rating,
+        vote: response.data.course.totalVote,
+
+      }
+      setCourse(courseData)
+      console.log(response.data.course.name)
+    } catch (error) {
 
       console.error("Error fetching role:", error);
     }
-    }
-    
-          
-      
+  }
 
-  useEffect(()=>{getCourseDetails()},[])
+
+
+
+  useEffect(() => { getCourseDetails() }, [])
 
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
 
-  const [expandedSections, setExpandedSections] = useState<number[]>([]); 
+  const [expandedSections, setExpandedSections] = useState<number[]>([]);
 
   let index = 0
 
@@ -79,7 +85,7 @@ const [course, setCourse] = useState<any>()
   };
 
   return (
-    <View style={{ flex: 1 , marginBottom:20}}>
+    <View style={{ flex: 1, marginBottom: 20 }}>
       {/*Header*/}
       <View style={styles.headerNav}>
         <View style={styles.headerContent}>
@@ -111,7 +117,7 @@ const [course, setCourse] = useState<any>()
             </View>
           </View>
           <View style={{ flexDirection: 'row', marginBottom: 10 }}>
-            <TouchableOpacity style={[styles.registerButton, {  }]} onPress={() => alert("Đăng ký khóa học thành công")}>
+            <TouchableOpacity style={[styles.registerButton, {}]} onPress={() => enroll(id)}>
               <Text style={styles.registerText}>Đăng ký</Text>
             </TouchableOpacity>
             <Text style={styles.studentCount}>Sĩ số: {course && course.studentCount}/{course && course.studentLimit}</Text>
@@ -128,10 +134,10 @@ const [course, setCourse] = useState<any>()
               color="black" />
           </TouchableOpacity>
           {sections.overview && (
-            course.overview.map((item : any, index:any) => (
+            course.overview.map((item: any, index: any) => (
               <View key={index} style={styles.scheduleContainer}>
                 <Text style={styles.sectionContent}>- {item}</Text>
-             </View>))
+              </View>))
           )}
 
           {/* Section 2: Objectives */}
@@ -143,10 +149,10 @@ const [course, setCourse] = useState<any>()
               color="black" />
           </TouchableOpacity>
           {sections.objectives && (
-             course.objectives.map((item : any, index:any) => (
+            course.objectives.map((item: any, index: any) => (
               <View key={index} style={styles.scheduleContainer}>
                 <Text style={styles.sectionContent}>- {item}</Text>
-             </View>))
+              </View>))
           )}
 
           {/* Section 3: Schedule */}
@@ -157,11 +163,11 @@ const [course, setCourse] = useState<any>()
               size={25}
               color="black" />
           </TouchableOpacity>
-             {sections.schedule &&
-                      course.schedule.map((item : any, index:any) => (
-                        <View key={index} style={styles.scheduleContainer}>
-                          <Text style={styles.sectionContent}>- {item}</Text>
-                       </View>))}
+          {sections.schedule &&
+            course.schedule.map((item: any, index: any) => (
+              <View key={index} style={styles.scheduleContainer}>
+                <Text style={styles.sectionContent}>- {item}</Text>
+              </View>))}
 
           {/* Section 4: Additional Info */}
           <TouchableOpacity onPress={() => toggleSection("additional")} style={styles.section}>
@@ -189,23 +195,23 @@ const styles = StyleSheet.create({
 
 
   },
-  headerNav:{
-    flexDirection: 'row', 
-        alignItems: 'center', // Vertical alignment
-        justifyContent: 'space-between', // Space out items
-        height: 92, // Custom header height
-        backgroundColor: '#2A58BA', // Background color
+  headerNav: {
+    flexDirection: 'row',
+    alignItems: 'center', // Vertical alignment
+    justifyContent: 'space-between', // Space out items
+    height: 92, // Custom header height
+    backgroundColor: '#2A58BA', // Background color
   },
 
-  headerContent:{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  back:{
+  headerContent: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
+  back: {
     width: 25,
     height: 25,
     marginTop: 30,
     marginLeft: 10,
     resizeMode: 'contain',
   },
-  headerTitle:{
+  headerTitle: {
     fontSize: 20, // Kích thước chữ tiêu đề header
     color: 'white', // Màu chữ tiêu đề
     marginTop: 30,
@@ -225,11 +231,13 @@ const styles = StyleSheet.create({
     flex: 1
 
   },
-  section:{flexDirection: 'row',
+  section: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 5,
-    paddingHorizontal: 20,},
+    paddingHorizontal: 20,
+  },
   topContainer: {
     flexDirection: "row",
     marginBottom: 16,
@@ -299,21 +307,21 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 10,
     marginBottom: 8,
-    flexWrap:'wrap',
-    width:'98%',
+    flexWrap: 'wrap',
+    width: '98%',
   },
   scheduleContainer: {
-    width:'98%',
+    width: '98%',
     marginBottom: 8,
   },
   scheduleTitle: {
     fontSize: 16,
-   
+
     fontWeight: "bold",
     color: "#333",
     marginBottom: 4,
-    flexWrap:'wrap',
-    width:'98%',
+    flexWrap: 'wrap',
+    width: '98%',
   },
   scheduleDetail: {
     fontSize: 14,

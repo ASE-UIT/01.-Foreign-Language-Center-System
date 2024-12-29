@@ -44,26 +44,32 @@ const CourseCard: React.FC<{ course: any }> = ({ course }) => (
   </View>
 );
 export default function Mycourse() {
-const [courses, setCourses] = useState<any[]>([]); // Biến để lưu dữ liệu
-const {user} = useClerk()
+  const [courses, setCourses] = useState<any[]>([]); // Biến để lưu dữ liệu
+  const { user } = useClerk()
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await getCourses();
+    setRefreshing(false);
+  };
   const getCourses = async () => {
     try {
       const response = await axios.get<any>(
-        `http://10.0.2.2:5000/api/student-information?clerkUserID=${user?.id}`, 
+        `http://10.0.2.2:5000/api/student-information?clerkUserID=${user?.id}`,
       );
-     
+
       const courseData = response.data.courses.map((course: any) => ({
         courseID: course.courseID,
         name: course.courseName,
         teachers: course.classes[0].teacher,
         imageUrl: teacher
-       
+
       }));
 
       setCourses(courseData);  // Lưu mảng khóa học vào state
 
-      console.log(response.data.courses[0].courseID)
-     
+
     } catch (error) {
       console.error("Error fetching role:", error);
     }
@@ -150,28 +156,29 @@ const {user} = useClerk()
   const renderCourse = ({ item }: { item: any }) => <CourseCard course={item} />;
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
   return (
-    <View style={{flex:1}}>
-      
-        <View style={styles.headerNav}>
-                  <Text style={styles.headerTitle}>Khóa học của bạn</Text>
-                  <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                    <Image
-                      source={require('../../../assets/images/menu.png')}
-                      style={styles.menu}
-                    />
-                  </TouchableOpacity>
-                </View>
-        <SafeAreaView style={{flex:2}}>
-          <FlatList
-            data={courses}
-            keyExtractor={(item) => item.courseID}
-            renderItem={renderCourse}
-            contentContainerStyle={{flexGrow: 1, paddingBottom:20}}
+    <View style={{ flex: 1 }}>
 
+      <View style={styles.headerNav}>
+        <Text style={styles.headerTitle}>Khóa học của bạn</Text>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Image
+            source={require('../../../assets/images/menu.png')}
+            style={styles.menu}
           />
-        </SafeAreaView>
+        </TouchableOpacity>
+      </View>
+      <SafeAreaView style={{ flex: 2 }}>
+        <FlatList
+          data={courses}
+          keyExtractor={(item) => item.courseID}
+          renderItem={renderCourse}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 20 }}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+        />
+      </SafeAreaView>
 
-    
+
     </View>
   )
 }
